@@ -243,6 +243,20 @@ Incluir mini-resumo de fluxo: quantos itens entraram, quantos foram completados/
 
 Se houve gap de mais de 3 dias sem interação: priorizar brain dump fresco. Perguntar "o que está na sua cabeça agora?" é mais produtivo do que reconstruir tudo que aconteceu.
 
+### 13. FEEDBACK PRO PRUMO
+
+Se {{USER_NAME}} mencionar feedback, bug, sugestão ou melhoria sobre o sistema Prumo em si (não sobre o conteúdo da pauta):
+
+1. Capturar o que foi dito (pedir pra elaborar se vago)
+2. Formatar: o que aconteceu, o que esperava, sugestão (se houver)
+3. Montar email com link mailto pronto:
+   - Para: tharso@gmail.com
+   - Subject: `PRUMO-FEEDBACK: [resumo curto]`
+   - Body: feedback formatado + metadados ({{AGENT_NAME}}, tom configurado, data do setup)
+4. Apresentar com link clicável. Um clique pra enviar.
+
+Na revisão semanal, incluir micro-prompt: "Algum feedback sobre o Prumo em si? Bug, ideia, coisa que te irritou?"
+
 ---
 
 ## Padrão de tags

@@ -204,6 +204,65 @@ Se o usuário parecer estar "testando" com itens genéricos ou fake ("comprar le
 
 ---
 
+## Feedback loop
+
+O Prumo tem um canal nativo de feedback para o criador. Isso é fundamental: o feedback mais valioso vem de quem usa o sistema no dia a dia, e essas pessoas não vão abrir issues no GitHub.
+
+### Como funciona
+
+O agente reconhece variações naturais de "feedback pro Prumo":
+- "feedback: achei o briefing confuso"
+- "quero dar um feedback pro prumo"
+- "tem uma coisa que podia melhorar no sistema"
+- "bug no prumo"
+
+Quando detectar, o agente:
+
+1. **Captura** o que o usuário disse (pode pedir pra elaborar se for vago)
+2. **Formata** em estrutura limpa: o que aconteceu, o que esperava, sugestão (se houver)
+3. **Monta o email** com link `mailto:` pronto:
+   - To: tharso@gmail.com
+   - Subject: `PRUMO-FEEDBACK: [resumo curto]`
+   - Body: feedback formatado + metadados (nome do agente, data do setup, tom configurado)
+4. **Apresenta** pro usuário: mostra o email montado e oferece o link clicável
+5. O usuário **clica e envia** (um toque)
+
+Exemplo de apresentação ao usuário:
+
+```
+Montei o feedback pra mandar pro criador do Prumo:
+
+---
+**Assunto:** PRUMO-FEEDBACK: Briefing não mostra itens por prioridade
+**Para:** tharso@gmail.com
+
+O briefing diário lista os itens na ordem que entraram, mas seria mais útil
+ver os urgentes primeiro. Quando tem muita coisa, os itens quentes se perdem
+no meio da lista.
+
+Sugestão: agrupar por urgência (quente → andamento → agendado).
+
+[Prumo v1.0 | Agente: "Atlas" | Tom: direto | Setup: 13/02/2026]
+---
+
+[Clica aqui pra enviar](mailto:...)
+
+Só apertar "Enviar" no email que abre. Sem editar nada (mas pode, se quiser).
+```
+
+### Onde isso entra no CLAUDE.md gerado
+
+Na seção de regras de ouro, adicionar como regra 13:
+
+**REGRA 13: FEEDBACK PRO PRUMO**
+Se o usuário mencionar feedback, bug, sugestão ou melhoria do sistema Prumo em si (não do conteúdo da pauta), montar email formatado com link mailto pronto para tharso@gmail.com com subject "PRUMO-FEEDBACK: [resumo]". Incluir no body: descrição do feedback, metadados do sistema (nome do agente, tom, data do setup). Apresentar pro usuário com link clicável. Um clique pra enviar.
+
+### Na revisão semanal
+
+Na revisão de domingo, incluir um micro-prompt: "Algum feedback sobre o Prumo em si? Bug, ideia, coisa que te irritou? Monto o email em 5 segundos." Isso garante coleta passiva e recorrente sem ser invasivo.
+
+---
+
 ## Reconfiguração
 
 Se o CLAUDE.md já existe na pasta, o sistema já está configurado. Oferecer:

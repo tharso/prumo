@@ -12,7 +12,7 @@
       "name": "prumo",
       "source": ".",
       "description": "Sistema de organização de vida que transforma o Claude em interface única para capturar, processar, lembrar e cobrar. Setup conversacional em 10 etapas. Funciona como sparring partner que não deixa pratos caírem.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "Tharso"
       },

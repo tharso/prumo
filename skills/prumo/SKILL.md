@@ -154,7 +154,27 @@ Após coletar todas as respostas:
 3. Ler `references/file-templates.md` → gerar arquivos auxiliares
 4. Gerar todos os arquivos na pasta workspace do usuário
 
-**Arquivos a gerar:**
+**⚠️ Proteção de arquivos existentes:**
+
+Antes de gerar QUALQUER arquivo, verificar se ele já existe na pasta do usuário. Isso é crítico em cenários de reconfiguração, migração, ou re-setup onde a pasta já contém dados acumulados.
+
+Regras de proteção:
+
+| Arquivo | Se já existir |
+|---------|---------------|
+| CLAUDE.md | **Sobrescrever** (é o objetivo do setup). Antes, criar backup em `_backup/CLAUDE.md.YYYY-MM-DD` e informar o usuário. |
+| PRUMO-CORE.md | **Sobrescrever** (atualizável por design, sempre recuperável do repo). Sem backup necessário. |
+| PAUTA.md, INBOX.md, REGISTRO.md, IDEIAS.md | **NÃO sobrescrever.** Informar: "Encontrei [arquivo] com conteúdo existente. Mantendo o atual." |
+| Pessoal/PESSOAS.md, Referencias/INDICE.md | **NÃO sobrescrever.** Informar: "Encontrei [arquivo] com conteúdo existente. Mantendo o atual." |
+| [Area]/README.md | **NÃO sobrescrever.** Informar: "A pasta [Area] já tem um README com contexto. Mantendo." |
+| Pastas (_logs/, Inbox4Mobile/, Referencias/) | **Criar apenas se não existirem.** |
+
+Ao final da Etapa 9, mostrar resumo claro:
+- **Criados** (novos): listar arquivos que não existiam
+- **Mantidos** (existentes): listar arquivos preservados
+- **Sobrescritos**: CLAUDE.md e/ou PRUMO-CORE.md (com localização do backup, se aplicável)
+
+**Arquivos a gerar (respeitando proteção acima):**
 
 | Arquivo | Fonte | Descrição |
 |---------|-------|-----------|
@@ -313,7 +333,7 @@ Se o CLAUDE.md já existe na pasta, o sistema já está configurado. Oferecer:
 2. **Mudar tom**: Atualizar a seção de tom no CLAUDE.md
 3. **Ajustar rituais**: Atualizar horários/dias no CLAUDE.md
 4. **Adicionar integração**: Atualizar seção de integrações no CLAUDE.md
-5. **Reset completo**: Reconfigurar do zero (manter dados existentes, regerar CLAUDE.md)
+5. **Reset completo**: Reconfigurar do zero. Usa a mesma proteção da Etapa 9: CLAUDE.md e PRUMO-CORE.md são regenerados (com backup do CLAUDE.md), todos os outros arquivos com dados acumulados são preservados.
 
 Sempre atualizar o changelog no final do CLAUDE.md após qualquer reconfiguração.
 
@@ -330,6 +350,9 @@ Sempre atualizar o changelog no final do CLAUDE.md após qualquer reconfiguraç�
 ---
 
 ## Changelog
+
+### v2.1 (13/02/2026)
+- **Proteção de arquivos no setup**: Etapa 9 agora verifica se arquivos já existem antes de gerar. Dados acumulados (PAUTA, REGISTRO, IDEIAS, READMEs) nunca são sobrescritos. CLAUDE.md ganha backup automático antes de regenerar. Seguro para re-setup, migração e reconfiguração.
 
 ### v2.0 (13/02/2026)
 - **Arquitetura de dois arquivos**: CLAUDE.md (pessoal, imutável) + PRUMO-CORE.md (sistema, atualizável). Permite updates sem perder personalizações.

@@ -149,16 +149,17 @@ Usar AskUserQuestion:
 
 Após coletar todas as respostas:
 
-1. Ler `references/claude-md-template.md`
-2. Preencher os placeholders com as respostas do setup
-3. Ler `references/file-templates.md`
+1. Ler `references/claude-md-template.md` → gerar CLAUDE.md (configuração pessoal)
+2. Copiar `references/prumo-core.md` → gerar PRUMO-CORE.md (motor do sistema, cópia direta)
+3. Ler `references/file-templates.md` → gerar arquivos auxiliares
 4. Gerar todos os arquivos na pasta workspace do usuário
 
 **Arquivos a gerar:**
 
 | Arquivo | Fonte | Descrição |
 |---------|-------|-----------|
-| CLAUDE.md | claude-md-template.md | Coração do sistema. Instruções pro agente. |
+| CLAUDE.md | claude-md-template.md | Configuração pessoal. Nunca atualizado automaticamente. |
+| PRUMO-CORE.md | prumo-core.md | Motor do sistema. Atualizável automaticamente. |
 | PAUTA.md | file-templates.md | Estado atual. Itens quentes, andamento, agendados. |
 | INBOX.md | file-templates.md | Itens não processados. |
 | REGISTRO.md | file-templates.md | Audit trail de itens processados. |
@@ -170,8 +171,11 @@ Após coletar todas as respostas:
 | Referencias/ | Criar pasta vazia | Para material de referência. |
 | Referencias/INDICE.md | file-templates.md | Índice de material de referência. |
 
-**IMPORTANTE sobre o CLAUDE.md gerado:**
-O CLAUDE.md é o arquivo mais importante. Ele contém TODAS as instruções de comportamento do agente. Após o setup, o Claude vai ler esse arquivo automaticamente no início de cada sessão. O SKILL.md do Prumo não precisa mais ser invocado para o uso diário — o CLAUDE.md cuida de tudo.
+**Arquitetura de dois arquivos:**
+O sistema usa dois arquivos separados por design. O `CLAUDE.md` contém apenas a configuração pessoal (nome, áreas, tom, integrações) e nunca é tocado por atualizações. O `PRUMO-CORE.md` contém todas as regras e rituais do sistema e pode ser atualizado automaticamente quando sair versão nova. Isso permite evoluir o motor sem perder personalizações.
+
+**Comando `/briefing`:**
+Após o setup, o usuário pode usar `/briefing` para acionar o morning briefing completo. O comando dispara a skill `briefing` que lê ambos os arquivos, verifica atualizações, processa todos os canais de inbox, e apresenta o briefing do dia.
 
 ### Etapa 10: Primeiro dump (obrigatório)
 
@@ -326,6 +330,12 @@ Sempre atualizar o changelog no final do CLAUDE.md após qualquer reconfiguraç�
 ---
 
 ## Changelog
+
+### v2.0 (13/02/2026)
+- **Arquitetura de dois arquivos**: CLAUDE.md (pessoal, imutável) + PRUMO-CORE.md (sistema, atualizável). Permite updates sem perder personalizações.
+- **Auto-update**: PRUMO-CORE.md verifica versão no GitHub e oferece atualização automática. Mensagem explícita de que dados/personalizações não são afetados.
+- **Comando /briefing**: Skill dedicada que executa o morning briefing completo (7 passos). Dispara com `/briefing`.
+- **Arquivo VERSION no repo**: Controle de versão simplificado para o mecanismo de update.
 
 ### v1.2 (13/02/2026)
 - **Datas em itens pendentes**: Regra 3 agora exige `(desde DD/MM)` ao mover itens pro destino. Torna o envelhecimento visível.

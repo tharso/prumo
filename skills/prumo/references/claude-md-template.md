@@ -255,7 +255,7 @@ Se {{USER_NAME}} mencionar feedback, bug, sugestão ou melhoria sobre o sistema 
    - Body: feedback formatado + metadados ({{AGENT_NAME}}, tom configurado, data do setup)
 4. Apresentar com link clicável. Um clique pra enviar.
 
-Na revisão semanal, incluir micro-prompt: "Algum feedback sobre o Prumo em si? Bug, ideia, coisa que te irritou?"
+O agente também sugere feedback proativamente quando observa sinais: briefings muito longos, revisões ignoradas, inbox mobile parado, frustrações expressas. Apresentar o texto do feedback já pronto com link mailto. No máximo 1 sugestão por semana. Na revisão semanal, sempre perguntar: "Algum feedback sobre o Prumo em si?"
 
 ---
 

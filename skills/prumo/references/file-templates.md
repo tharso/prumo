@@ -19,7 +19,7 @@ _Nada ainda. Faça seu primeiro dump pra popular._
 
 ## Em andamento
 
-_Itens que têm progresso ativo._
+_Itens que têm progresso ativo. Formato: `- [Tag] Descrição. Próxima ação: X. (desde DD/MM)`_
 
 ## Agendado / Lembretes
 
@@ -34,6 +34,14 @@ _Coisas que precisam acontecer, mas não essa semana._
 ## Hibernando (existe mas não está ativo)
 
 _Projetos ou tarefas que existem mas não estão recebendo atenção agora._
+
+## Semana atual — Concluídos (DD/MM-DD/MM)
+
+_Itens concluídos nesta semana. Visibilidade do progresso._
+
+## Semana passada — Concluídos (DD/MM-DD/MM)
+
+_Concluídos da semana anterior. Limpo automaticamente na revisão semanal._
 
 ---
 

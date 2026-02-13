@@ -322,3 +322,25 @@ Sempre atualizar o changelog no final do CLAUDE.md após qualquer reconfiguraç�
 - Todas as datas no formato DD/MM/AAAA
 - Tags usam formato `[Area]` ou `[Area/Subarea]`
 - O fuso padrão é o do usuário (perguntar se necessário, default: América/São_Paulo)
+
+---
+
+## Changelog
+
+### v1.2 (13/02/2026)
+- **Datas em itens pendentes**: Regra 3 agora exige `(desde DD/MM)` ao mover itens pro destino. Torna o envelhecimento visível.
+- **Links clicáveis**: Regra 1 agora exige `computer://` links ao referenciar arquivos na conversa. Entregar, não só informar.
+- **Seção de concluídos na PAUTA**: Template da PAUTA agora inclui "Semana atual — Concluídos" e "Semana passada — Concluídos". Rotação automática na revisão semanal.
+- **Renomeação descritiva**: Regra 3 agora exige renomeação autoexplicativa ao mover qualquer arquivo do inbox (não só referências).
+
+### v1.1 (13/02/2026)
+- Feedback loop nativo (regra 13 no CLAUDE.md)
+- Feedback proativo (detecção de sinais + sugestão automática)
+- Template do CLAUDE.md com regra 13
+
+### v1.0 (12/02/2026)
+- Setup wizard com 10 etapas
+- Templates: CLAUDE.md, PAUTA.md, INBOX.md, REGISTRO.md, IDEIAS.md, PESSOAS.md
+- 3 tons de comunicação (direto, equilibrado, gentil)
+- Captura mobile (iOS shortcut + email)
+- Integrações: Gmail, Google Calendar

@@ -123,6 +123,8 @@ Revisar toda a PAUTA.md:
 - Atualizar `Pessoal/PESSOAS.md` (pendências, follow-ups, quem sumiu)
 - Revisar `IDEIAS.md` (alguma ideia amadureceu? migrar para PAUTA se sim)
 - Mini-resumo de fluxo: itens entrados, completados, pendentes, mais antigo parado
+- Mover itens de "Semana atual — Concluídos" para "Semana passada — Concluídos"
+- Limpar "Semana passada" anterior (já tem 2+ semanas, não precisa mais)
 
 Registrar resumo em `_logs/YYYY-WXX.md`
 
@@ -171,6 +173,8 @@ Após qualquer interação que modifique o estado do sistema:
 
 A memória do sistema são os arquivos, não o contexto da conversa. Isso não é opcional.
 
+**Links clicáveis:** Sempre que referenciar um arquivo do sistema na conversa (transcrição salva, documento movido, referência indexada), incluir link clicável: `[Descrição](computer:///caminho/completo/do/arquivo.ext)`. Nunca expor caminhos internos como texto cru. O link é a interface.
+
 ### 2. SEMPRE LER ANTES DE AGIR
 
 No início de cada sessão (especialmente se for um chat novo):
@@ -189,10 +193,12 @@ O inbox tem múltiplos canais: INBOX.md, Inbox4Mobile/{{#SE_GMAIL}}, e emails "{
 Itens no inbox devem ser:
 - Categorizados (qual área/projeto?)
 - Transformados em ação (qual a próxima ação concreta?)
-- Movidos para PAUTA.md ou para o README.md da área
+- Movidos para PAUTA.md ou README.md da área, **com renomeação descritiva** ao salvar no destino. O nome do arquivo deve ser autoexplicativo: `Fonte_Titulo-Curto_Ano.extensão` para referências, `Descricao_Contexto.extensão` para documentos pessoais. Ninguém deveria precisar abrir um arquivo pra saber o que tem dentro.
 - Fisicamente removidos do inbox (deletar original). Documentar no REGISTRO antes de deletar.
 
 **Apresentação**: Numerar os itens do inbox ao apresentá-los. Oferecer alternativas de categorização/ação para agilizar decisão.
+
+Ao mover itens para PAUTA.md ou README de área, sempre incluir a data de entrada no formato `(desde DD/MM)`. Isso torna visível o envelhecimento de cada item e facilita cobranças na revisão semanal.
 
 Inbox vazio = sistema saudável.
 

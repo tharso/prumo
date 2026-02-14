@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.3**
+> **prumo_version: 3.4**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -37,6 +37,19 @@
 **INBOX.md**: Onde itens novos entram antes de serem processados. Deve estar vazio após cada sessão.
 
 **README.md em cada pasta**: Contexto da área/projeto, pendências ativas, histórico.
+
+---
+
+## Comandos disponíveis
+
+| Comando | O que faz |
+|---------|-----------|
+| `/prumo:setup` | Configuração inicial ou reconfiguração (áreas, tom, rituais) |
+| `/prumo:briefing` | Rotina matinal completa (inbox + calendário + pauta + briefing) |
+| `/prumo:inbox` | Processa inbox sob demanda (todos os canais) |
+| `/prumo:dump` | Captura rápida — o usuário despeja info e o Prumo organiza |
+| `/prumo:revisao` | Revisão semanal completa (análise por área, limpeza, prioridades) |
+| `/prumo:status` | Dashboard rápido — números, alertas, recomendação em uma tela |
 
 ---
 
@@ -270,6 +283,11 @@ No início de cada sessão (ou no briefing), o agente deve verificar se há atua
 
 ## Changelog do Core
 
+### v3.4 (14/02/2026)
+- `/prumo:prumo` renomeado para `/prumo:setup` (mais claro)
+- Novos comandos: `/prumo:inbox` (processar inbox sob demanda), `/prumo:dump` (captura rápida), `/prumo:revisao` (revisão semanal), `/prumo:status` (dashboard rápido)
+- Seção "Comandos disponíveis" adicionada ao Core
+
 ### v3.3 (14/02/2026)
 - Auto-update bloqueante: quando há atualização, o briefing PARA e mostra só o aviso com changelog. Não roda o briefing junto. Espera o usuário decidir (atualizar agora / depois). Se atualizar, roda o briefing na versão nova.
 
@@ -298,4 +316,4 @@ No início de cada sessão (ou no briefing), o agente deve verificar se há atua
 
 ---
 
-*Prumo Core v3.3 — https://github.com/tharso/prumo*
+*Prumo Core v3.4 — https://github.com/tharso/prumo*

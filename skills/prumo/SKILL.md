@@ -1,8 +1,7 @@
 ---
-name: prumo
+name: setup
 description: >
-  Sistema de organização de vida pessoal que transforma o Claude em interface única
-  para capturar, processar, lembrar e cobrar. Use esta skill quando o usuário quiser
+  Setup e configuração do Prumo. Use esta skill quando o usuário quiser
   configurar o Prumo ("setup", "configurar prumo", "montar meu sistema"),
   adicionar novas áreas de vida, reconfigurar tom ou rituais. Também dispara com:
   "/Prumo", "sistema de produtividade", "quero parar de esquecer coisas",
@@ -30,7 +29,7 @@ A solução é um agente que funciona como interface única para:
 
 ### 1. Setup (primeiro uso)
 Quando o usuário quer configurar o sistema pela primeira vez.
-Triggers: `/Prumo`, "configurar prumo", "setup", "montar sistema", "começar a usar".
+Triggers: `/prumo:setup`, "configurar prumo", "setup", "montar sistema", "começar a usar".
 
 ### 2. Reconfigurar
 Quando o sistema já existe e o usuário quer ajustar.
@@ -64,7 +63,7 @@ Como fazer:
 1. Feche esta conversa (o Prumo já está instalado, não perde nada)
 2. Na tela do Cowork, olhe abaixo e à esquerda da caixa de input — tem um ícone de pasta
 3. Clique nele e selecione a pasta onde quer organizar sua vida (pode ser uma existente ou criar uma nova)
-4. Comece uma nova conversa e digite /Prumo
+4. Comece uma nova conversa e digite /prumo:setup
 
 Vou estar aqui quando voltar."
 

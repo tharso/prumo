@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.4**
+> **prumo_version: 3.5**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -50,6 +50,7 @@
 | `/prumo:dump` | Captura rápida — o usuário despeja info e o Prumo organiza |
 | `/prumo:revisao` | Revisão semanal completa (análise por área, limpeza, prioridades) |
 | `/prumo:status` | Dashboard rápido — números, alertas, recomendação em uma tela |
+| `/prumo:menu` | Lista todos os comandos disponíveis |
 
 ---
 
@@ -283,6 +284,9 @@ No início de cada sessão (ou no briefing), o agente deve verificar se há atua
 
 ## Changelog do Core
 
+### v3.5 (14/02/2026)
+- Novo comando: `/prumo:menu` — lista todos os comandos disponíveis
+
 ### v3.4 (14/02/2026)
 - `/prumo:prumo` renomeado para `/prumo:setup` (mais claro)
 - Novos comandos: `/prumo:inbox` (processar inbox sob demanda), `/prumo:dump` (captura rápida), `/prumo:revisao` (revisão semanal), `/prumo:status` (dashboard rápido)
@@ -316,4 +320,4 @@ No início de cada sessão (ou no briefing), o agente deve verificar se há atua
 
 ---
 
-*Prumo Core v3.4 — https://github.com/tharso/prumo*
+*Prumo Core v3.5 — https://github.com/tharso/prumo*

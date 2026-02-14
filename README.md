@@ -21,12 +21,10 @@ O Claude vira seu co-piloto: captura tudo que entra na sua vida, organiza, e cob
 
 ## Instalação
 
-No Claude Desktop (Cowork mode), execute:
-
-```
-/plugin marketplace add tharso/prumo
-/plugin install prumo@prumo
-```
+1. [Baixe o plugin (.zip)](https://github.com/tharso/prumo/archive/refs/heads/main.zip)
+2. Abra o Claude Desktop → Cowork
+3. Clique em **Plugins** (sidebar) → **Upload plugin**
+4. Arraste o .zip (não precisa descompactar)
 
 Depois, basta dizer "configurar prumo" e o setup conversacional começa. Em ~14 minutos você tem tudo rodando.
 

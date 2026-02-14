@@ -5,7 +5,7 @@ description: >
   para capturar, processar, lembrar e cobrar. Use esta skill quando o usuário quiser
   configurar o Prumo ("setup", "configurar prumo", "montar meu sistema"),
   adicionar novas áreas de vida, reconfigurar tom ou rituais. Também dispara com:
-  "organizar minha vida", "sistema de produtividade", "quero parar de esquecer coisas",
+  "/Prumo", "sistema de produtividade", "quero parar de esquecer coisas",
   "life OS", "me ajuda a organizar", "tô perdido com tanta coisa". Se o usuário mencionar
   qualquer variação de "preciso de um sistema pra não deixar as coisas caírem", esta é a skill.
 ---
@@ -30,7 +30,7 @@ A solução é um agente que funciona como interface única para:
 
 ### 1. Setup (primeiro uso)
 Quando o usuário quer configurar o sistema pela primeira vez.
-Triggers: "configurar prumo", "setup", "montar sistema", "começar a usar".
+Triggers: `/Prumo`, "configurar prumo", "setup", "montar sistema", "começar a usar".
 
 ### 2. Reconfigurar
 Quando o sistema já existe e o usuário quer ajustar.
@@ -52,15 +52,29 @@ O setup é um wizard conversacional. **Uma pergunta por vez.** Nunca fazer mais 
 
 O Prumo precisa de uma pasta real no computador do usuário para funcionar. Sem isso, os arquivos vão para uma pasta temporária escondida no sistema que o usuário nunca vai encontrar.
 
-Verificar se o Cowork tem uma pasta de workspace selecionada pelo usuário (não a pasta temporária padrão). Se não tem:
+**Como detectar:** Verificar o path do workspace montado. Se contém `local-agent-mode-sessions` ou `outputs` sem relação com uma pasta do usuário, é a pasta temporária. Se o path aponta para algo como `/Users/.../Documents/...` ou qualquer caminho real do sistema de arquivos do usuário, é pasta real.
 
-1. Parar tudo e explicar: "Antes de começar, preciso que você selecione uma pasta no seu computador onde o Prumo vai organizar seus arquivos. Pode ser uma pasta que você já usa (tipo 'Documentos/MeusArquivos') ou uma nova (tipo 'Documentos/Prumo'). O importante é ser um lugar que faça sentido pra você."
-2. Instruir como selecionar: "No Cowork, clique no ícone de pasta na barra lateral e selecione a pasta desejada. Se precisar, crie uma nova pasta antes."
-3. **Se o usuário já tem uma estrutura organizada**, perguntar: "Você já tem uma pasta onde organiza suas coisas? Se sim, me diz qual e eu me adapto ao que já existe."
-4. **Esperar** o usuário confirmar que selecionou a pasta. NÃO prosseguir sem pasta real.
-5. Após a seleção, verificar o que já existe na pasta e informar: "Vi que você já tem [N] arquivos/pastas aqui. Vou respeitar tudo que já existe e só criar o que falta."
+**Se NÃO tem pasta real selecionada:**
 
-Se a pasta já estiver selecionada: confirmar com o usuário ("Vou usar a pasta [nome]. É aqui que você quer organizar?") e seguir.
+Parar tudo. Não fazer nenhuma pergunta do setup. Explicar de forma clara e direta:
+
+"Antes de começar, preciso que você selecione uma pasta no seu computador. Sem isso, os arquivos ficam numa pasta escondida que você não vai encontrar depois.
+
+Como fazer:
+1. Feche esta conversa (o Prumo já está instalado, não perde nada)
+2. Na tela do Cowork, olhe abaixo e à esquerda da caixa de input — tem um ícone de pasta
+3. Clique nele e selecione a pasta onde quer organizar sua vida (pode ser uma existente ou criar uma nova)
+4. Comece uma nova conversa e digite /Prumo
+
+Vou estar aqui quando voltar."
+
+**NÃO tentar contornar** (tipo "me diz o caminho e eu crio"). A seleção da pasta tem que ser feita ANTES de iniciar a conversa. Não dá pra mudar no meio. É uma limitação da plataforma.
+
+**Se TEM pasta real selecionada:**
+
+Confirmar com o usuário: "Vou usar a pasta [nome legível da pasta]. É aqui que você quer organizar?" Em seguida, verificar o que já existe e informar: "Vi que você já tem [N] arquivos/pastas aqui. Vou respeitar tudo que já existe e só criar o que falta."
+
+Seguir para Etapa 1.
 
 ### Etapa 1: Boas-vindas
 
@@ -392,6 +406,11 @@ Sempre atualizar o changelog no final do CLAUDE.md após qualquer reconfiguraç�
 ---
 
 ## Changelog
+
+### v3.1 (14/02/2026)
+- **Trigger `/Prumo`**: Comando principal de ativação trocado de "quero organizar minha vida" para `/Prumo`. Mais claro, sem soar autoajuda.
+- **Etapa 0 reescrita (detectar, não instruir)**: A Etapa 0 anterior tentava guiar a seleção de pasta no meio da conversa, o que é impossível no Cowork (pasta precisa ser escolhida ANTES de iniciar a sessão). Nova versão detecta automaticamente se a pasta é real ou temporária. Se for temporária, manda o usuário fechar, selecionar a pasta, e voltar. Sem workarounds.
+- **Localização correta do seletor**: Corrigido de "ícone de pasta na barra lateral" para "abaixo e à esquerda da caixa de input".
 
 ### v3.0 (14/02/2026)
 - **Etapa 0 — Verificação de pasta**: Setup agora começa verificando se o Cowork tem uma pasta real selecionada. Se não tem, guia o usuário a selecionar antes de qualquer pergunta. Se o usuário já tem estrutura organizada, adapta-se ao que existe.

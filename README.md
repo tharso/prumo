@@ -23,10 +23,11 @@ O Claude vira seu co-piloto: captura tudo que entra na sua vida, organiza, e cob
 
 1. [Baixe o plugin (.zip)](https://github.com/tharso/prumo/archive/refs/heads/main.zip)
 2. Abra o Claude Desktop → Cowork
-3. Clique em **Plugins** (sidebar) → **Upload plugin**
-4. Arraste o .zip (não precisa descompactar)
+3. Clique em **Plugins** (sidebar) → **"+"** → arraste o .zip
+4. Na tela do Cowork, **antes de iniciar a conversa**, clique no ícone de pasta (abaixo e à esquerda da caixa de input) e selecione onde quer organizar seus arquivos
+5. Digite **`/Prumo`** e o setup conversacional começa
 
-Depois, basta dizer "configurar prumo" e o setup conversacional começa. Em ~14 minutos você tem tudo rodando.
+Em ~14 minutos você tem tudo rodando.
 
 ## Landing page
 

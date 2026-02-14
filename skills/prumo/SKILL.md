@@ -14,7 +14,7 @@ description: >
 
 Prumo é um sistema de organização de vida que usa o Claude como interface única para gerenciar múltiplas áreas da vida. O nome vem de "estar no prumo" — alinhado, no eixo.
 
-O conceito central: tudo que entra na vida do usuário passa por um inbox, é processado, categorizado, e vira ação ou referência. O Claude funciona como agente que cobra, lembra, e não deixa pratos caírem.
+O conceito central: tudo que entra na vida do usuário passa por um inbox, é processado, categorizado, e vira ação ou referência. Pense no Prumo como um amigo que te lembra de tudo na hora certa, mas em vez de fazer assédio moral, te ajuda a resolver as coisas.
 
 ## Filosofia
 
@@ -42,12 +42,32 @@ Para determinar o modo: verificar se já existe um CLAUDE.md na pasta workspace 
 
 ## Fluxo de Setup
 
-O setup é um wizard conversacional. Usar AskUserQuestion quando possível para agilizar. O tom durante o setup é amigável e eficiente — a personalidade "ácida" começa depois, no uso diário.
+O setup é um wizard conversacional. **Uma pergunta por vez.** Nunca fazer mais de uma pergunta na mesma mensagem. Sempre oferecer opções claras via AskUserQuestion para que o usuário precise digitar o mínimo possível. O tom durante o setup é amigável e eficiente — a personalidade escolhida pelo usuário começa depois, no uso diário.
+
+**Princípio fundamental do setup:** Todas as decisões são reversíveis e vão sendo calibradas com o uso. Isso deve ser comunicado ao usuário logo no início e reforçado quando relevante. O objetivo é tirar pressão ("não preciso saber tudo agora") e passar confiança ("o sistema me conhece melhor com o tempo").
+
+### Etapa 0: Verificação de pasta
+
+**Esta etapa é obrigatória e acontece ANTES de qualquer pergunta.**
+
+O Prumo precisa de uma pasta real no computador do usuário para funcionar. Sem isso, os arquivos vão para uma pasta temporária escondida no sistema que o usuário nunca vai encontrar.
+
+Verificar se o Cowork tem uma pasta de workspace selecionada pelo usuário (não a pasta temporária padrão). Se não tem:
+
+1. Parar tudo e explicar: "Antes de começar, preciso que você selecione uma pasta no seu computador onde o Prumo vai organizar seus arquivos. Pode ser uma pasta que você já usa (tipo 'Documentos/MeusArquivos') ou uma nova (tipo 'Documentos/Prumo'). O importante é ser um lugar que faça sentido pra você."
+2. Instruir como selecionar: "No Cowork, clique no ícone de pasta na barra lateral e selecione a pasta desejada. Se precisar, crie uma nova pasta antes."
+3. **Se o usuário já tem uma estrutura organizada**, perguntar: "Você já tem uma pasta onde organiza suas coisas? Se sim, me diz qual e eu me adapto ao que já existe."
+4. **Esperar** o usuário confirmar que selecionou a pasta. NÃO prosseguir sem pasta real.
+5. Após a seleção, verificar o que já existe na pasta e informar: "Vi que você já tem [N] arquivos/pastas aqui. Vou respeitar tudo que já existe e só criar o que falta."
+
+Se a pasta já estiver selecionada: confirmar com o usuário ("Vou usar a pasta [nome]. É aqui que você quer organizar?") e seguir.
 
 ### Etapa 1: Boas-vindas
 
 Breve, sem enrolação:
-"Vou te fazer umas perguntas pra montar seu sistema de organização. Em 5 minutos você tem tudo rodando. O Prumo vai funcionar como seu co-piloto: captura tudo, organiza, e cobra quando algo fica parado."
+"Vou te fazer umas perguntas pra montar seu sistema de organização. Leva uns 10 minutos. O Prumo vai funcionar como um amigo que te lembra de tudo na hora certa e te ajuda a não deixar nada cair."
+
+Logo em seguida, reforçar: "Nenhuma resposta aqui é definitiva. O Prumo vai te conhecendo melhor com o uso e tudo pode ser ajustado depois."
 
 ### Etapa 2: Identidade
 
@@ -57,30 +77,52 @@ Usar AskUserQuestion:
 
 ### Etapa 3: Áreas de vida
 
-Esta é a etapa mais importante. Perguntar quais são as áreas principais da vida do usuário.
+Esta é a etapa mais importante. **Perguntar uma área por vez**, com opções claras. Nunca jogar todas as áreas na mesma pergunta.
 
-Oferecer exemplos mas não limitar. Áreas comuns:
-- Trabalho (emprego, startup, negócio próprio)
-- Projetos paralelos (frilas, side projects)
-- Pessoal (família, casa, saúde)
-- Admin (burocracia, finanças, documentos)
-- Desenvolvimento (estudo, carreira, certificações)
+Fluxo recomendado (uma pergunta por mensagem):
 
-Para cada área, perguntar sub-áreas/projetos. Exemplo:
-- Trabalho → "Empresa X", "Projeto Y"
-- Pessoal → "Família", "Casa", "Saúde"
+**Pergunta 1 — Trabalho:** "Primeiro, trabalho. Qual a sua situação?" Oferecer opções via AskUserQuestion:
+- Empregado (CLT, PJ, etc.)
+- Empreendedor / startup
+- Freelancer / autônomo
+- Mais de uma coisa ao mesmo tempo
+- Não trabalho atualmente
 
-NÃO insistir em detalhamento excessivo. O sistema pode (e vai) ser refinado com o uso. 3-6 áreas com 1-3 sub-áreas cada é suficiente.
+Conforme a resposta, fazer UMA pergunta de follow-up: "Qual o nome da empresa/projeto?" ou "Quais são os frilas/projetos ativos?"
 
-**Tags automáticas**: Após definir as áreas, gerar tags automaticamente. Para cada área "Trabalho" com sub-área "Startup X", criar tags `[Trabalho]` e `[Trabalho/Startup X]`. O usuário não precisa definir tags manualmente — elas derivam da estrutura.
+**Pergunta 2 — Projetos paralelos:** "Tem algum projeto pessoal, side project ou trabalho paralelo além do principal?"
+- Sim (pedir nome de cada, um por vez)
+- Não agora
+
+**Pergunta 3 — Vida pessoal:** "E a vida pessoal? Quais dessas áreas te importam mais pra organizar?" Oferecer multiselect:
+- Família
+- Saúde / exercício
+- Finanças / contas
+- Casa / manutenção
+- Outra (campo aberto)
+
+**Pergunta 4 — Burocracias:** "Tem burocracias que você precisa rastrear? Tipo documentos, processos, contas a pagar, renovações..."
+- Sim (pedir exemplos)
+- Nada urgente agora
+
+Ao final, confirmar: "Então suas áreas são: [lista]. Tá bom assim pra começar? Lembra que dá pra adicionar ou mudar a qualquer momento."
+
+NÃO insistir em detalhamento excessivo. O sistema vai se refinando com o uso. 3-6 áreas com 1-3 sub-áreas cada é suficiente. Comunicar isso: "Responde da melhor forma possível, sem estresse. O Prumo vai te conhecendo melhor durante o uso."
+
+**Tags automáticas**: Gerar tags automaticamente a partir das áreas definidas. Para cada área "Trabalho" com sub-área "Startup X", criar tags `[Trabalho]` e `[Trabalho/Startup X]`. O usuário não precisa definir tags manualmente.
 
 ### Etapa 4: Contexto pessoal e lembretes
 
-Perguntas que enriquecem o sistema (opcionais, mas valiosas):
-- Qual seu email principal? (para a seção de informações pessoais)
-- Tem filhos? (nomes, idades — permite criar lembretes como "quarta = lanche da escola")
-- Tem compromissos recorrentes que tende a esquecer? Coletar como lista. Ex: "Quarta = lanche da Nina", "Dia 10 = pagar aluguel", "Toda segunda = reunião de equipe".
-- Qual sua principal tendência? (Esquecer coisas / Procrastinar / Começar demais e terminar de menos / Hiperfoco que derruba outros pratos)
+**Uma pergunta por vez.** Cada uma dessas é uma mensagem separada:
+
+1. "Qual seu email principal?" (campo aberto)
+2. "Tem filhos?" → Se sim: "Nome e idade de cada um?" (Isso permite lembretes tipo "quarta = lanche da escola")
+3. "Tem compromissos recorrentes que você tende a esquecer? Tipo lanche da escola, contas no dia X, reuniões fixas..." → Coletar como lista
+4. "Qual a sua principal tendência?" Oferecer opções via AskUserQuestion:
+   - Esqueço coisas (se não tá na minha frente, não existe)
+   - Procrastino (especialmente quando envolve fricção)
+   - Começo demais e não termino
+   - Hiperfoco (mergulho em uma coisa e as outras caem)
 
 Usar a resposta sobre tendência para gerar o `{{PROBLEMA_PRINCIPAL}}` no template:
 - "Esquecer coisas" → "tendência a esquecer compromissos e pendências quando não estão na sua frente"
@@ -350,6 +392,13 @@ Sempre atualizar o changelog no final do CLAUDE.md após qualquer reconfiguraç�
 ---
 
 ## Changelog
+
+### v3.0 (14/02/2026)
+- **Etapa 0 — Verificação de pasta**: Setup agora começa verificando se o Cowork tem uma pasta real selecionada. Se não tem, guia o usuário a selecionar antes de qualquer pergunta. Se o usuário já tem estrutura organizada, adapta-se ao que existe.
+- **Uma pergunta por vez**: Todas as etapas do setup agora fazem uma pergunta por mensagem. Opções claras via AskUserQuestion, mínimo de digitação. UX radicalmente melhorada.
+- **Decisões reversíveis**: Comunicado desde o início que todas as escolhas do setup podem ser ajustadas depois. "O Prumo vai te conhecendo melhor com o uso."
+- **Tom mais acessível**: Removido "sócio chato", "Admin". Linguagem amigável durante setup ("amigo que te lembra de tudo na hora certa").
+- **Terminologia clara**: "Admin" → "Burocracias do dia a dia".
 
 ### v2.1 (13/02/2026)
 - **Proteção de arquivos no setup**: Etapa 9 agora verifica se arquivos já existem antes de gerar. Dados acumulados (PAUTA, REGISTRO, IDEIAS, READMEs) nunca são sobrescritos. CLAUDE.md ganha backup automático antes de regenerar. Seguro para re-setup, migração e reconfiguração.

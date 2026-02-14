@@ -20,15 +20,27 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
 
 ## Passo 2: Verificar atualização
 
+**⚠️ Este passo é BLOQUEANTE. Se houver atualização, NÃO prosseguir para o Passo 3 até o usuário decidir. Não rodar o briefing junto com o aviso de update.**
+
 1. Leia o campo `prumo_version` no topo do `PRUMO-CORE.md` local.
 2. Busque a versão remota em: `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
 3. Se a versão remota for **igual ou menor**: prossiga sem mencionar nada.
 4. Se a versão remota for **maior**:
    a. Busque o PRUMO-CORE.md remoto em: `https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md`
    b. Leia a seção "Changelog do Core" do arquivo remoto. Extraia as entradas entre a versão local e a remota.
-   c. Apresente ao usuário: "Há uma atualização do Prumo (v[local] → v[remota]). O que mudou: [itens do changelog]. Apenas o motor é atualizado. Seus arquivos e configurações permanecem intactos. Atualizar?"
-   d. Se aceitar: substitua o `PRUMO-CORE.md` local pelo remoto.
-   e. Se recusar: prossiga sem insistir.
+   c. **PARAR AQUI.** Apresentar SOMENTE o aviso de atualização, sem nenhum conteúdo do briefing:
+      "Antes do briefing: tem uma atualização do Prumo (v[local] → v[remota]).
+
+      O que mudou:
+      [listar os itens do changelog]
+
+      É só o motor do sistema (PRUMO-CORE.md). Seus arquivos e configurações não são tocados. Leva 5 segundos.
+
+      a) Atualizar agora (recomendado — já rodo o briefing na versão nova)
+      b) Depois (rodo o briefing com a versão atual, pergunto de novo amanhã)"
+   d. **ESPERAR a resposta.** Não continuar o briefing nesta mesma mensagem.
+   e. Se escolher (a): substituir PRUMO-CORE.md, confirmar "Atualizado pra v[nova].", e então reler o PRUMO-CORE.md atualizado antes de prosseguir com o Passo 3.
+   f. Se escolher (b): prosseguir com o briefing normalmente. Perguntar de novo no próximo briefing.
 
 ## Passo 3: Estado atual
 

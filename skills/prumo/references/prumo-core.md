@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.2**
+> **prumo_version: 3.3**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -242,20 +242,25 @@ O Prumo não é um quadro branco que lista coisas. É um agente que age. Para ca
 
 ## Verificação de atualização
 
+**⚠️ A verificação de update é BLOQUEANTE. Se houver atualização, o agente NÃO deve continuar com o briefing ou qualquer outra ação na mesma mensagem. Parar, informar, esperar decisão.**
+
 No início de cada sessão (ou no briefing), o agente deve verificar se há atualização disponível:
 
 1. Ler a versão local: campo `prumo_version` no topo deste arquivo
 2. Buscar a versão remota em: `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
-3. Comparar. Se a versão remota for maior:
+3. Se a versão remota for igual ou menor: nada a fazer, seguir em silêncio.
+4. Se a versão remota for maior:
    a. Buscar o PRUMO-CORE.md remoto em `https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md`
    b. Extrair a seção "Changelog do Core" do arquivo remoto. Identificar todas as entradas entre a versão local e a versão remota.
-   c. Apresentar ao usuário com o que mudou:
-      "Há uma atualização do Prumo (v[local] → v[remota]). O que mudou:
-      [listar os itens do changelog das versões intermediárias + nova]
-      Apenas o motor do sistema (PRUMO-CORE.md) é atualizado. Seus arquivos, dados e configurações permanecem intactos. Atualizar?"
-   d. Se o usuário aceitar: substituir o PRUMO-CORE.md local pelo remoto.
-   e. Se recusar: respeitar, não insistir na mesma sessão.
-4. Se a versão remota for igual ou menor: nada a fazer, seguir em silêncio.
+   c. **PARAR.** Apresentar SOMENTE o aviso de atualização (sem briefing, sem processar inbox, sem nada mais):
+      "Antes do briefing: tem uma atualização do Prumo (v[local] → v[remota]).
+      O que mudou: [changelog]
+      É só o motor (PRUMO-CORE.md). Seus arquivos não são tocados. Leva 5 segundos.
+      a) Atualizar agora (recomendado)
+      b) Depois (pergunto de novo amanhã)"
+   d. **ESPERAR** a resposta do usuário. Não prosseguir.
+   e. Se (a): substituir PRUMO-CORE.md local pelo remoto. Confirmar. Reler o core atualizado. Prosseguir com o briefing.
+   f. Se (b): prosseguir com o briefing usando a versão atual. Perguntar de novo no próximo briefing.
 
 **Frequência:** Verificar no máximo 1x por sessão. Não verificar se já verificou hoje.
 
@@ -264,6 +269,9 @@ No início de cada sessão (ou no briefing), o agente deve verificar se há atua
 ---
 
 ## Changelog do Core
+
+### v3.3 (14/02/2026)
+- Auto-update bloqueante: quando há atualização, o briefing PARA e mostra só o aviso com changelog. Não roda o briefing junto. Espera o usuário decidir (atualizar agora / depois). Se atualizar, roda o briefing na versão nova.
 
 ### v3.2 (14/02/2026)
 - Regra 14: Lista numerada contínua no briefing (nunca resetar numeração) + opções com letras (a, b, c) para resposta rápida ("3b, 7a")
@@ -290,4 +298,4 @@ No início de cada sessão (ou no briefing), o agente deve verificar se há atua
 
 ---
 
-*Prumo Core v3.2 — https://github.com/tharso/prumo*
+*Prumo Core v3.3 — https://github.com/tharso/prumo*

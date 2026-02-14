@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 2.0**
+> **prumo_version: 3.1**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -194,12 +194,42 @@ No início de cada sessão (ou no briefing), o agente deve verificar se há atua
 1. Ler a versão local: campo `prumo_version` no topo deste arquivo
 2. Buscar a versão remota em: `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
 3. Comparar. Se a versão remota for maior:
-   - Informar o usuário: "Há uma atualização do Prumo disponível (v[local] → v[remota]). A atualização afeta apenas o motor do sistema (PRUMO-CORE.md). Nenhuma personalização, arquivo ou dado seu será alterado."
-   - Se o usuário aceitar: buscar o novo PRUMO-CORE.md em `https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md` e substituir o arquivo local.
-   - Se recusar: respeitar, não insistir na mesma sessão.
+   a. Buscar o PRUMO-CORE.md remoto em `https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md`
+   b. Extrair a seção "Changelog do Core" do arquivo remoto. Identificar todas as entradas entre a versão local e a versão remota.
+   c. Apresentar ao usuário com o que mudou:
+      "Há uma atualização do Prumo (v[local] → v[remota]). O que mudou:
+      [listar os itens do changelog das versões intermediárias + nova]
+      Apenas o motor do sistema (PRUMO-CORE.md) é atualizado. Seus arquivos, dados e configurações permanecem intactos. Atualizar?"
+   d. Se o usuário aceitar: substituir o PRUMO-CORE.md local pelo remoto.
+   e. Se recusar: respeitar, não insistir na mesma sessão.
+4. Se a versão remota for igual ou menor: nada a fazer, seguir em silêncio.
 
 **Frequência:** Verificar no máximo 1x por sessão. Não verificar se já verificou hoje.
 
+**Importante:** O arquivo VERSION no repo deve sempre refletir a versão do prumo-core.md (o motor), não do plugin ou do SKILL.md. Se VERSION e prumo_version divergirem, algo deu errado no deploy.
+
 ---
 
-*Prumo Core v2.0 — https://github.com/tharso/prumo*
+## Changelog do Core
+
+### v3.1 (14/02/2026)
+- Trigger principal: `/Prumo`
+- Etapa 0 do setup detecta pasta automaticamente (real vs temporária)
+- Localização do seletor de pasta corrigida
+- Release notes no auto-update (o sistema agora informa o que mudou)
+
+### v2.0 (13/02/2026)
+- Arquitetura de dois arquivos (CLAUDE.md + PRUMO-CORE.md)
+- Auto-update do motor via GitHub
+- Comando `/briefing`
+- Proteção de arquivos existentes no setup
+- Uma pergunta por vez no setup
+- Decisões reversíveis comunicadas ao usuário
+- Tom mais acessível no setup
+
+### v1.0 (12/02/2026)
+- Versão inicial do motor
+
+---
+
+*Prumo Core v3.1 — https://github.com/tharso/prumo*

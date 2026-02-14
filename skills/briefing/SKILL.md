@@ -57,13 +57,19 @@ Se houver itens novos (de qualquer canal):
 
 ## Passo 6: Montar o briefing
 
-Apresentar de forma direta (no tom configurado no CLAUDE.md):
+Apresentar de forma direta (no tom configurado no CLAUDE.md). **FORMATO OBRIGATÓRIO:**
 
-1. **Compromissos do dia** (do calendário, se disponível)
-2. **Itens quentes** que precisam de atenção hoje
-3. **Lembretes do dia** (consultar lembretes recorrentes no CLAUDE.md — ex: "quarta = lanche da escola")
-4. **Itens envelhecendo** — cobrar coisas paradas há muito tempo, com a data `(desde DD/MM)` visível
-5. **Novidades do inbox** — se processou itens, mostrar resumo do que entrou
+- **Lista numerada contínua** na mensagem inteira (Regra 14 do PRUMO-CORE). Nunca resetar numeração ao mudar de seção. Seções podem ter subtítulos, mas a numeração segue: 1, 2, 3... até o fim.
+- **Opções com letras** dentro de cada item quando houver decisão possível (a, b, c). O usuário responde "3b, 7a".
+- **Proatividade nível 3-4** em cada item (Regra 15 do PRUMO-CORE). Não apenas listar — propor ação concreta, pesquisar, oferecer ajuda.
+
+Conteúdo do briefing (tudo na mesma lista numerada contínua):
+
+- Compromissos do dia (do calendário, se disponível) — com contexto e preparação
+- Itens quentes que precisam de atenção hoje — com proposta de ação
+- Lembretes do dia (consultar lembretes recorrentes no CLAUDE.md) — com opções
+- Itens envelhecendo — cobrar com data `(desde DD/MM)`, diagnosticar por que parou, propor micro-passo
+- Novidades do inbox — se processou itens, mostrar resumo do que entrou
 
 Se a PAUTA estiver vazia: não fazer o briefing padrão. Pedir um brain dump.
 

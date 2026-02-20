@@ -633,6 +633,81 @@ blockquote p {
   border-bottom-color: var(--amber);
 }
 
+/* ===================== IMAGE SECTIONS ===================== */
+.image-break {
+  padding: 40px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+}
+
+.image-break img {
+  max-width: 680px;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  opacity: 0.92;
+}
+
+.section-with-image .container-wide {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 60px;
+  align-items: center;
+}
+
+.section-with-image .container-wide.img-left {
+  grid-template-columns: 400px 1fr;
+}
+
+.section-with-image .container-wide.img-left .section-image {
+  order: -1;
+}
+
+.section-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  opacity: 0.92;
+}
+
+.section-with-image .section-text h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  line-height: 1.2;
+  color: var(--amber);
+  margin-bottom: 32px;
+}
+
+.section-with-image .section-text p {
+  color: var(--fg-muted);
+  font-size: 1.05rem;
+  margin-bottom: 20px;
+}
+
+.section-with-image .section-text p:last-child { margin-bottom: 0; }
+
+@media (max-width: 900px) {
+  .section-with-image .container-wide,
+  .section-with-image .container-wide.img-left {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .section-with-image .container-wide.img-left .section-image {
+    order: 0;
+  }
+
+  .image-break img {
+    max-width: 100%;
+    padding: 0 24px;
+  }
+}
+
 /* ===================== SCROLL ANIMATIONS ===================== */
 .fade-up {
   opacity: 0;
@@ -690,14 +765,24 @@ blockquote p {
   </div>
 </section>
 
+<!-- VISUAL BREAK — INSÔNIA -->
+<div class="image-break fade-up">
+  <img src="imgs/still-life-1-insomnia.png" alt="Criado-mudo às 3h da manhã: celular com notificações empilhadas, melatonina, chá frio, Kindle abandonado" loading="lazy" />
+</div>
+
 <!-- SEÇÃO 2 — O PROBLEMA REAL -->
-<section class="section" id="problema">
-  <div class="container">
-    <h2 class="fade-up">Sabe o que realmente estressa?</h2>
-    <p class="fade-up">Não é ter coisas pra fazer. É <span class="underline-accent">carregar na cabeça coisas com as quais você não pode lidar agora</span>.</p>
-    <p class="fade-up">Aquele email que precisa responder, mas não agora. A ligação que tem que fazer, mas só depois das 15h. O exame que precisa agendar, mas primeiro precisa do pedido médico. Cada uma dessas coisas ocupa um espaço na sua cabeça. E quanto mais espaços ocupados, menos capacidade sobra pra focar no que realmente importa neste momento.</p>
-    <p class="fade-up">Sabe aquele loop que começa quando você deita, quando abre um livro, quando dá play num filme? "Preciso responder o email do fulano. Quando era a reunião da escola? Será que eu paguei o boleto? Qual era a ideia que eu tive no carro?" Isso não é falta de disciplina. É a sua mente fazendo hora extra como gerente de projeto da sua própria vida, sem nunca bater o ponto de saída.</p>
-    <p class="fade-up"><span class="strong-text">Apps de produtividade não resolvem isso. O que eles fazem é criar mais uma caixa de entrada. Mais um lugar pra checar, mais um prato pra girar. Você não está sendo produtivo no Notion. Você está administrando o Notion.</span></p>
+<section class="section section-with-image" id="problema">
+  <div class="container-wide">
+    <div class="section-text">
+      <h2 class="fade-up">Sabe o que realmente estressa?</h2>
+      <p class="fade-up">Não é ter coisas pra fazer. É <span class="underline-accent">carregar na cabeça coisas com as quais você não pode lidar agora</span>.</p>
+      <p class="fade-up">Aquele email que precisa responder, mas não agora. A ligação que tem que fazer, mas só depois das 15h. O exame que precisa agendar, mas primeiro precisa do pedido médico. Cada uma dessas coisas ocupa um espaço na sua cabeça. E quanto mais espaços ocupados, menos capacidade sobra pra focar no que realmente importa neste momento.</p>
+      <p class="fade-up">Sabe aquele loop que começa quando você deita, quando abre um livro, quando dá play num filme? "Preciso responder o email do fulano. Quando era a reunião da escola? Será que eu paguei o boleto? Qual era a ideia que eu tive no carro?" Isso não é falta de disciplina. É a sua mente fazendo hora extra como gerente de projeto da sua própria vida, sem nunca bater o ponto de saída.</p>
+      <p class="fade-up"><span class="strong-text">Apps de produtividade não resolvem isso. O que eles fazem é criar mais uma caixa de entrada. Mais um lugar pra checar, mais um prato pra girar. Você não está sendo produtivo no Notion. Você está administrando o Notion.</span></p>
+    </div>
+    <div class="section-image fade-up">
+      <img src="imgs/still-life-2-desk-chaos.png" alt="Mesa caótica misturando trabalho e vida pessoal: laptop com lista lotada, caneca de Produtividade, dever de casa sobre contrato, conta vencida" loading="lazy" />
+    </div>
   </div>
 </section>
 
@@ -716,16 +801,21 @@ blockquote p {
 </section>
 
 <!-- SEÇÃO 4 — MICROGERENCIAMENTO -->
-<section class="section" id="micro">
-  <div class="container">
-    <h2 class="fade-up">Microgerenciamento a favor da sua vida.<br>Sem o idiota que normalmente vem junto.</h2>
-    <p class="fade-up">Sabe <em>aquele</em> chefe? Sim, você sabe de quem estamos falando. Aquele que manda email na sexta às 18h "só pra lembrar" da entrega da segunda.</p>
-    <p class="fade-up">O problema com aquele chefe nunca foi a cobrança. A cobrança funciona. O problema é o custo emocional que vem junto: o julgamento, o ego, a política, o "será que ele acha que sou incompetente?".</p>
-    <p class="fade-up">Tira o idiota da equação e o que sobra é pura responsabilidade funcional. Alguém que diz "faz 12 dias que isso tá aqui, bora resolver? Eu te ajudo." Não é paternalismo. Não é pressão. É parceria.</p>
-    <p class="fade-up">Prumo faz a cobrança sem o custo. Ele vai te encher o saco pra você ser eficiente. Mas em vez da ansiedade e frustração, <span class="underline-accent">só vem a parte boa: nada cai</span>.</p>
-    <blockquote class="fade-up">
-      <p>A cobrança é o método. O alívio é o resultado.</p>
-    </blockquote>
+<section class="section section-with-image" id="micro">
+  <div class="container-wide img-left">
+    <div class="section-text">
+      <h2 class="fade-up">Microgerenciamento a favor da sua vida.<br>Sem o idiota que normalmente vem junto.</h2>
+      <p class="fade-up">Sabe <em>aquele</em> chefe? Sim, você sabe de quem estamos falando. Aquele que manda email na sexta às 18h "só pra lembrar" da entrega da segunda.</p>
+      <p class="fade-up">O problema com aquele chefe nunca foi a cobrança. A cobrança funciona. O problema é o custo emocional que vem junto: o julgamento, o ego, a política, o "será que ele acha que sou incompetente?".</p>
+      <p class="fade-up">Tira o idiota da equação e o que sobra é pura responsabilidade funcional. Alguém que diz "faz 12 dias que isso tá aqui, bora resolver? Eu te ajudo." Não é paternalismo. Não é pressão. É parceria.</p>
+      <p class="fade-up">Prumo faz a cobrança sem o custo. Ele vai te encher o saco pra você ser eficiente. Mas em vez da ansiedade e frustração, <span class="underline-accent">só vem a parte boa: nada cai</span>.</p>
+      <blockquote class="fade-up">
+        <p>A cobrança é o método. O alívio é o resultado.</p>
+      </blockquote>
+    </div>
+    <div class="section-image fade-up">
+      <img src="imgs/still-life-3-friday-1759.png" alt="Celular em primeiro plano com notificação do WhatsApp de 'Mala Supremo' às 17:59 de sexta-feira" loading="lazy" />
+    </div>
   </div>
 </section>
 

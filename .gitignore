@@ -1,0 +1,12 @@
+.DS_Store
+imgs/
+
+# Materiais internos (não publicar no repositório de produto)
+Prumo-Ideias-e-Possibilidades.pdf
+aprendizados-*.md
+artigo-prumo-*.md
+landing-copy-*.md
+manifesto-prumo.md
+melhorias-pendentes/
+prumo-ideias.html
+test-output/

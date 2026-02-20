@@ -36,15 +36,15 @@ Arquivos de estado e operação:
 
 ## Comandos ativos
 
-- `/prumo:setup`
-- `/prumo:briefing` (canônico)
-- `/briefing` (alias legado)
-- `/prumo:inbox`
-- `/prumo:dump`
-- `/prumo:revisao`
-- `/prumo:status`
-- `/prumo:handover`
-- `/prumo:menu`
+- `/prumo:setup`: configuração inicial ou reconfiguração do sistema (áreas, tom, rituais e integrações).
+- `/prumo:briefing` (canônico): rotina matinal completa com agenda, inbox, curadoria de email e prioridades.
+- `/briefing` (alias legado): executa a mesma rotina do `/prumo:briefing` para compatibilidade.
+- `/prumo:inbox`: processa inbox sob demanda (INBOX.md, Inbox4Mobile e canais conectados quando disponíveis).
+- `/prumo:dump`: captura rápida de informações soltas para o sistema organizar em contexto e ação.
+- `/prumo:revisao`: revisão semanal da pauta, limpeza de pendências e recalibração de prioridades.
+- `/prumo:status`: visão rápida do estado atual (itens quentes, bloqueios e próximos focos).
+- `/prumo:handover`: abre, responde e fecha handovers de validação entre agentes.
+- `/prumo:menu`: lista os comandos disponíveis no sistema.
 
 ## Briefing: lógica atual
 

@@ -1,6 +1,6 @@
 # Prumo
 
-Sistema de organizacao pessoal orientado a acao. O foco do Prumo nao e listar pendencia; e transformar entrada difusa em decisao clara.
+Sistema de organização pessoal orientado à ação. O foco do Prumo não é listar pendência; é transformar entrada difusa em decisão clara.
 
 Estado deste documento: **19/02/2026**.
 
@@ -8,36 +8,36 @@ Estado deste documento: **19/02/2026**.
 
 - Core local: `prumo_version 3.6` (`PRUMO-CORE.md`).
 - Skill principal de setup: `v3.4` (`SKILL.md`).
-- Skill de briefing: `v2.2` (com curadoria por acao em runtime com e sem shell).
-- Coexistencia multiagente Codex/Cowork ativa e validada.
-- Handovers `HO-2026-02-19-001` ate `HO-2026-02-19-005`: **CLOSED** em `_state/HANDOVER.md`.
+- Skill de briefing: `v2.2` (com curadoria por ação em runtime com e sem shell).
+- Coexistência multiagente Codex/Cowork ativa e validada.
+- Handovers `HO-2026-02-19-001` até `HO-2026-02-19-005`: **CLOSED** em `_state/HANDOVER.md`.
 
 ## O que o sistema entrega hoje
 
-1. Setup guiado para gerar estrutura de operacao (arquivos, areas, rituais, tom).
-2. Briefing diario com consolidacao de agenda e triagem de email por prioridade.
-3. Processamento de inbox multi-canal (`INBOX.md`, `Inbox4Mobile/`, email quando disponivel).
-4. Revisao semanal com higienizacao de pauta e historico.
-5. Protocolo de coexistencia entre agentes (lock por escopo + handover rastreavel).
+1. Setup guiado para gerar estrutura de operação (arquivos, áreas, rituais, tom).
+2. Briefing diário com consolidação de agenda e triagem de email por prioridade.
+3. Processamento de inbox multi-canal (`INBOX.md`, `Inbox4Mobile/`, email quando disponível).
+4. Revisão semanal com higienização de pauta e histórico.
+5. Protocolo de coexistência entre agentes (lock por escopo + handover rastreável).
 
 ## Arquitetura
 
-O sistema opera em tres arquivos principais:
+O sistema opera em três arquivos principais:
 
-- `CLAUDE.md`: configuracao pessoal (identidade, areas, tom, lembretes, integracoes).
-- `PRUMO-CORE.md`: regras operacionais do sistema (rituais, fluxo, governanca).
-- `AGENTS.md`: adaptador para runtimes que nao usam `CLAUDE.md` nativamente.
+- `CLAUDE.md`: configuração pessoal (identidade, áreas, tom, lembretes, integrações).
+- `PRUMO-CORE.md`: regras operacionais do sistema (rituais, fluxo, governança).
+- `AGENTS.md`: adaptador para runtimes que não usam `CLAUDE.md` nativamente.
 
-Arquivos de estado e operacao:
+Arquivos de estado e operação:
 
 - `_state/agent-lock.json`: lock cooperativo por escopo entre agentes.
-- `_state/HANDOVER.md`: validacoes cruzadas e status de handovers.
-- `_state/briefing-state.json`: referencia temporal de briefing (`last_briefing_at`).
+- `_state/HANDOVER.md`: validações cruzadas e status de handovers.
+- `_state/briefing-state.json`: referência temporal de briefing (`last_briefing_at`).
 
 ## Comandos ativos
 
 - `/prumo:setup`
-- `/prumo:briefing` (canonico)
+- `/prumo:briefing` (canônico)
 - `/briefing` (alias legado)
 - `/prumo:inbox`
 - `/prumo:dump`
@@ -46,22 +46,22 @@ Arquivos de estado e operacao:
 - `/prumo:handover`
 - `/prumo:menu`
 
-## Briefing: logica atual
+## Briefing: lógica atual
 
 ### Canais lidos
 
 - `Inbox4Mobile/` (incluindo imagens)
-- Gmail (quando disponivel)
-- Google Calendar (hoje e amanha)
-- `_state/HANDOVER.md` (pendencias de validacao)
+- Gmail (quando disponível)
+- Google Calendar (hoje e amanhã)
+- `_state/HANDOVER.md` (pendências de validação)
 
-### Curadoria de email (modelo unico)
+### Curadoria de email (modelo único)
 
-A triagem usa tres buckets:
+A triagem usa três buckets:
 
 - `Responder`: exige resposta ativa.
 - `Ver`: exige leitura/checagem, sem resposta imediata.
-- `Sem acao`: baixo valor imediato.
+- `Sem ação`: baixo valor imediato.
 
 Cada item deve vir com:
 
@@ -70,13 +70,13 @@ Cada item deve vir com:
 
 ### Janela temporal
 
-- Se `_state/briefing-state.json` tiver `last_briefing_at`, essa e a ancora.
-- Se nao tiver, fallback de 24h.
+- Se `_state/briefing-state.json` tiver `last_briefing_at`, essa é a âncora.
+- Se não tiver, fallback de 24h.
 - Ao concluir o briefing, atualizar `last_briefing_at`.
 
-### Runtime com shell (modo avancado)
+### Runtime com shell (modo avançado)
 
-Quando disponivel, pode usar script dual-profile:
+Quando disponível, pode usar script dual-profile:
 
 - `scripts/prumo_google_dual_snapshot.sh`
 
@@ -86,24 +86,24 @@ Template do script no produto:
 
 Esse modo permite consolidar duas contas (ex.: pessoal/trabalho) no mesmo briefing.
 
-### Runtime sem shell (paridade obrigatoria)
+### Runtime sem shell (paridade obrigatória)
 
-Sem shell/Gemini CLI, o briefing **mantem a mesma taxonomia de curadoria** via integracoes nativas. O objetivo e evitar degradacao de qualidade por limitacao de runtime.
+Sem shell/Gemini CLI, o briefing **mantém a mesma taxonomia de curadoria** via integrações nativas. O objetivo é evitar degradação de qualidade por limitação de runtime.
 
-## Coexistencia Codex x Cowork
+## Coexistência Codex x Cowork
 
 Protocolo vigente:
 
-1. lock de escopo em `_state/agent-lock.json` antes de alteracoes criticas.
-2. handover em `_state/HANDOVER.md` para mudancas relevantes.
+1. lock de escopo em `_state/agent-lock.json` antes de alterações críticas.
+2. handover em `_state/HANDOVER.md` para mudanças relevantes.
 3. briefing checa `PENDING_VALIDATION` e `REJECTED` automaticamente.
 
-Status de validacao recente:
+Status de validação recente:
 
-- Base de coexistencia: aprovada.
-- Checagem automatica de handover no briefing: aprovada.
+- Base de coexistência: aprovada.
+- Checagem automática de handover no briefing: aprovada.
 - Comando manual `/prumo:handover`: aprovado.
-- Integracao de curadoria Google dual: aprovada (com nota de limite de runtime Cowork).
+- Integração de curadoria Google dual: aprovada (com nota de limite de runtime Cowork).
 - Paridade sem shell + versionamento formal: aprovada.
 
 ## Estrutura do projeto (snapshot local)
@@ -127,19 +127,19 @@ Prumo/
 └── test-output/
 ```
 
-## O que ainda nao esta redondo
+## O que ainda não está redondo
 
-1. Distribuicao de plugin depende do pacote de release (manifesto e empacotamento) no repositorio de distribuicao.
-2. Integracao dual-profile depende de infraestrutura local (shell + Gemini CLI + MCP autenticado).
-3. Ainda faltam testes de regressao automatizados para cenarios de briefing e reconfiguracao.
+1. Distribuição de plugin depende do pacote de release (manifesto e empacotamento) no repositório de distribuição.
+2. Integração dual-profile depende de infraestrutura local (shell + Gemini CLI + MCP autenticado).
+3. Ainda faltam testes de regressão automatizados para cenários de briefing e reconfiguração.
 
 ## Roadmap curto
 
-1. Consolidar pacote de release para publicacao sem ajuste manual.
+1. Consolidar pacote de release para publicação sem ajuste manual.
 2. Adicionar testes de smoke para briefing (com e sem shell).
-3. Evoluir metricas de qualidade de curadoria (taxa de `Responder` resolvido por ciclo).
+3. Evoluir métricas de qualidade de curadoria (taxa de `Responder` resolvido por ciclo).
 
-## Referencias rapidas
+## Referências rápidas
 
 - Motor local: `../PRUMO-CORE.md`
 - Estado operacional: `../_state/`
@@ -148,4 +148,4 @@ Prumo/
 
 ---
 
-Se o sistema parar de parecer util, o problema nao e falta de lista. E falta de decisao com contexto. O README acima existe para evitar exatamente esse tipo de autoengano elegante.
+Se o sistema parar de parecer útil, o problema não é falta de lista. É falta de decisão com contexto. O README acima existe para evitar exatamente esse tipo de autoengano elegante.

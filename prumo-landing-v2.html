@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prumo — Produtividade é o cacete.</title>
+<meta name="description" content="Chega de carregar tudo sozinho. Prumo é um assistente pessoal de organização de vida para Claude Desktop." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #09090b;
+  --bg-elevated: #18181b;
+  --bg-card: #1c1c1f;
+  --fg: #fafafa;
+  --fg-muted: #a1a1aa;
+  --fg-dim: #71717a;
+  --amber: #fbbf24;
+  --amber-dark: #d97706;
+  --amber-glow: rgba(251, 191, 36, 0.12);
+  --border: #27272a;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-display);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--amber);
+  color: var(--bg);
+}
+
+a {
+  color: var(--amber);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+a:hover { border-bottom-color: var(--amber); }
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: 100px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-of-type {
+  border-bottom: none;
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  line-height: 1.2;
+  color: var(--amber);
+  margin-bottom: 32px;
+}
+
+p {
+  color: var(--fg-muted);
+  font-size: 1.05rem;
+  margin-bottom: 20px;
+}
+
+p:last-child { margin-bottom: 0; }
+
+.strong-text {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.underline-accent {
+  text-decoration: underline;
+  text-decoration-color: var(--amber);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+  color: var(--fg);
+}
+
+blockquote {
+  border-left: 3px solid var(--amber);
+  padding: 16px 24px;
+  margin: 40px 0 0 0;
+  background: var(--amber-glow);
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p {
+  color: var(--fg);
+  font-weight: 500;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* ===================== HEADER ===================== */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 0;
+  background: rgba(9, 9, 11, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-logo {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--amber);
+  letter-spacing: -0.02em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--amber);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
+  border-bottom-color: transparent;
+}
+
+.btn-primary svg { width: 16px; height: 16px; }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.btn-outline:hover {
+  border-color: var(--fg-dim);
+  background: var(--bg-elevated);
+  border-bottom-color: var(--fg-dim);
+}
+
+/* ===================== HERO ===================== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 80px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--amber);
+  margin-bottom: 16px;
+}
+
+.hero .subtitle {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 400;
+  color: var(--fg);
+  margin-bottom: 40px;
+  line-height: 1.3;
+}
+
+.hero .body-text {
+  color: var(--fg-muted);
+  font-size: 1.1rem;
+  max-width: 540px;
+  margin-bottom: 12px;
+}
+
+.hero .body-bold {
+  color: var(--fg);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+}
+
+.hero-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+
+.hero-note {
+  font-size: 0.85rem;
+  color: var(--fg-dim);
+}
+
+.hero-note a {
+  color: var(--fg-dim);
+  border-bottom: 1px solid var(--fg-dim);
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--fg-dim);
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ===================== CARDS (3-col) ===================== */
+.three-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin: 40px 0;
+}
+
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 24px;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--fg-muted);
+}
+
+.card h3 {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--fg);
+  margin-bottom: 12px;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+  line-height: 1.6;
+}
+
+/* ===================== BRIEFING MODULE ===================== */
+.briefing-wrapper {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 40px 0;
+}
+
+.briefing-topbar {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--fg-dim);
+}
+
+.briefing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.briefing-content {
+  padding: 28px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--fg-muted);
+  min-height: 420px;
+}
+
+.briefing-content .line {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.briefing-content .line.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.briefing-content .line.greeting {
+  color: var(--fg);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.briefing-content .line.section-label {
+  color: var(--amber);
+  font-weight: 500;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.briefing-content .line.item {
+  padding-left: 8px;
+  margin-bottom: 6px;
+}
+
+.briefing-content .line.item .item-num {
+  color: var(--amber);
+  margin-right: 8px;
+}
+
+.briefing-content .line.item .detail {
+  color: var(--fg-dim);
+  font-size: 0.8rem;
+}
+
+.briefing-content .line.item .smart {
+  color: var(--amber);
+  font-style: italic;
+}
+
+.briefing-content .line.prompt {
+  color: var(--fg);
+  margin-top: 24px;
+}
+
+.briefing-options {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.briefing-option {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--fg-muted);
+  background: var(--bg);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.briefing-option.visible {
+  opacity: 1;
+}
+
+/* ===================== CHIPS ===================== */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.chip {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--fg-muted);
+  background: var(--bg-elevated);
+}
+
+/* ===================== SETUP STEPS ===================== */
+.steps {
+  margin: 40px 0;
+}
+
+.step {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 36px;
+}
+
+.step:last-child { margin-bottom: 0; }
+
+.step-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--amber);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--amber);
+  margin-top: 2px;
+}
+
+.step-content h3 {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--fg);
+  margin-bottom: 6px;
+}
+
+.step-content p {
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+  margin-bottom: 0;
+}
+
+.step-content a {
+  color: var(--amber);
+}
+
+.code-block {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--fg-dim);
+  line-height: 1.7;
+}
+
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--amber);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 10px;
+}
+
+/* ===================== CTA FINAL ===================== */
+.cta-section {
+  text-align: center;
+  padding: 120px 0;
+}
+
+.cta-section h2 {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.cta-section p {
+  max-width: 540px;
+  margin: 0 auto 20px;
+}
+
+.cta-section .body-bold {
+  color: var(--fg);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+}
+
+/* ===================== FEEDBACK ===================== */
+.feedback-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+}
+
+.feedback-card h3 {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+
+.feedback-card p {
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+}
+
+.feedback-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* ===================== FOOTER ===================== */
+.footer {
+  padding: 60px 0 40px;
+  border-top: 1px solid var(--border);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.footer-brand span {
+  font-weight: 700;
+  color: var(--amber);
+  font-size: 1rem;
+}
+
+.footer-brand .pipe {
+  color: var(--fg-dim);
+  font-weight: 300;
+}
+
+.footer-note {
+  color: var(--fg-dim);
+  font-size: 0.8rem;
+  margin-bottom: 32px;
+}
+
+.footer-about {
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+}
+
+.footer-about h4 {
+  color: var(--fg);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+
+.footer-about p {
+  color: var(--fg-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.footer-links {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--fg-muted);
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border);
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--amber);
+  border-bottom-color: var(--amber);
+}
+
+/* ===================== SCROLL ANIMATIONS ===================== */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-up.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===================== MOBILE ===================== */
+@media (max-width: 768px) {
+  .section { padding: 72px 0; }
+  .hero h1 { font-size: clamp(2rem, 8vw, 3rem); }
+  .three-cards { grid-template-columns: 1fr; gap: 16px; }
+  .hero-cta-row { flex-direction: column; align-items: flex-start; }
+  .briefing-content { padding: 20px; font-size: 0.8rem; min-height: 380px; }
+  .cta-section { padding: 80px 0; }
+  .feedback-buttons { flex-direction: column; }
+  .step { gap: 14px; }
+  .footer-links { flex-direction: column; gap: 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-logo">Prumo</div>
+    <div class="header-right">
+      <a href="https://github.com/tharso/prumo/releases" class="btn-primary btn-header">
+        Instalar grátis
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <h1>Produtividade é o cacete.</h1>
+    <p class="subtitle">Chega de carregar tudo sozinho.</p>
+    <p class="body-text">Você não precisa de mais um framework, mais um app, mais um método com acrônimo bonito. Precisa de alguém que preste atenção na sua vida e te cobre quando as coisas começam a parar.</p>
+    <p class="body-bold">Prumo faz isso.</p>
+    <div class="hero-cta-row">
+      <a href="https://github.com/tharso/prumo/releases" class="btn-primary">
+        Instalar o Prumo
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <span class="hero-note">Grátis (por enquanto). Fluxo principal: <a href="https://claude.ai/download" target="_blank">Claude Desktop</a> (Cowork mode) com plano Max. Core atual: v3.6.</span>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO 2 — O PROBLEMA REAL -->
+<section class="section" id="problema">
+  <div class="container">
+    <h2 class="fade-up">Sabe o que realmente estressa?</h2>
+    <p class="fade-up">Não é ter coisas pra fazer. É <span class="underline-accent">carregar na cabeça coisas com as quais você não pode lidar agora</span>.</p>
+    <p class="fade-up">Aquele email que precisa responder, mas não agora. A ligação que tem que fazer, mas só depois das 15h. O exame que precisa agendar, mas primeiro precisa do pedido médico. Cada uma dessas coisas ocupa um espaço na sua cabeça. E quanto mais espaços ocupados, menos capacidade sobra pra focar no que realmente importa neste momento.</p>
+    <p class="fade-up">Sabe aquele loop que começa quando você deita, quando abre um livro, quando dá play num filme? "Preciso responder o email do fulano. Quando era a reunião da escola? Será que eu paguei o boleto? Qual era a ideia que eu tive no carro?" Isso não é falta de disciplina. É a sua mente fazendo hora extra como gerente de projeto da sua própria vida, sem nunca bater o ponto de saída.</p>
+    <p class="fade-up"><span class="strong-text">Apps de produtividade não resolvem isso. O que eles fazem é criar mais uma caixa de entrada. Mais um lugar pra checar, mais um prato pra girar. Você não está sendo produtivo no Notion. Você está administrando o Notion.</span></p>
+  </div>
+</section>
+
+<!-- SEÇÃO 3 — O QUE PRUMO ENTREGA -->
+<section class="section" id="alivio">
+  <div class="container">
+    <h2 class="fade-up">Prumo não te faz produzir mais.<br>Te faz carregar menos.</h2>
+    <p class="fade-up">O resultado de usar Prumo não é "completei 30% mais tarefas essa semana".</p>
+    <p class="fade-up">É dormir sem aquela sensação de que esqueceu algo importante. Sentar pra trabalhar sem gastar 20 minutos tentando lembrar o que era urgente. Saber, pela primeira vez em meses, exatamente o que tá pegando fogo e o que pode esperar.</p>
+    <p class="fade-up">Você já se acostumou tanto com o peso que nem percebe mais. Até tirá-lo das costas.</p>
+    <p class="fade-up">E sim: quando sua cabeça fica mais leve, sobra mais energia pra fazer o que importa. Você acaba até performando melhor. Mas não porque alguém te chicoteou. Porque sua mente descansou. A performance, quando vem, é consequência. Não objetivo.</p>
+    <blockquote class="fade-up">
+      <p>Te deixar mais produtivo é um efeito colateral inevitável de Prumo, mas não é a razão dele existir.</p>
+    </blockquote>
+  </div>
+</section>
+
+<!-- SEÇÃO 4 — MICROGERENCIAMENTO -->
+<section class="section" id="micro">
+  <div class="container">
+    <h2 class="fade-up">Microgerenciamento a favor da sua vida.<br>Sem o idiota que normalmente vem junto.</h2>
+    <p class="fade-up">Sabe <em>aquele</em> chefe? Sim, você sabe de quem estamos falando. Aquele que manda email na sexta às 18h "só pra lembrar" da entrega da segunda.</p>
+    <p class="fade-up">O problema com aquele chefe nunca foi a cobrança. A cobrança funciona. O problema é o custo emocional que vem junto: o julgamento, o ego, a política, o "será que ele acha que sou incompetente?".</p>
+    <p class="fade-up">Tira o idiota da equação e o que sobra é pura responsabilidade funcional. Alguém que diz "faz 12 dias que isso tá aqui, bora resolver? Eu te ajudo." Não é paternalismo. Não é pressão. É parceria.</p>
+    <p class="fade-up">Prumo faz a cobrança sem o custo. Ele vai te encher o saco pra você ser eficiente. Mas em vez da ansiedade e frustração, <span class="underline-accent">só vem a parte boa: nada cai</span>.</p>
+    <blockquote class="fade-up">
+      <p>A cobrança é o método. O alívio é o resultado.</p>
+    </blockquote>
+  </div>
+</section>
+
+<!-- SEÇÃO 5 — BRIEFING -->
+<section class="section" id="briefing">
+  <div class="container">
+    <h2 class="fade-up">Bom dia. Aqui está seu dia.</h2>
+    <p class="fade-up">Você abre o chat, diz "bom dia" e Prumo checa seu email, sua agenda, suas pendências. Sem você lembrar de checar fonte por fonte.</p>
+
+    <div class="briefing-wrapper fade-up" id="briefingModule">
+      <div class="briefing-topbar">
+        <div class="briefing-dot"></div>
+        Prumo · Briefing matinal
+      </div>
+      <div class="briefing-content" id="briefingContent">
+        <div class="line greeting" data-delay="0">Bom dia! Quinta-feira, 20 de fevereiro. Janela: desde o último briefing (ontem, 09:12).</div>
+
+        <div class="line section-label" data-delay="600"><strong>Hoje:</strong></div>
+        <div class="line item" data-delay="900"><span class="item-num">1.</span> Reunião com investidor às 10h <span class="detail">(link do Meet já tá aqui)</span></div>
+        <div class="line item" data-delay="1200"><span class="item-num">2.</span> Lanche da Nina na escola — <span class="smart">quarta, não hoje (você perguntou ontem)</span></div>
+        <div class="line item" data-delay="1500"><span class="item-num">3.</span> Sessão de terapia às 17h. <span class="detail">Quer repassar as anotações da última sessão antes?</span></div>
+
+        <div class="line section-label" data-delay="2100"><strong>Curadoria de email (desde o último briefing):</strong></div>
+        <div class="line item" data-delay="2400"><span class="item-num">4.</span> <span class="smart">Responder · P1 · trabalho</span> — Financeiro pediu confirmação de faturamento hoje. <span class="detail">Quer rascunho de resposta?</span></div>
+        <div class="line item" data-delay="2700"><span class="item-num">5.</span> <span class="smart">Ver · P2 · pessoal</span> — Clínica enviou preparo do exame de segunda. <span class="detail">Leitura curta, sem resposta.</span></div>
+        <div class="line item" data-delay="3000"><span class="item-num">6.</span> <span class="smart">Sem ação · P3 · trabalho</span> — Newsletter de produto. <span class="detail">Só referência, arquivável.</span></div>
+
+        <div class="line section-label" data-delay="3600"><strong>Pode esperar (mas não esqueci):</strong></div>
+        <div class="line item" data-delay="3900"><span class="item-num">7.</span> Passaporte vence em 43 dias. <span class="detail">Link pra renovação já separado.</span></div>
+        <div class="line item" data-delay="4200"><span class="item-num">8.</span> Pesquisar colchão novo <span class="detail">(faz 3 semanas que tá aqui)</span></div>
+
+        <div class="line prompt" data-delay="4800">O que quer atacar primeiro?</div>
+        <div class="briefing-options" data-delay="5100">
+          <span class="briefing-option">a) Responder financeiro (P1)</span>
+          <span class="briefing-option">b) Ler preparo do exame (P2)</span>
+          <span class="briefing-option">c) Outra coisa</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="fade-up">Isso não é um chatbot genérico. É alguém que conhece sua vida, leu seus emails, checou sua agenda e te devolveu uma fila de ação (Responder, Ver, Sem ação) com prioridade objetiva.</p>
+  </div>
+</section>
+
+<!-- SEÇÃO 6 — UM CÉREBRO SÓ -->
+<section class="section" id="cerebro">
+  <div class="container">
+    <h2 class="fade-up">Você não é um perfil do LinkedIn.</h2>
+    <p class="fade-up">Apps de produtividade tratam você como se a sua vida coubesse num rótulo. O profissional organizado. A mãe dedicada. O freelancer produtivo.</p>
+    <p class="fade-up">Mas você é tudo isso ao mesmo tempo. Precisa entregar um projeto pro cliente, levar o filho no médico, responder o contador sobre o IR e lembrar de comprar o presente de aniversário da sogra. Tudo no mesmo dia. Tudo na mesma cabeça.</p>
+    <p class="fade-up">Prumo não separa sua vida em caixinhas. Ele entende que <span class="underline-accent">a reunião com o investidor precisa acontecer, mas que você também precisa ir buscar a sua filha na ginástica artística</span>. E trata os dois com a mesma seriedade.</p>
+    <blockquote class="fade-up">
+      <p>Prumo é pra vida. A vida inteira, sem fatiar em categorias que a sua cabeça nunca respeitou.</p>
+    </blockquote>
+  </div>
+</section>
+
+<!-- SEÇÃO 7 — SIMPLICIDADE -->
+<section class="section" id="simplicidade">
+  <div class="container">
+    <h2 class="fade-up">Se você sabe mandar mensagem, sabe usar Prumo.</h2>
+    <p class="fade-up">A maioria dos sistemas de organização exige que você aprenda algo antes de começar. Uma interface, uma lógica de campos, uma taxonomia de tags, um fluxo de arrastar cards entre colunas. Antes de organizar sua vida, você precisa organizar o app.</p>
+    <p class="fade-up"><span class="strong-text">É o paradoxo: a pessoa que não consegue manter as coisas em ordem precisa manter em ordem a ferramenta que deveria manter as coisas em ordem.</span></p>
+    <p class="fade-up">Prumo não pede nada que você já não saiba fazer.</p>
+
+    <div class="three-cards fade-up">
+      <div class="card">
+        <div class="card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>Despeje</h3>
+        <p>Mandou uma mensagem? Prumo processa, categoriza, extrai a próxima ação. Texto, foto, link, áudio. Pode ser bagunçado. Pode ser às 2h da manhã. Ele organiza.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <h3>Diga "bom dia"</h3>
+        <p>Todo dia de manhã, o briefing: o que tem na agenda, o que está pegando fogo, o que ficou parado tempo demais. Sem rodeios.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3>Revise no domingo</h3>
+        <p>Uma vez por semana: o que andou, o que empacou, o que pode ser descartado. O sistema se mantém limpo ou ele te avisa que não está.</p>
+      </div>
+    </div>
+
+    <p class="fade-up"><span class="strong-text">Sem dashboard. Sem tutorial de 40 minutos. Sem disciplina sobre-humana. Basicamente, você diz bom dia e o resto é conversa.</span></p>
+  </div>
+</section>
+
+<!-- SEÇÃO 8 — PROATIVIDADE -->
+<section class="section" id="proativo">
+  <div class="container">
+    <h2 class="fade-up">Prumo é proativo pra que você não precise ser.</h2>
+    <p class="fade-up">"Seja proativo!" é o mantra de todo coach de LinkedIn. Como se a solução pra todos os problemas fosse você querer mais, correr atrás mais, antecipar mais.</p>
+    <p class="fade-up">Prumo inverte. Ele é proativo pra que você possa só reagir. Lê seus emails, interpreta, antecipa o que vai precisar da sua atenção. Não espera você checar. Não depende da sua memória. O sistema vem até você.</p>
+    <p class="fade-up">Quando a diferença entre "esqueci" e "resolvi" é só alguém ter te avisado na hora certa, faz sentido que esse alguém não precise dormir.</p>
+  </div>
+</section>
+
+<!-- SEÇÃO 9 — MOBILE -->
+<section class="section" id="mobile">
+  <div class="container">
+    <div class="fade-up" style="display:flex;align-items:center;gap:12px;margin-bottom:32px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      <h2 style="margin-bottom:0;">Lembrou de algo? Manda do celular.</h2>
+    </div>
+    <p class="fade-up">Não espere chegar no computador.</p>
+    <p class="fade-up">Um atalho no iPhone que captura texto, fotos, áudios, links e qualquer coisa que você compartilhar. Tudo cai na sua inbox e é processado no próximo briefing.</p>
+
+    <div class="chips fade-up">
+      <span class="chip">Texto rápido</span>
+      <span class="chip">Tirar foto</span>
+      <span class="chip">Galeria</span>
+      <span class="chip">Gravar áudio</span>
+      <span class="chip">Email</span>
+      <span class="chip">Compartilhar de qualquer app</span>
+    </div>
+
+    <p class="fade-up" style="font-size:0.85rem;color:var(--fg-dim);">iPhone via Apple Shortcuts. Android via email.</p>
+  </div>
+</section>
+
+<!-- SEÇÃO 10 — PROPRIEDADE DOS DADOS -->
+<section class="section" id="dados">
+  <div class="container">
+    <h2 class="fade-up">Nada é do Prumo. Tudo é seu.</h2>
+    <p class="fade-up">Prumo não mantém servidor próprio nem banco de dados centralizado. O núcleo operacional são arquivos de texto em pastas do seu computador, que você pode abrir com qualquer editor.</p>
+    <p class="fade-up">Se amanhã você decidir que Prumo não funciona: deleta o plugin e acabou. Seus arquivos continuam exatamente onde estavam. Sua pauta, suas notas, seus registros, suas ideias. Tudo em Markdown, legível por qualquer coisa, pra sempre.</p>
+    <p class="fade-up">A maioria dos apps te prende. Prumo funciona ao contrário: seu sistema vive localmente. Quando você conecta Gmail/Calendar ou roda em um runtime de IA, os dados seguem as regras dessa integração e desse runtime.</p>
+    <blockquote class="fade-up">
+      <p>A pior coisa que acontece se você sair é ter uma pasta organizada que continua funcionando sem Prumo.</p>
+    </blockquote>
+  </div>
+</section>
+
+<!-- SEÇÃO 11 — SETUP -->
+<section class="section" id="setup">
+  <div class="container">
+    <h2 class="fade-up">Um papo rápido e tá rodando.</h2>
+
+    <div class="steps fade-up">
+      <div class="step">
+        <div class="step-num">00</div>
+        <div class="step-content">
+          <h3>Fluxo principal: Claude Cowork no plano Max</h3>
+          <p>Hoje, para usar o fluxo completo no Claude Cowork, você precisa do plano Max. <a href="https://claude.ai/upgrade" target="_blank">Assinar o Max</a>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h3>Instale o plugin</h3>
+          <a href="https://github.com/tharso/prumo/releases" class="btn-download">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar o Prumo (.zip)
+          </a>
+          <div class="code-block">
+            # Depois de baixar:<br>
+            1. Abra o Claude Desktop → Cowork<br>
+            2. Clique em Plugins (na sidebar) → "+"<br>
+            3. Arraste o .zip (não precisa descompactar)
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h3>Selecione uma pasta</h3>
+          <p>Na tela do Cowork, abaixo e à esquerda da caixa de input, clique no ícone de pasta. Escolha onde o Prumo vai organizar seus arquivos. Faça isso ANTES de iniciar a conversa.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h3>Digite /prumo:setup</h3>
+          <p>O setup conversacional começa. Uma pergunta por vez, tudo reversível.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h3>Responda às perguntas</h3>
+          <p>Áreas da vida, projetos, tendências, tom de comunicação. Leva tipo uns 14 minutos.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <h3>Primeiro dump</h3>
+          <p>Despeje tudo que está na sua cabeça. CLAUDE.md + 8 arquivos gerados. O sistema começa a trabalhar.</p>
+        </div>
+      </div>
+    </div>
+    <p class="fade-up" style="font-size:0.9rem;color:var(--fg-dim);margin-top:20px;">Modo avançado (opcional): dual-profile via Gemini CLI local para consolidar contas pessoal + trabalho no briefing.</p>
+    <p class="fade-up" style="font-size:0.9rem;color:var(--fg-dim);">Compatível também com Codex (beta) via <code>AGENTS.md</code>.</p>
+  </div>
+</section>
+
+<!-- SEÇÃO 12 — CTA FINAL -->
+<section class="section cta-section" id="cta">
+  <div class="container">
+    <h2 class="fade-up">Seus pratos estão caindo?</h2>
+    <p class="fade-up">Não precisa de mais um app. Não precisa de mais um framework de produtividade. Não precisa de disciplina sobre-humana. Precisa de alguém que preste atenção na sua vida e te cobre quando as coisas começam a parar.</p>
+    <p class="body-bold fade-up">Prumo faz isso. Sem o ego do idiota lá.</p>
+    <a href="https://github.com/tharso/prumo/releases" class="btn-primary fade-up">
+      Instalar o Prumo
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- SEÇÃO 13 — FEEDBACK -->
+<section class="section" id="feedback">
+  <div class="container">
+    <h2 class="fade-up" style="font-size:1.4rem;">Prumo é um projeto aberto e em evolução.</h2>
+    <p class="fade-up">Bug, ideia, elogio, reclamação, desabafo existencial: tudo é bem-vindo.</p>
+
+    <div class="feedback-card fade-up">
+      <h3>Jeito mais fácil:</h3>
+      <p>Fale "feedback pro Prumo" dentro do próprio sistema. Seu agente monta o email, você só clica "Enviar". Sem sair do fluxo, sem abrir browser.</p>
+    </div>
+
+    <p class="fade-up" style="color:var(--fg-dim);font-size:0.9rem;">Ou, se preferir o caminho clássico:</p>
+    <div class="feedback-buttons fade-up">
+      <a href="https://github.com/tharso/prumo/issues" class="btn-outline" target="_blank">Issue no GitHub</a>
+      <a href="mailto:tharso@tharso.com" class="btn-outline">Email direto</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-brand">
+      <span>Prumo</span>
+    </div>
+    <p class="footer-note">Fluxo principal: <a href="https://claude.ai/download" target="_blank" style="color:var(--fg-dim);">Claude Desktop</a> (Cowork mode) com plano Max. Compatível com Codex (beta) via <code>AGENTS.md</code>.</p>
+
+    <div class="footer-about">
+      <h4>Sobre o autor</h4>
+      <p>Meu nome é Tharso. Trabalho fazendo a ponte entre UX, comunicação, design e tecnologia há mais de 25 anos. Desde que criei Prumo, tenho usado-o diariamente. Se quiser conversar sobre este ou outros projetos, você me encontra aqui:</p>
+      <div class="footer-links">
+        <a href="https://tharso.com" target="_blank">tharso.com</a>
+        <a href="https://linkedin.com/in/tharso" target="_blank">LinkedIn</a>
+        <a href="mailto:tharso@tharso.com">tharso@tharso.com</a>
+        <a href="https://wa.me/5511975100608?text=Oi%2C%20Tharso.%20Vi%20seu%20contato%20atrav%C3%A9s%20do%20Prumo." target="_blank">WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll-triggered fade-in animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in-view');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Briefing animation
+const briefingObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      startBriefingAnimation();
+      briefingObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+
+const briefingModule = document.getElementById('briefingModule');
+if (briefingModule) {
+  briefingObserver.observe(briefingModule);
+}
+
+function startBriefingAnimation() {
+  const lines = document.querySelectorAll('#briefingContent .line');
+  const options = document.querySelectorAll('.briefing-option');
+
+  lines.forEach(line => {
+    const delay = parseInt(line.getAttribute('data-delay') || '0');
+    setTimeout(() => {
+      line.classList.add('visible');
+    }, delay);
+  });
+
+  const optionsContainer = document.querySelector('.briefing-options');
+  if (optionsContainer) {
+    const delay = parseInt(optionsContainer.getAttribute('data-delay') || '5100');
+    setTimeout(() => {
+      options.forEach((opt, i) => {
+        setTimeout(() => opt.classList.add('visible'), i * 150);
+      });
+    }, delay);
+  }
+}
+</script>
+
+</body>
+</html>

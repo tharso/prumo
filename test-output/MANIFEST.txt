@@ -1,0 +1,77 @@
+PRUMO SETUP TEST - Marina Lopes
+Generated: 2026-02-13
+
+PERSONA:
+- Name: Marina Lopes
+- Agent Name: Farol (custom choice)
+- Email: marina.lopes@gmail.com
+- Location: São Paulo, Brazil
+
+AREAS OF LIFE:
+1. Trabalho (UX Designer @ TechCorp)
+2. MaosDeMariana (Side project - handmade jewelry on Instagram)
+3. Pessoal
+   - Familia (Single mother of Theo, age 6)
+   - Casa (Rented apartment)
+   - Saude (Wants to return to running)
+4. Admin (MEI, taxes, finances)
+
+RECURRING COMMITMENTS:
+- Monday: Design review meeting @ TechCorp
+- Friday: Instagram post (Mãos de Marina)
+- Daily 17:30: Pick up Theo from school
+- 20th of each month: Pay rent
+
+RITUALS:
+- Morning briefing: 8:30 AM
+- Weekly review: Sunday evening
+
+TONE: Direto (direct, can challenge assumptions, sparring partner not cheerleader)
+
+INTEGRATIONS:
+- Gmail: marina.lopes@gmail.com
+- Google Calendar: "Marina" + "TechCorp"
+
+FILES GENERATED:
+✓ CLAUDE.md (280 lines - complete operating manual)
+✓ PAUTA.md (Initial state with recurring reminders)
+✓ INBOX.md (Empty, ready for processing)
+✓ REGISTRO.md (Audit trail structure)
+✓ IDEIAS.md (Ideas repository)
+✓ Pessoal/PESSOAS.md (People tracking)
+✓ Referencias/INDICE.md (Reference index)
+✓ Trabalho/README.md
+✓ MaosDeMariana/README.md
+✓ Pessoal/Familia/README.md
+✓ Pessoal/Casa/README.md
+✓ Pessoal/Saude/README.md
+✓ Admin/README.md
+
+KEY FEATURES OF THIS SETUP:
+
+1. COMPLETE CLAUDE.MD
+   - Written naturally (no placeholders)
+   - All sections resolved based on Marina's answers
+   - Custom tone ("direto") fully integrated
+   - All integrations (Gmail, Calendar) explicitly configured
+   - 12 golden rules fully explained
+   - Tag pattern defined
+   - Clear briefing procedure
+   - Recurring commitments documented in system
+
+2. PERSONALIZED CONTEXT
+   - Problem statement matches her tendency (starts too many, finishes too few)
+   - Areas match her actual life structure
+   - Recurring reminders are specific and non-negotiable (e.g., pick up Theo 17:30)
+   - Side project acknowledged as having growth potential but needing focus
+   - Family context integrated into system (single mother, time constraints)
+
+3. OPERATIONAL READINESS
+   - All file structure created
+   - PAUTA.md includes her recurring commitments
+   - Each area has a README explaining context
+   - PESSOAS.md started with Theo as key person
+   - Inbox channels documented (mobile folder, email subjects)
+   - All tone guidance is in place for daily operation
+
+SYSTEM IS READY FOR USE.

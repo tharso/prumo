@@ -226,9 +226,9 @@ Regras de proteção:
 
 | Arquivo | Se já existir |
 |---------|---------------|
-| CLAUDE.md | **Sobrescrever** (é o objetivo do setup). Antes, criar backup em `_backup/CLAUDE.md.YYYY-MM-DD` e informar o usuário. |
-| PRUMO-CORE.md | **Sobrescrever** (atualizável por design, sempre recuperável do repo). Sem backup necessário. |
-| AGENTS.md | **Sobrescrever** (adapter derivado de CLAUDE/CORE). Se existir, criar backup em `_backup/AGENTS.md.YYYY-MM-DD` e informar o usuário. |
+| CLAUDE.md | **Não sobrescrever silenciosamente.** Em setup inicial pode criar; em reconfiguração, pedir confirmação explícita antes de regenerar. Sempre criar backup em `_backup/CLAUDE.md.YYYY-MM-DD-HHMMSS`. |
+| PRUMO-CORE.md | **Sobrescrever** apenas em atualização de motor ou setup explícito. Sempre criar backup em `_backup/PRUMO-CORE.md.YYYY-MM-DD-HHMMSS` antes da troca. |
+| AGENTS.md | **Não sobrescrever silenciosamente.** Se existir, pedir confirmação explícita, criar backup em `_backup/AGENTS.md.YYYY-MM-DD-HHMMSS` e só então atualizar. |
 | PAUTA.md, INBOX.md, REGISTRO.md, IDEIAS.md | **NÃO sobrescrever.** Informar: "Encontrei [arquivo] com conteúdo existente. Mantendo o atual." |
 | Pessoal/PESSOAS.md, Referencias/INDICE.md | **NÃO sobrescrever.** Informar: "Encontrei [arquivo] com conteúdo existente. Mantendo o atual." |
 | [Area]/README.md | **NÃO sobrescrever.** Informar: "A pasta [Area] já tem um README com contexto. Mantendo." |
@@ -237,7 +237,7 @@ Regras de proteção:
 Ao final da Etapa 9, mostrar resumo claro:
 - **Criados** (novos): listar arquivos que não existiam
 - **Mantidos** (existentes): listar arquivos preservados
-- **Sobrescritos**: CLAUDE.md e/ou PRUMO-CORE.md (com localização do backup, se aplicável)
+- **Sobrescritos**: apenas arquivos com confirmação explícita (sempre indicando backup e motivo)
 
 **Arquivos a gerar (respeitando proteção acima):**
 
@@ -304,7 +304,7 @@ Se o usuário parecer estar "testando" com itens genéricos ou fake ("comprar le
 
 ## Feedback loop
 
-O Prumo tem um canal nativo de feedback para o criador. Isso é fundamental: o feedback mais valioso vem de quem usa o sistema no dia a dia, e essas pessoas não vão abrir issues no GitHub.
+O Prumo tem um canal nativo de feedback para o time mantenedor. Isso é fundamental: o feedback mais valioso vem de quem usa o sistema no dia a dia, e essas pessoas nem sempre vão abrir issues no GitHub.
 
 ### Como funciona
 
@@ -319,7 +319,7 @@ Quando detectar, o agente:
 1. **Captura** o que o usuário disse (pode pedir pra elaborar se for vago)
 2. **Formata** em estrutura limpa: o que aconteceu, o que esperava, sugestão (se houver)
 3. **Monta o email** com link `mailto:` pronto:
-   - To: tharso@gmail.com
+   - To: email de suporte configurado no produto (`email-de-feedback@dominio-do-produto.com`)
    - Subject: `PRUMO-FEEDBACK: [resumo curto]`
    - Body: feedback formatado + metadados (nome do agente, data do setup, tom configurado)
 4. **Apresenta** pro usuário: mostra o email montado e oferece o link clicável
@@ -328,11 +328,11 @@ Quando detectar, o agente:
 Exemplo de apresentação ao usuário:
 
 ```
-Montei o feedback pra mandar pro criador do Prumo:
+Montei o feedback pra mandar para o time do Prumo:
 
 ---
 **Assunto:** PRUMO-FEEDBACK: Briefing não mostra itens por prioridade
-**Para:** tharso@gmail.com
+**Para:** email-de-feedback@dominio-do-produto.com
 
 O briefing diário lista os itens na ordem que entraram, mas seria mais útil
 ver os urgentes primeiro. Quando tem muita coisa, os itens quentes se perdem
@@ -353,7 +353,7 @@ Só apertar "Enviar" no email que abre. Sem editar nada (mas pode, se quiser).
 Na seção de regras de ouro, adicionar como regra 13:
 
 **REGRA 13: FEEDBACK PRO PRUMO**
-Se o usuário mencionar feedback, bug, sugestão ou melhoria do sistema Prumo em si (não do conteúdo da pauta), montar email formatado com link mailto pronto para tharso@gmail.com com subject "PRUMO-FEEDBACK: [resumo]". Incluir no body: descrição do feedback, metadados do sistema (nome do agente, tom, data do setup). Apresentar pro usuário com link clicável. Um clique pra enviar.
+Se o usuário mencionar feedback, bug, sugestão ou melhoria do sistema Prumo em si (não do conteúdo da pauta), montar email formatado com link mailto pronto para o canal de suporte configurado no produto (ex: `email-de-feedback@dominio-do-produto.com`) com subject "PRUMO-FEEDBACK: [resumo]". Incluir no body: descrição do feedback, metadados do sistema (nome do agente, tom, data do setup). Apresentar pro usuário com link clicável. Um clique pra enviar.
 
 ### Feedback proativo (o diferencial)
 

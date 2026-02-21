@@ -4,6 +4,18 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.6.2] - 2026-02-21
+
+### Added
+- Guardrails explícitos de atualização segura para impedir sobrescrita de arquivos personalizados.
+- Script `scripts/safe_core_update.sh` para atualizar apenas `PRUMO-CORE.md` com backup automático.
+- Regra de validação no CI para presença do guardrail de update.
+
+### Changed
+- Instruções de update em `skills/briefing/SKILL.md`, `skills-briefing-SKILL.md` e `references/prumo-core.md` reforçam allowlist de escrita.
+- Setup/reconfiguração em `SKILL.md` passa a exigir confirmação explícita para sobrescritas de arquivos sensíveis.
+- Conteúdo público sanitizado para remover referências pessoais diretas em canais e exemplos.
+
 ## [3.6.1] - 2026-02-21
 
 ### Added

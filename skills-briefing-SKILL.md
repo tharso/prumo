@@ -26,8 +26,11 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
 4. Se a versão remota for **maior**:
    a. Busque o PRUMO-CORE.md remoto em: `https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md`
    b. Leia a seção "Changelog do Core" do arquivo remoto. Extraia as entradas entre a versão local e a remota.
-   c. Apresente ao usuário: "Há uma atualização do Prumo (v[local] → v[remota]). O que mudou: [itens do changelog]. Apenas o motor é atualizado. Seus arquivos e configurações permanecem intactos. Atualizar?"
-   d. Se aceitar: substitua o `PRUMO-CORE.md` local pelo remoto.
+   c. Apresente ao usuário: "Há uma atualização do Prumo (v[local] → v[remota]). O que mudou: [itens do changelog]. A atualização pode tocar SOMENTE `PRUMO-CORE.md`. Seus arquivos pessoais e operacionais não podem ser alterados. Atualizar?"
+   d. Se aceitar:
+      - criar backup de `PRUMO-CORE.md` em `_backup/PRUMO-CORE.md.YYYY-MM-DD-HHMMSS` (criando `_backup/` se necessário)
+      - substituir apenas `PRUMO-CORE.md`
+      - abortar se qualquer outra escrita for necessária
    e. Se recusar: prossiga sem insistir.
 
 ## Passo 3: Estado atual

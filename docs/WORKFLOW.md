@@ -16,6 +16,17 @@ Este documento define o fluxo oficial para desenvolvimento do Prumo.
 4. Merge em `main`.
 5. Atualização de versão/changelog quando houver mudança pública.
 
+## 2.1) Regra crítica de atualização segura
+
+Update de versão nunca pode tocar arquivos personalizados do usuário.
+
+Allowlist de escrita no update:
+
+1. `PRUMO-CORE.md`
+2. `_backup/PRUMO-CORE.md.*`
+
+Para execução via shell, usar `scripts/safe_core_update.sh`.
+
 ## 3) Taxonomia mínima de labels
 
 - Tipo: `type/feature`, `type/bug`, `type/debt`, `type/spike`, `type/chore`.

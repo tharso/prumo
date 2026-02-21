@@ -36,3 +36,8 @@ jobs:
       - name: Validate docs workflow exists
         run: |
           test -f docs/WORKFLOW.md
+
+      - name: Validate safe update guardrail exists
+        run: |
+          test -x scripts/safe_core_update.sh
+          grep -q "Garantia de não sobrescrita em updates" README.md

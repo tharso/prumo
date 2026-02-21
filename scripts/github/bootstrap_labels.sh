@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-OWNER="${1:-tharso}"
-REPO="${2:-prumo}"
+if [[ $# -ge 1 ]]; then
+  OWNER="$1"
+else
+  OWNER="$(gh repo view --json owner -q '.owner.login')"
+fi
+
+if [[ $# -ge 2 ]]; then
+  REPO="$2"
+else
+  REPO="$(gh repo view --json name -q '.name')"
+fi
 
 create_or_update_label() {
   local name="$1"

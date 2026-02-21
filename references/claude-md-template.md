@@ -102,4 +102,4 @@ INÍCIO DO TEMPLATE:
 
 ---
 
-*Criado com [Prumo](https://github.com/tharso/prumo) — Última atualização: {{DATA_SETUP}}*
+*Criado com Prumo — Última atualização: {{DATA_SETUP}}*

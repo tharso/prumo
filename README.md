@@ -2,15 +2,15 @@
 
 Sistema de organização pessoal orientado à ação. O foco do Prumo não é listar pendência; é transformar entrada difusa em decisão clara.
 
-Estado deste documento: **19/02/2026**.
+Estado deste documento: **21/02/2026**.
 
 ## Estado atual
 
 - Core local: `prumo_version 3.6` (`PRUMO-CORE.md`).
 - Skill principal de setup: `v3.4` (`SKILL.md`).
 - Skill de briefing: `v2.2` (com curadoria por ação em runtime com e sem shell).
-- Coexistência multiagente Codex/Cowork ativa e validada.
-- Handovers `HO-2026-02-19-001` até `HO-2026-02-19-005`: **CLOSED** em `_state/HANDOVER.md`.
+- Coexistência multiagente ativa e validada.
+- Fluxo de handover operacional e auditável via `_state/HANDOVER.md`.
 
 ## O que o sistema entrega hoje
 
@@ -87,6 +87,15 @@ Cada item deve vir com:
 - Se não tiver, fallback de 24h.
 - Ao concluir o briefing, atualizar `last_briefing_at`.
 
+### Garantia de não sobrescrita em updates
+
+Durante atualização de versão do Prumo, a escrita permitida é restrita a:
+
+1. `PRUMO-CORE.md`
+2. `_backup/PRUMO-CORE.md.*` (backup pré-atualização)
+
+Arquivos personalizados do usuário (`CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`, `IDEIAS.md`, `AGENTS.md` e pastas de áreas) não podem ser alterados no fluxo de update.
+
 ### Runtime com shell (modo avançado)
 
 Quando disponível, pode usar script dual-profile:
@@ -103,7 +112,7 @@ Esse modo permite consolidar duas contas (ex.: pessoal/trabalho) no mesmo briefi
 
 Sem shell/Gemini CLI, o briefing **mantém a mesma taxonomia de curadoria** via integrações nativas. O objetivo é evitar degradação de qualidade por limitação de runtime.
 
-## Coexistência Codex x Cowork
+## Coexistência multiagente
 
 Protocolo vigente:
 
@@ -116,7 +125,7 @@ Status de validação recente:
 - Base de coexistência: aprovada.
 - Checagem automática de handover no briefing: aprovada.
 - Comando manual `/prumo:handover`: aprovado.
-- Integração de curadoria Google dual: aprovada (com nota de limite de runtime Cowork).
+- Integração de curadoria Google dual: aprovada (com nota de limite de runtime por ambiente).
 - Paridade sem shell + versionamento formal: aprovada.
 
 ## Estrutura do projeto (snapshot local)

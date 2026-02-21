@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-OWNER="${1:-tharso}"
+if [[ $# -ge 1 ]]; then
+  OWNER="$1"
+else
+  OWNER="$(gh repo view --json owner -q '.owner.login')"
+fi
 TITLE="${2:-Prumo Product OS}"
 
 PROJECT_URL=$(gh project create --owner "$OWNER" --title "$TITLE" --format json | jq -r '.url')

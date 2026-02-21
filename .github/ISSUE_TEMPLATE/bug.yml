@@ -1,0 +1,52 @@
+name: Bug
+description: Comportamento incorreto, regressão ou risco.
+title: "bug: "
+labels:
+  - type/bug
+  - status/triage
+body:
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impacto
+      description: Quem é afetado e qual o dano.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamento atual
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências
+      description: Logs, screenshots, links de commit/PR.
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severidade
+      options:
+        - priority/p0
+        - priority/p1
+        - priority/p2
+        - priority/p3
+    validations:
+      required: true

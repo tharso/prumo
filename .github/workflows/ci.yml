@@ -32,10 +32,20 @@ jobs:
           test -f .github/ISSUE_TEMPLATE/bug.yml
           test -f .github/ISSUE_TEMPLATE/tech_debt.yml
           test -f .github/ISSUE_TEMPLATE/spike.yml
+          test -f .github/ISSUE_TEMPLATE/validation.yml
 
       - name: Validate docs workflow exists
         run: |
           test -f docs/WORKFLOW.md
+          test -f docs/PRODUCT_DEVELOPMENT_GUIDELINES.md
+
+      - name: Validate multi-agent governance hooks
+        run: |
+          grep -q "compatibility_matrix" .github/ISSUE_TEMPLATE/feature.yml
+          grep -q "cross_validation_plan" .github/ISSUE_TEMPLATE/feature.yml
+          grep -q "type/validation" .github/pull_request_template.md
+          grep -q "agent/gemini" scripts/github/bootstrap_labels.sh
+          grep -q "compat/multi-agent" scripts/github/bootstrap_labels.sh
 
       - name: Validate safe update guardrail exists
         run: |

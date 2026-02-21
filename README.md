@@ -53,11 +53,12 @@ Este repositório agora usa um fluxo padrão de produto com Issues, Project e ve
 1. Templates de issue: `.github/ISSUE_TEMPLATE/`
 2. Template de PR: `.github/pull_request_template.md`
 3. CI de higiene: `.github/workflows/ci.yml`
-4. Guia operacional: `docs/WORKFLOW.md`
-5. Versão pública: `VERSION`
-6. Histórico de mudanças: `CHANGELOG.md`
-7. Bootstrap de labels: `scripts/github/bootstrap_labels.sh`
-8. Bootstrap de project: `scripts/github/bootstrap_project.sh`
+4. Diretrizes obrigatórias de engenharia: `docs/PRODUCT_DEVELOPMENT_GUIDELINES.md`
+5. Guia operacional: `docs/WORKFLOW.md`
+6. Versão pública: `VERSION`
+7. Histórico de mudanças: `CHANGELOG.md`
+8. Bootstrap de labels: `scripts/github/bootstrap_labels.sh`
+9. Bootstrap de project: `scripts/github/bootstrap_project.sh`
 
 ## Briefing: lógica atual
 

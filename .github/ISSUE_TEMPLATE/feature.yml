@@ -9,6 +9,7 @@ body:
     attributes:
       value: |
         Descreva o problema real primeiro. Solução sem problema definido é só hobby caro.
+        Toda feature deve nascer pronta para validação cruzada por outros agentes.
   - type: textarea
     id: problem
     attributes:
@@ -39,6 +40,29 @@ body:
       placeholder: |
         - [ ]
         - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility_matrix
+    attributes:
+      label: Matriz de compatibilidade multiagente
+      description: Como esta feature se comporta em Codex, Claude (Cowork) e Gemini.
+      placeholder: |
+        - Codex:
+        - Claude (Cowork):
+        - Gemini:
+        - Fallbacks / limites conhecidos:
+    validations:
+      required: true
+  - type: textarea
+    id: cross_validation_plan
+    attributes:
+      label: Plano de validação cruzada
+      description: Quais issues `type/validation` serão abertas ao final da implementação e por quem.
+      placeholder: |
+        - Validacao por Codex:
+        - Validacao por Claude:
+        - Validacao por Gemini:
     validations:
       required: true
   - type: dropdown

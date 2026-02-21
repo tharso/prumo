@@ -26,6 +26,7 @@ create_or_update_label "type/bug" "D73A4A" "Defeito ou regressão"
 create_or_update_label "type/debt" "B60205" "Dívida técnica"
 create_or_update_label "type/spike" "5319E7" "Investigação timeboxed"
 create_or_update_label "type/chore" "1D76DB" "Manutenção"
+create_or_update_label "type/validation" "5319E7" "Validação cruzada entre agentes"
 
 create_or_update_label "priority/p0" "B60205" "Crítico"
 create_or_update_label "priority/p1" "D93F0B" "Alta"
@@ -48,5 +49,8 @@ create_or_update_label "area/infra" "BFD4F2" "Infraestrutura e automação"
 
 create_or_update_label "agent/codex" "0366D6" "Execução principal pelo Codex"
 create_or_update_label "agent/cowork" "8250DF" "Execução principal pelo Cowork"
+create_or_update_label "agent/gemini" "1F883D" "Execução principal pelo Gemini"
+
+create_or_update_label "compat/multi-agent" "0B7285" "Compatibilidade entre Codex, Cowork e Gemini"
 
 echo "Labels atualizadas em $OWNER/$REPO"

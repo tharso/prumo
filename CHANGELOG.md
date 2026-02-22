@@ -4,6 +4,11 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.7.4] - 2026-02-22
+
+### Fixed
+- `scripts/tests/briefing_smoke.sh` agora faz fallback para `grep` quando `rg` não está disponível no runner, evitando falso negativo no CI.
+
 ## [3.7.3] - 2026-02-22
 
 ### Added

@@ -42,6 +42,10 @@ Verificar TODOS os canais, sem pular nenhum:
 
 1. **Pasta `Inbox4Mobile/`**: Listar TODOS os arquivos. Abrir cada um, inclusive imagens (screenshots, fotos, prints de WhatsApp contêm informações críticas).
    - Se existir `Inbox4Mobile/_processed.json`, usar como filtro para não reapresentar como "novos" os itens já processados em sessão anterior sem deleção física.
+   - Se houver muitos itens multimídia, oferecer preview visual opcional:
+     - com shell: executar `python3 scripts/generate_inbox_preview.py` para gerar `inbox-preview.html` na raiz do workspace.
+     - sem shell: gerar o mesmo `inbox-preview.html` inline (HTML local equivalente) com os mesmos blocos: metadados, preview e botões de clipboard.
+     - se a geração falhar, seguir com a lista numerada no chat (fallback universal).
 2. **Google dual via Gemini CLI (prioridade quando disponível)**:
    - Se existir `scripts/prumo_google_dual_snapshot.sh`, executar esse script.
    - Usar a saída do script como fonte principal para agenda (`AGENDA_HOJE` + `AGENDA_AMANHA`) e curadoria de emails (`TRIAGEM_RESPONDER`, `TRIAGEM_VER`, `TRIAGEM_SEM_ACAO`) das contas `pessoal` e `trabalho`.

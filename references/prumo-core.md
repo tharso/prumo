@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.6.3**
+> **prumo_version: 3.6.4**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -174,6 +174,13 @@ Itens no inbox devem ser:
 3. Manter transparência: informar no briefing quais itens estão marcados como processados, mas pendentes de deleção física.
 
 **Apresentação**: Numerar os itens do inbox ao apresentá-los. Oferecer alternativas de categorização/ação para agilizar decisão.
+
+**Preview visual opcional (inbox multimídia):**
+
+1. Quando houver muitos arquivos visuais (imagens, PDFs, links), oferecer gerar `inbox-preview.html`.
+2. Com shell: usar `python3 scripts/generate_inbox_preview.py`.
+3. Sem shell: gerar HTML equivalente inline, mantendo a mesma estrutura funcional (preview + metadados + botões de clipboard).
+4. Se a geração falhar, manter o fluxo padrão em lista numerada no chat.
 
 Ao mover itens para PAUTA.md ou README de área, sempre incluir a data de entrada no formato `(desde DD/MM)`. Isso torna visível o envelhecimento de cada item e facilita cobranças na revisão semanal.
 
@@ -392,6 +399,11 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 - Novo comando `/prumo:handover` para operação manual de handovers fora do briefing
 - Briefing passa a usar janela temporal via `_state/briefing-state.json` e curadoria de emails orientada à ação (`Responder`/`Ver`/`Sem ação`)
 
+### v3.6.4 (22/02/2026)
+- Preview visual opcional para triagem do `Inbox4Mobile` via `inbox-preview.html`.
+- Script oficial de geração: `scripts/generate_inbox_preview.py`.
+- Fallback documentado para runtime sem shell: gerar HTML inline equivalente.
+
 ### v3.6.3 (22/02/2026)
 - Regra 3 reforçada com commit explícito de inbox (confirmar, executar em lote e verificar resultado).
 - Deleção do inbox passou a exigir ação real de filesystem, com tratamento explícito de falha por permissão.
@@ -438,4 +450,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.6.3 — https://github.com/tharso/prumo*
+*Prumo Core v3.6.4 — https://github.com/tharso/prumo*

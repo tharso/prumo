@@ -6,7 +6,7 @@ Estado deste documento: **21/02/2026**.
 
 ## Estado atual
 
-- Core de referência no produto: `prumo_version 3.6.3` (`references/prumo-core.md`).
+- Core de referência no produto: `prumo_version 3.6.4` (`references/prumo-core.md`).
 - Skill principal de setup: `v3.4` (`SKILL.md`).
 - Skill de briefing: `v2.2` (com curadoria por ação em runtime com e sem shell).
 - Coexistência multiagente ativa e validada.
@@ -103,6 +103,10 @@ Arquivos personalizados do usuário (`CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGIS
 Quando disponível, pode usar script dual-profile:
 
 - `scripts/prumo_google_dual_snapshot.sh`
+
+Para triagem visual opcional do inbox multimídia:
+
+- `scripts/generate_inbox_preview.py` (gera `inbox-preview.html` local)
 
 Template do script no produto:
 

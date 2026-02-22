@@ -18,7 +18,7 @@ Use este fluxo para manter arquivos de estado enxutos.
 
 1. Executar:
    - `python3 Prumo/scripts/prumo_sanitize_state.py --workspace .`
-   - opcional (gatilhos automáticos): `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace .`
+   - opcional (gatilhos automáticos + calibração por workspace): `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace .`
 2. Reportar ao usuário quantos handovers `CLOSED` podem ser movidos para archive.
 
 ## Passo 3: Aplicação
@@ -32,6 +32,7 @@ Use este fluxo para manter arquivos de estado enxutos.
    - `_state/HANDOVER.md`
    - `_state/HANDOVER.summary.md`
    - `_state/auto-sanitize-state.json`
+   - `_state/auto-sanitize-history.json`
 
 ## Passo 4: Pós-checagem
 

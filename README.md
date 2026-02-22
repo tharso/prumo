@@ -6,7 +6,7 @@ Estado deste documento: **21/02/2026**.
 
 ## Estado atual
 
-- Core de referência no produto: `prumo_version 3.7.1` (`references/prumo-core.md`).
+- Core de referência no produto: `prumo_version 3.7.2` (`references/prumo-core.md`).
 - Skill principal de setup: `v3.4` (`SKILL.md`).
 - Skill de briefing: `v2.2` (com curadoria por ação em runtime com e sem shell).
 - Coexistência multiagente ativa e validada.
@@ -32,7 +32,10 @@ Arquivos de estado e operação:
 
 - `_state/agent-lock.json`: lock cooperativo por escopo entre agentes.
 - `_state/HANDOVER.md`: validações cruzadas e status de handovers.
+- `_state/HANDOVER.summary.md`: resumo leve de handover para briefing.
 - `_state/briefing-state.json`: referência temporal de briefing (`last_briefing_at`).
+- `_state/auto-sanitize-state.json`: estado da última autosanitização.
+- `_state/auto-sanitize-history.json`: histórico local para calibrar thresholds por usuário/workspace.
 
 ## Comandos ativos
 
@@ -70,7 +73,7 @@ Este repositório agora usa um fluxo padrão de produto com Issues, Project e ve
 - `Inbox4Mobile/` (incluindo imagens)
 - Gmail (quando disponível)
 - Google Calendar (hoje e amanhã)
-- `_state/HANDOVER.md` (pendências de validação)
+- `_state/HANDOVER.summary.md` (ou fallback `_state/HANDOVER.md`)
 
 ### Curadoria de email (modelo único)
 
@@ -110,7 +113,7 @@ Para triagem visual opcional do inbox multimídia:
 
 - `scripts/generate_inbox_preview.py` (gera `Inbox4Mobile/inbox-preview.html` + `Inbox4Mobile/_preview-index.json`)
 - `scripts/prumo_sanitize_state.py` (compacta handovers antigos e gera `_state/HANDOVER.summary.md`)
-- `scripts/prumo_auto_sanitize.py` (autosanitização por gatilhos + cooldown; registra estado em `_state/auto-sanitize-state.json`)
+- `scripts/prumo_auto_sanitize.py` (autosanitização por gatilhos + cooldown; calibração adaptativa por workspace via `_state/auto-sanitize-history.json`)
 
 Template do script no produto:
 
@@ -130,7 +133,8 @@ Quando o runtime tem shell, o briefing pode executar manutenção preventiva aut
 1. roda `prumo_auto_sanitize.py` com cooldown (default: 6h),
 2. dispara sanitização de handover quando `HANDOVER.md` cresce além do limite,
 3. regenera preview/index do inbox quando volume ou defasagem exigirem,
-4. grava trilha em `_state/auto-sanitize-state.json`.
+4. calibra thresholds com base no histórico do próprio usuário/workspace,
+5. grava trilha em `_state/auto-sanitize-state.json` e histórico em `_state/auto-sanitize-history.json`.
 
 Regra de segurança: autosanitização não toca arquivos pessoais (`CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`, `IDEIAS.md`).
 

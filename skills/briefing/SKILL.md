@@ -47,6 +47,7 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
    - se não existir ou estiver desatualizado, leia `_state/HANDOVER.md`;
    - identifique itens em `PENDING_VALIDATION` ou `REJECTED`.
 4. Se existir `_state/auto-sanitize-state.json`, leia para telemetria de manutenção (última execução/último apply).
+5. Se existir `_state/auto-sanitize-history.json`, use amostra leve quando precisar explicar thresholds adaptativos.
 
 ## Passo 4: Canais de entrada
 

@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.7.1**
+> **prumo_version: 3.7.2**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -31,6 +31,7 @@
     ├── briefing-state.json   ← Timestamp do último briefing concluído (`last_briefing_at`)
     ├── HANDOVER.summary.md   ← Resumo leve para briefing (quando existir)
     ├── auto-sanitize-state.json ← Estado da autosanitização (gatilhos, cooldown, ações)
+    ├── auto-sanitize-history.json ← Histórico local para calibração por usuário
     └── archive/              ← Histórico compactado de handovers
 ```
 
@@ -411,7 +412,9 @@ Autosanitização é manutenção preventiva, não limpeza destrutiva.
    - preview/index ausentes ou defasados.
 4. Estado operacional da autosanitização:
    - `_state/auto-sanitize-state.json` com métricas, decisão e ações executadas.
+   - `_state/auto-sanitize-history.json` com histórico local para calibrar thresholds por usuário/workspace.
 5. Regra de segurança: autosanitização não pode apagar histórico sem archive e não pode tocar arquivos pessoais.
+6. Regra de calibração: thresholds de autosanitização devem priorizar o histórico do usuário atual; sem amostra suficiente, usar defaults seguros.
 
 Referência operacional: `Prumo/references/modules/sanitization.md`.
 
@@ -467,6 +470,11 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 ---
 
 ## Changelog do Core
+
+### v3.7.2 (22/02/2026)
+- Autosanitização passa a calibrar thresholds por usuário/workspace via `_state/auto-sanitize-history.json`.
+- Novo estado explícito de calibração (modo, amostra, thresholds efetivos e overrides) em `_state/auto-sanitize-state.json`.
+- Fallback seguro mantido: sem histórico suficiente, usar defaults.
 
 ### v3.7.1 (22/02/2026)
 - Autosanitização adicionada com gatilhos objetivos e cooldown (`scripts/prumo_auto_sanitize.py`).
@@ -552,4 +560,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.7.1 — https://github.com/tharso/prumo*
+*Prumo Core v3.7.2 — https://github.com/tharso/prumo*

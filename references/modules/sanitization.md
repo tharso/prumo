@@ -6,6 +6,7 @@ Objetivo: manter arquivos operacionais enxutos sem apagar histórico.
 
 - `python3 Prumo/scripts/prumo_sanitize_state.py --workspace . --apply`
 - `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply`
+- `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --adaptive auto`
 
 ## O que faz
 
@@ -30,6 +31,10 @@ Objetivo: manter arquivos operacionais enxutos sem apagar histórico.
 3. thresholds em uso
 4. decisão (`triggers`, `cooldown_ok`, `will_apply`)
 5. resultado de cada ação executada
+
+Histórico por workspace (base para calibração adaptativa):
+
+- `_state/auto-sanitize-history.json`
 
 ## Segurança
 

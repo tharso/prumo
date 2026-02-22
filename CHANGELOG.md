@@ -4,6 +4,16 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.7.2] - 2026-02-22
+
+### Added
+- Histórico local de autosanitização por workspace em `_state/auto-sanitize-history.json`.
+- Estado de autosanitização expandido com modo adaptativo, thresholds efetivos e overrides.
+
+### Changed
+- `scripts/prumo_auto_sanitize.py` agora calibra thresholds por usuário/workspace (quando há amostra suficiente), com fallback seguro para defaults.
+- Documentação (`docs/AUTOSANITIZACAO.md`, `README.md`, módulos de referência e core) atualizada para explicitar calibração por usuário, não por média global.
+
 ## [3.7.1] - 2026-02-22
 
 ### Added

@@ -6,10 +6,15 @@ Objetivo: manter o runtime leve sem perder histórico e sem tocar arquivos pesso
 
 Autosanitização é uma rotina de manutenção preventiva acionada por gatilhos objetivos.
 Ela pode rodar no começo do briefing (quando há shell) ou manualmente.
+Os thresholds podem ser calibrados automaticamente por usuário (workspace), com base no histórico local.
 
 Script principal:
 
 - `scripts/prumo_auto_sanitize.py`
+
+Histórico por usuário:
+
+- `_state/auto-sanitize-history.json`
 
 ## Como roda
 
@@ -31,6 +36,12 @@ python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply
 python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply --force
 ```
 
+### Desligar calibração adaptativa (modo fixo)
+
+```bash
+python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --adaptive off
+```
+
 ## Gatilhos padrão
 
 1. `HANDOVER.md` >= `120000` bytes **e** há handovers `CLOSED` acima do limite de retenção
@@ -38,6 +49,18 @@ python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply --force
 3. `Inbox4Mobile/` com >= `8` arquivos
 4. `Inbox4Mobile/` com >= `4` itens multimídia
 5. `inbox-preview.html` ou `_preview-index.json` ausentes/desatualizados
+
+## Calibração adaptativa por usuário
+
+Quando `--adaptive auto` (default), o script usa o histórico do próprio workspace para ajustar:
+
+1. `handover_max_bytes`
+2. `handover_max_lines`
+3. `handover_keep_closed`
+4. `inbox_min_total`
+5. `inbox_min_media`
+
+Sem histórico suficiente, ele usa os valores base com segurança.
 
 ## Cooldown
 
@@ -75,6 +98,7 @@ Campos principais:
 4. `thresholds`
 5. `decision`
 6. `actions`
+7. `adaptive` (status, amostra, ajustes recomendados)
 
 Esse arquivo permite depurar por que a autosanitização rodou (ou não rodou).
 

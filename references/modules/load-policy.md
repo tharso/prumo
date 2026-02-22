@@ -14,6 +14,7 @@ Objetivo: reduzir overhead de contexto sem perder capacidade operacional.
   - obrigatório: `CLAUDE.md`, `PRUMO-CORE.md`, `PAUTA.md`, `INBOX.md`
   - preferencial leve: `_state/HANDOVER.summary.md` (se existir)
   - estado operacional: `_state/auto-sanitize-state.json` (se existir)
+  - histórico de calibração: `_state/auto-sanitize-history.json` (amostra leve, quando necessário)
   - detalhado sob demanda: `_state/HANDOVER.md`, arquivos de `Inbox4Mobile/`
   - módulo específico: `Prumo/references/modules/briefing-fast-path.md`
 

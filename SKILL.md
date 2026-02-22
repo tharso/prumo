@@ -257,7 +257,7 @@ Ao final da Etapa 9, mostrar resumo claro:
 | _state/briefing-state.json | Gerar JSON inicial | Estado de referência temporal do briefing (`last_briefing_at`). |
 | scripts/prumo_google_dual_snapshot.sh | prumo-google-dual-snapshot.sh | Script opcional para briefing Google dual (agenda + curadoria de emails desde último briefing). |
 | scripts/prumo_sanitize_state.py | Gerar arquivo | Sanitização de estado operacional (`HANDOVER`) com backup e resumo leve. |
-| scripts/prumo_auto_sanitize.py | Gerar arquivo | Autosanitização por gatilhos (handover/inbox) com cooldown e telemetria em `_state/auto-sanitize-state.json`. |
+| scripts/prumo_auto_sanitize.py | Gerar arquivo | Autosanitização por gatilhos (handover/inbox) com cooldown e calibração por workspace via `_state/auto-sanitize-history.json`. |
 | Inbox4Mobile/ | Criar pasta vazia | Para notas/arquivos do celular. |
 | Referencias/ | Criar pasta vazia | Para material de referência. |
 | Referencias/INDICE.md | file-templates.md | Índice de material de referência. |

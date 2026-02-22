@@ -77,6 +77,7 @@ Codex não pode:
 ## 6) Projeto GitHub (board)
 
 Use o script `scripts/github/bootstrap_project.sh` para criar o board base.
+Para board já existente, use `scripts/github/sync_project_schema.sh <owner> <project_number> true`.
 
 Campos recomendados:
 
@@ -87,3 +88,8 @@ Campos recomendados:
 - Target Version
 - Agent
 - Blocked By
+
+Observação prática:
+
+- Campos podem ser sincronizados via API/CLI.
+- Views (`Backlog`, `Next`, `In Progress`, `Review/Validation`, `Done`) ainda exigem configuração manual na UI do GitHub Project.

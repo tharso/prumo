@@ -4,6 +4,27 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.7.3] - 2026-02-22
+
+### Added
+- Workflow de release automatizada em `.github/workflows/release.yml`:
+  - valida `VERSION` em semver,
+  - valida entrada correspondente no `CHANGELOG.md`,
+  - cria tag `vX.Y.Z` quando ausente,
+  - cria/atualiza GitHub Release com notas extraídas do changelog.
+- Smoke test de briefing em `scripts/tests/briefing_smoke.sh` cobrindo:
+  - taxonomia `Responder`/`Ver`/`Sem ação`,
+  - prioridade `P1/P2/P3`,
+  - janela temporal (`last_briefing_at` + fallback 24h),
+  - paridade de instruções para runtime com shell e sem shell.
+- Script `scripts/github/sync_project_schema.sh` para sincronizar schema/valores do Project existente.
+
+### Changed
+- CI (`.github/workflows/ci.yml`) passa a executar smoke tests de briefing.
+- Bootstrap de project (`scripts/github/bootstrap_project.sh`) agora aplica schema automaticamente e deixa checklist explícito de views no README do board.
+- `scripts/github/sync_project_schema.sh` ajustado para compatibilidade com Bash do macOS (sem dependência de Bash 4+).
+- Documentação (`README.md`, `docs/WORKFLOW.md`) atualizada para refletir release automática, smoke tests e sync de schema.
+
 ## [3.7.2] - 2026-02-22
 
 ### Added

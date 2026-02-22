@@ -47,6 +47,11 @@ jobs:
           grep -q "agent/gemini" scripts/github/bootstrap_labels.sh
           grep -q "compat/multi-agent" scripts/github/bootstrap_labels.sh
 
+      - name: Briefing smoke tests
+        run: |
+          test -x scripts/tests/briefing_smoke.sh
+          scripts/tests/briefing_smoke.sh
+
       - name: Validate safe update guardrail exists
         run: |
           test -x scripts/safe_core_update.sh

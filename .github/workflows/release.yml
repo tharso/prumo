@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "VERSION"
+      - "CHANGELOG.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version and changelog
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$(cat VERSION)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "$VERSION" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' >/dev/null
+          grep -q "^## \[$VERSION\] - " CHANGELOG.md
+
+          TAG="v$VERSION"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+          awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\] - " {capture=1; print; next}
+            capture && $0 ~ "^## \\[" {exit}
+            capture {print}
+          ' CHANGELOG.md > release_notes.md
+
+          test -s release_notes.md
+
+      - name: Ensure tag exists
+        id: tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.meta.outputs.tag }}"
+
+          git fetch --tags origin
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG" "$GITHUB_SHA"
+          git push origin "$TAG"
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.meta.outputs.tag }}"
+          VERSION="${{ steps.meta.outputs.version }}"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" \
+              --title "Prumo $VERSION" \
+              --notes-file release_notes.md \
+              --latest
+          else
+            gh release create "$TAG" \
+              --title "Prumo $VERSION" \
+              --notes-file release_notes.md \
+              --target "$GITHUB_SHA"
+          fi

@@ -2,7 +2,7 @@
 
 Sistema de organização pessoal orientado à ação. O foco do Prumo não é listar pendência; é transformar entrada difusa em decisão clara.
 
-Estado deste documento: **21/02/2026**.
+Estado deste documento: **22/02/2026**.
 
 ## Estado atual
 
@@ -57,14 +57,17 @@ Este repositório agora usa um fluxo padrão de produto com Issues, Project e ve
 1. Templates de issue: `.github/ISSUE_TEMPLATE/`
 2. Template de PR: `.github/pull_request_template.md`
 3. CI de higiene: `.github/workflows/ci.yml`
-4. Diretrizes obrigatórias de engenharia: `docs/PRODUCT_DEVELOPMENT_GUIDELINES.md`
-5. Guia operacional: `docs/WORKFLOW.md`
-6. Manual prático (Projects/Issues + Codex autônomo): `docs/MANUAL_GITHUB_CODEX_AUTONOMO.md`
-7. Guia de autosanitização: `docs/AUTOSANITIZACAO.md`
-8. Versão pública: `VERSION`
-9. Histórico de mudanças: `CHANGELOG.md`
-10. Bootstrap de labels: `scripts/github/bootstrap_labels.sh`
-11. Bootstrap de project: `scripts/github/bootstrap_project.sh`
+4. Workflow de release: `.github/workflows/release.yml`
+5. Diretrizes obrigatórias de engenharia: `docs/PRODUCT_DEVELOPMENT_GUIDELINES.md`
+6. Guia operacional: `docs/WORKFLOW.md`
+7. Manual prático (Projects/Issues + Codex autônomo): `docs/MANUAL_GITHUB_CODEX_AUTONOMO.md`
+8. Guia de autosanitização: `docs/AUTOSANITIZACAO.md`
+9. Versão pública: `VERSION`
+10. Histórico de mudanças: `CHANGELOG.md`
+11. Bootstrap de labels: `scripts/github/bootstrap_labels.sh`
+12. Bootstrap de project: `scripts/github/bootstrap_project.sh`
+13. Sync de schema de project existente: `scripts/github/sync_project_schema.sh`
+14. Smoke test de briefing: `scripts/tests/briefing_smoke.sh`
 
 ## Briefing: lógica atual
 
@@ -186,7 +189,13 @@ Prumo/
 │   ├── generate_inbox_preview.py
 │   ├── prumo_auto_sanitize.py
 │   ├── prumo_google_dual_snapshot.sh
-│   └── prumo_sanitize_state.py
+│   ├── prumo_sanitize_state.py
+│   ├── github/
+│   │   ├── bootstrap_labels.sh
+│   │   ├── bootstrap_project.sh
+│   │   └── sync_project_schema.sh
+│   └── tests/
+│       └── briefing_smoke.sh
 └── test-output/
 ```
 
@@ -194,12 +203,12 @@ Prumo/
 
 1. Distribuição de plugin depende do pacote de release (manifesto e empacotamento) no repositório de distribuição.
 2. Integração dual-profile depende de infraestrutura local (shell + Gemini CLI + MCP autenticado).
-3. Ainda faltam testes de regressão automatizados para cenários de briefing e reconfiguração.
+3. Ainda faltam cenários automatizados de reconfiguração completa (`/prumo:setup`) com fixtures de workspace.
 
 ## Roadmap curto
 
 1. Consolidar pacote de release para publicação sem ajuste manual.
-2. Adicionar testes de smoke para briefing (com e sem shell).
+2. Adicionar suíte de regressão para setup/reconfiguração com fixtures.
 3. Evoluir métricas de qualidade de curadoria (taxa de `Responder` resolvido por ciclo).
 
 ## Referências rápidas

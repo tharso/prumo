@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.6.7**
+> **prumo_version: 3.7.1**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -28,7 +28,10 @@
 ├── [Áreas]/           ← Uma pasta por área de vida, cada uma com README.md
 ├── _logs/             ← Registros semanais de revisão
 └── _state/            ← Estado operacional (lock + handover + referência de briefing)
-    └── briefing-state.json  ← Timestamp do último briefing concluído (`last_briefing_at`)
+    ├── briefing-state.json   ← Timestamp do último briefing concluído (`last_briefing_at`)
+    ├── HANDOVER.summary.md   ← Resumo leve para briefing (quando existir)
+    ├── auto-sanitize-state.json ← Estado da autosanitização (gatilhos, cooldown, ações)
+    └── archive/              ← Histórico compactado de handovers
 ```
 
 ### Descrição dos arquivos principais
@@ -54,12 +57,23 @@
 | `/prumo:revisao` | Revisão semanal completa (análise por área, limpeza, prioridades) |
 | `/prumo:status` | Dashboard rápido — números, alertas, recomendação em uma tela |
 | `/prumo:handover` | Abre, responde e fecha handovers multiagente fora do briefing |
+| `/prumo:sanitize` | Sanitiza estado operacional (compacta handovers + gera resumo leve) |
 | `/prumo:menu` | Lista todos os comandos disponíveis |
 
 **Canônico vs alias:**
 - Comando canônico de briefing: `/prumo:briefing`
 - Alias legado aceito: `/briefing`
 - Regra de produto: priorizar sempre o canônico nas instruções e documentação nova.
+
+## Política de leitura incremental
+
+Para evitar overhead sem empobrecer o sistema, usar leitura por camadas:
+
+1. Camada base (sempre): `CLAUDE.md`, `PRUMO-CORE.md`, `PAUTA.md`, `INBOX.md`.
+2. Camada leve (preferencial): `_state/HANDOVER.summary.md`, `Inbox4Mobile/_preview-index.json`, `Inbox4Mobile/inbox-preview.html`.
+3. Camada profunda (sob demanda): binários e arquivos longos (`PDF`, `imagens`, transcrições extensas) apenas para itens `P1`, ambíguos ou de risco.
+
+Referência operacional: `Prumo/references/modules/load-policy.md`.
 
 ---
 
@@ -76,18 +90,27 @@ Quando o usuário iniciar o briefing (via `/prumo:briefing`, alias legado `/brie
    - prioridade 3: data inferida por APIs de calendário no mesmo fuso.
    - Se nenhuma fonte for confiável, não anunciar dia/data textual no cabeçalho.
 3. Ler PAUTA.md
-4. Verificar `_state/HANDOVER.md` (se existir) e identificar itens em `PENDING_VALIDATION` ou `REJECTED`
-5. Verificar pasta `Inbox4Mobile/` (notas e arquivos do celular) — **ABRIR TODOS OS ARQUIVOS, INCLUSIVE IMAGENS**
-6. Definir janela temporal de email:
+4. Verificar handovers:
+   - se existir `_state/HANDOVER.summary.md`, usar como leitura principal;
+   - se não existir ou estiver inconsistente, ler `_state/HANDOVER.md`;
+   - identificar itens em `PENDING_VALIDATION` ou `REJECTED`.
+5. Rodar autosanitização (quando shell disponível):
+   - executar `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply` (ou `scripts/prumo_auto_sanitize.py` conforme layout);
+   - respeitar cooldown e gatilhos internos;
+   - se falhar, seguir briefing normalmente e reportar falha de manutenção.
+6. Verificar pasta `Inbox4Mobile/` em 2 estágios:
+   - Estágio A (triagem leve): listar itens, gerar preview/índice e classificar ação+prioridade.
+   - Estágio B (aprofundamento seletivo): abrir conteúdo bruto completo só para `P1`, ambíguos, risco legal/financeiro/documental, ou pedido explícito do usuário.
+7. Definir janela temporal de email:
    - Se `_state/briefing-state.json` existir com `last_briefing_at`, usar esse timestamp.
    - Senão, usar fallback de 24h.
-7. Se Gmail configurado: buscar emails na janela e classificar por ação:
+8. Se Gmail configurado: buscar emails na janela e classificar por ação:
    - `Responder` (exige resposta ativa)
    - `Ver` (exige leitura/checagem sem resposta imediata)
    - `Sem ação` (baixo valor imediato)
    - Sempre incluir prioridade `P1/P2/P3` e motivo objetivo.
-8. Se Calendar configurado: verificar calendário de hoje e amanhã
-9. Apresentar:
+9. Se Calendar configurado: verificar calendário de hoje e amanhã
+10. Apresentar:
    - Data e dia da semana no fuso do usuário (definido no `CLAUDE.md`; default `America/Sao_Paulo`)
    - Compromissos do dia
    - Itens quentes que precisam de atenção
@@ -124,6 +147,7 @@ O usuário pode interagir a qualquer momento para:
 - **Check-in**: Perguntar status de algo ou atualizar progresso
 - **Pedir lembrete**: "Me cobra isso em 3 dias"
 - **Handover**: Usar `/prumo:handover` para registrar validação cruzada entre agentes fora da rotina de briefing
+- **Sanitização**: Usar `/prumo:sanitize` para compactar estado operacional e manter leitura rápida
 
 ---
 
@@ -147,15 +171,21 @@ No início de cada sessão (especialmente se for um chat novo):
 2. Ler este PRUMO-CORE.md (se ainda não lido)
 3. Ler PAUTA.md
 4. Ler INBOX.md (processar se houver itens)
-5. Verificar pasta `Inbox4Mobile/` — ABRIR TODOS OS ARQUIVOS, INCLUSIVE IMAGENS
+5. Verificar `Inbox4Mobile/` por triagem leve primeiro (`inbox-preview.html` + `_preview-index.json`); aprofundar só itens críticos
 6. Se Gmail configurado: buscar emails com subject do agente
-7. Se existir `_state/HANDOVER.md`, verificar handovers em aberto
+7. Se existir `_state/HANDOVER.summary.md`, verificar pendências por ele; fallback para `_state/HANDOVER.md`
 8. Se existir `_state/briefing-state.json`, usar `last_briefing_at` como referência de janela no briefing
-9. Se existir `_state/agent-lock.json`, respeitar lock por escopo antes de escrever
+9. Se existir `_state/auto-sanitize-state.json`, usar como telemetria leve de manutenção
+10. Se existir `_state/agent-lock.json`, respeitar lock por escopo antes de escrever
 
 ### 3. PROCESSAR O INBOX (TODOS OS CANAIS)
 
 O inbox tem múltiplos canais: INBOX.md, Inbox4Mobile/, e emails (se Gmail configurado). TODOS devem ser processados no briefing. Nunca pular um canal. Nunca ignorar um tipo de arquivo (texto, imagem, PDF, áudio).
+
+Triagem obrigatória em 2 estágios:
+
+1. **Triagem leve**: classificar por ação (`Responder`, `Ver`, `Sem ação`) e prioridade (`P1/P2/P3`) usando preview e metadados.
+2. **Aprofundamento seletivo**: abrir conteúdo bruto apenas para itens críticos (`P1`), ambíguos ou de risco.
 
 Itens no inbox devem ser:
 - Categorizados (qual área/projeto?)
@@ -181,11 +211,11 @@ Itens no inbox devem ser:
 
 **Apresentação**: Numerar os itens do inbox ao apresentá-los. Oferecer alternativas de categorização/ação para agilizar decisão.
 
-**Preview visual opcional (inbox multimídia):**
+**Preview visual prioritário (inbox multimídia):**
 
-1. Quando houver muitos arquivos visuais (imagens, PDFs, links), oferecer gerar `inbox-preview.html`.
-2. Com shell: usar `python3 scripts/generate_inbox_preview.py`.
-3. Sem shell: gerar HTML equivalente inline, mantendo a mesma estrutura funcional (preview + metadados + botões de clipboard).
+1. Quando houver 4+ itens multimídia ou 8+ itens totais no `Inbox4Mobile/`, gerar por padrão `inbox-preview.html` + `_preview-index.json`.
+2. Com shell: usar `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; fi`.
+3. Sem shell: gerar HTML equivalente inline e um índice textual equivalente (metadados mínimos + tipo + tamanho + data).
 4. Se a geração falhar, manter o fluxo padrão em lista numerada no chat.
 
 Ao mover itens para PAUTA.md ou README de área, sempre incluir a data de entrada no formato `(desde DD/MM)`. Isso torna visível o envelhecimento de cada item e facilita cobranças na revisão semanal.
@@ -320,6 +350,7 @@ Prumo pode ser operado por mais de um agente (ex: Cowork + Codex). Isso só func
 **Arquivos de estado:**
 1. `_state/agent-lock.json` — lock por escopo e TTL.
 2. `_state/HANDOVER.md` — fila de validação cruzada (append-only por item).
+3. `_state/HANDOVER.summary.md` — leitura leve para briefing.
 
 **Regras do lock (`_state/agent-lock.json`):**
 - Campos mínimos: `owner`, `scope`, `started_at`, `ttl_minutes`
@@ -333,7 +364,8 @@ Prumo pode ser operado por mais de um agente (ex: Cowork + Codex). Isso só func
 - Correção de bug sistêmico.
 
 **Checagem automática no briefing:**
-- Em `/prumo:briefing`, verificar `_state/HANDOVER.md` e destacar itens `PENDING_VALIDATION`/`REJECTED`.
+- Em `/prumo:briefing`, priorizar `_state/HANDOVER.summary.md` e cair para `_state/HANDOVER.md` quando necessário.
+- Destacar itens `PENDING_VALIDATION`/`REJECTED`.
 - Se o handover estiver endereçado ao agente atual, propor ação explícita de validação/fechamento.
 
 **Comando manual fora do briefing:**
@@ -351,6 +383,37 @@ Prumo pode ser operado por mais de um agente (ex: Cowork + Codex). Isso só func
 **Política de fechamento:**
 - `PENDING_VALIDATION` → `APPROVED`/`REJECTED` → `CLOSED`
 - Máximo recomendado de handovers abertos: 3
+
+### 17. SANITIZAÇÃO OPERACIONAL (SEM PERDER HISTÓRICO)
+
+Para reduzir latência e custo de contexto, o sistema deve manter arquivos operacionais enxutos:
+
+1. Sanitização recomendada semanal: `python3 Prumo/scripts/prumo_sanitize_state.py --workspace . --apply`.
+2. O processo deve:
+   - compactar `CLOSED` antigos de `_state/HANDOVER.md`,
+   - mover histórico para `_state/archive/HANDOVER-ARCHIVE.md`,
+   - gerar `_state/HANDOVER.summary.md` para leitura leve.
+3. Sem `--apply`, o comando roda em dry-run.
+4. Regra de segurança: sanitização nunca pode editar arquivos pessoais (`CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`, `IDEIAS.md`).
+
+Referência operacional: `Prumo/references/modules/sanitization.md`.
+
+### 18. AUTOSANITIZAÇÃO (GATILHOS + COOLDOWN)
+
+Autosanitização é manutenção preventiva, não limpeza destrutiva.
+
+1. Com shell disponível, o briefing pode executar:
+   - `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply`
+2. O script deve respeitar cooldown (default: 6h) para evitar execução em loop.
+3. Gatilhos padrão:
+   - `HANDOVER.md` >= 120000 bytes ou >= 350 linhas, **e** existir `CLOSED` acima de `handover_keep_closed`;
+   - `Inbox4Mobile/` com >= 8 arquivos ou >= 4 multimídia;
+   - preview/index ausentes ou defasados.
+4. Estado operacional da autosanitização:
+   - `_state/auto-sanitize-state.json` com métricas, decisão e ações executadas.
+5. Regra de segurança: autosanitização não pode apagar histórico sem archive e não pode tocar arquivos pessoais.
+
+Referência operacional: `Prumo/references/modules/sanitization.md`.
 
 ---
 
@@ -404,6 +467,18 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 ---
 
 ## Changelog do Core
+
+### v3.7.1 (22/02/2026)
+- Autosanitização adicionada com gatilhos objetivos e cooldown (`scripts/prumo_auto_sanitize.py`).
+- Estado de manutenção passa a ser persistido em `_state/auto-sanitize-state.json`.
+- Briefing pode executar manutenção preventiva automaticamente (best-effort, sem bloquear a rotina).
+- Regra 18 adicionada para formalizar os guardrails de autosanitização.
+
+### v3.7.0 (22/02/2026)
+- Briefing oficializado em duas camadas de leitura: triagem leve + aprofundamento seletivo.
+- Inbox multimídia passa a priorizar `inbox-preview.html` + `_preview-index.json` antes de abrir binários.
+- Novo comando operacional `/prumo:sanitize` para compactar handovers e gerar resumo leve.
+- Política de leitura incremental documentada via módulos em `Prumo/references/modules/`.
 
 ### Customizações locais (19/02/2026)
 - Comando canônico de briefing definido como `/prumo:briefing` (alias legado `/briefing` documentado)
@@ -477,4 +552,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.6.7 — https://github.com/tharso/prumo*
+*Prumo Core v3.7.1 — https://github.com/tharso/prumo*

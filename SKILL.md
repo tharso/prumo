@@ -256,6 +256,8 @@ Ao final da Etapa 9, mostrar resumo claro:
 | _state/ | Criar pasta vazia | Estado operacional (lock + handover). |
 | _state/briefing-state.json | Gerar JSON inicial | Estado de referência temporal do briefing (`last_briefing_at`). |
 | scripts/prumo_google_dual_snapshot.sh | prumo-google-dual-snapshot.sh | Script opcional para briefing Google dual (agenda + curadoria de emails desde último briefing). |
+| scripts/prumo_sanitize_state.py | Gerar arquivo | Sanitização de estado operacional (`HANDOVER`) com backup e resumo leve. |
+| scripts/prumo_auto_sanitize.py | Gerar arquivo | Autosanitização por gatilhos (handover/inbox) com cooldown e telemetria em `_state/auto-sanitize-state.json`. |
 | Inbox4Mobile/ | Criar pasta vazia | Para notas/arquivos do celular. |
 | Referencias/ | Criar pasta vazia | Para material de referência. |
 | Referencias/INDICE.md | file-templates.md | Índice de material de referência. |
@@ -270,6 +272,9 @@ Se o script não existir ou não puder rodar (runtime sem shell), a curadoria se
 
 **Comando `/prumo:handover`:**
 Fora da rotina de briefing, o usuário pode usar `/prumo:handover` para operar validações cruzadas entre agentes em `_state/HANDOVER.md` (listar, abrir, responder e fechar handovers).
+
+**Comando `/prumo:sanitize`:**
+Quando o estado operacional estiver pesado (muitos handovers antigos), usar `/prumo:sanitize` para compactar `_state/HANDOVER.md`, mover histórico para `_state/archive/HANDOVER-ARCHIVE.md` e gerar `_state/HANDOVER.summary.md` para leitura leve no briefing. Também pode executar autosanitização por gatilhos via `scripts/prumo_auto_sanitize.py`.
 
 ### Etapa 10: Primeiro dump (obrigatório)
 

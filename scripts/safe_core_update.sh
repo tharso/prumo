@@ -7,7 +7,7 @@ set -euo pipefail
 # 2) _backup/PRUMO-CORE.md.*
 
 REPO_DIR="${1:-.}"
-REMOTE_CORE_URL="${2:-https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md}"
+REMOTE_CORE_URL="${2:-https://raw.githubusercontent.com/tharso/prumo/main/references/prumo-core.md}"
 TARGET_FILE="${REPO_DIR}/PRUMO-CORE.md"
 BACKUP_DIR="${REPO_DIR}/_backup"
 TIMESTAMP="$(date +"%Y-%m-%d-%H%M%S")"

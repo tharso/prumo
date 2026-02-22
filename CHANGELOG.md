@@ -4,6 +4,41 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.7.1] - 2026-02-22
+
+### Added
+- Script `scripts/prumo_auto_sanitize.py` para autosanitização por gatilhos com cooldown.
+- Estado persistido de manutenção em `_state/auto-sanitize-state.json` (métricas, decisão e ações).
+
+### Changed
+- Core (`references/prumo-core.md`) evoluiu para `3.7.1` com regra formal de autosanitização.
+- Skills de briefing agora podem executar autosanitização preventiva (best-effort, sem bloquear briefing).
+- Documentação de sanitização e política de leitura incremental atualizadas para incluir fluxo automático.
+
+## [3.7.0] - 2026-02-22
+
+### Added
+- Script `scripts/prumo_sanitize_state.py` para compactar `HANDOVER` sem perda de histórico:
+  - move `CLOSED` antigos para `_state/archive/HANDOVER-ARCHIVE.md`,
+  - gera backup em `_state/archive/backups/`,
+  - gera `_state/HANDOVER.summary.md` para leitura leve.
+- Módulos de leitura incremental:
+  - `references/modules/load-policy.md`
+  - `references/modules/briefing-fast-path.md`
+  - `references/modules/sanitization.md`
+- Skill operacional `/prumo:sanitize` (`skills/sanitize/SKILL.md` e `skills-sanitize-SKILL.md`).
+
+### Changed
+- Briefing oficializado em dois estágios para inbox multimídia:
+  - Estágio A (triagem leve): preview + índice (`inbox-preview.html` + `_preview-index.json`);
+  - Estágio B (aprofundamento seletivo): abrir bruto só para `P1`, ambíguos ou itens de risco.
+- `scripts/generate_inbox_preview.py` atualizado:
+  - corrige caminhos relativos quando o HTML é salvo dentro de `Inbox4Mobile/`,
+  - exclui os arquivos gerados da própria listagem,
+  - ordena do mais recente para o mais antigo,
+  - remove inline base64 de imagem para reduzir peso do HTML.
+- Core e skills de briefing atualizados para priorizar leitura leve e reduzir overhead de contexto.
+
 ## [3.6.7] - 2026-02-22
 
 ### Changed

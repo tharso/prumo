@@ -6,7 +6,7 @@ Estado deste documento: **21/02/2026**.
 
 ## Estado atual
 
-- Core de referência no produto: `prumo_version 3.6.7` (`references/prumo-core.md`).
+- Core de referência no produto: `prumo_version 3.7.1` (`references/prumo-core.md`).
 - Skill principal de setup: `v3.4` (`SKILL.md`).
 - Skill de briefing: `v2.2` (com curadoria por ação em runtime com e sem shell).
 - Coexistência multiagente ativa e validada.
@@ -44,6 +44,7 @@ Arquivos de estado e operação:
 - `/prumo:revisao`: revisão semanal da pauta, limpeza de pendências e recalibração de prioridades.
 - `/prumo:status`: visão rápida do estado atual (itens quentes, bloqueios e próximos focos).
 - `/prumo:handover`: abre, responde e fecha handovers de validação entre agentes.
+- `/prumo:sanitize`: compacta estado operacional (`HANDOVER`) e gera resumo leve para acelerar briefing.
 - `/prumo:menu`: lista os comandos disponíveis no sistema.
 
 ## Workflow de produto (GitHub)
@@ -56,10 +57,11 @@ Este repositório agora usa um fluxo padrão de produto com Issues, Project e ve
 4. Diretrizes obrigatórias de engenharia: `docs/PRODUCT_DEVELOPMENT_GUIDELINES.md`
 5. Guia operacional: `docs/WORKFLOW.md`
 6. Manual prático (Projects/Issues + Codex autônomo): `docs/MANUAL_GITHUB_CODEX_AUTONOMO.md`
-7. Versão pública: `VERSION`
-8. Histórico de mudanças: `CHANGELOG.md`
-9. Bootstrap de labels: `scripts/github/bootstrap_labels.sh`
-10. Bootstrap de project: `scripts/github/bootstrap_project.sh`
+7. Guia de autosanitização: `docs/AUTOSANITIZACAO.md`
+8. Versão pública: `VERSION`
+9. Histórico de mudanças: `CHANGELOG.md`
+10. Bootstrap de labels: `scripts/github/bootstrap_labels.sh`
+11. Bootstrap de project: `scripts/github/bootstrap_project.sh`
 
 ## Briefing: lógica atual
 
@@ -106,13 +108,31 @@ Quando disponível, pode usar script dual-profile:
 
 Para triagem visual opcional do inbox multimídia:
 
-- `scripts/generate_inbox_preview.py` (gera `inbox-preview.html` local)
+- `scripts/generate_inbox_preview.py` (gera `Inbox4Mobile/inbox-preview.html` + `Inbox4Mobile/_preview-index.json`)
+- `scripts/prumo_sanitize_state.py` (compacta handovers antigos e gera `_state/HANDOVER.summary.md`)
+- `scripts/prumo_auto_sanitize.py` (autosanitização por gatilhos + cooldown; registra estado em `_state/auto-sanitize-state.json`)
 
 Template do script no produto:
 
 - `references/prumo-google-dual-snapshot.sh`
 
 Esse modo permite consolidar duas contas (ex.: pessoal/trabalho) no mesmo briefing.
+
+### Triagem de inbox em 2 estágios
+
+1. Estágio A (leve): preview + índice (`inbox-preview.html` e `_preview-index.json`).
+2. Estágio B (seletivo): abrir bruto só para `P1`, ambíguos ou risco legal/financeiro/documental.
+
+### Autosanitização (futuro operacional já habilitado)
+
+Quando o runtime tem shell, o briefing pode executar manutenção preventiva automática:
+
+1. roda `prumo_auto_sanitize.py` com cooldown (default: 6h),
+2. dispara sanitização de handover quando `HANDOVER.md` cresce além do limite,
+3. regenera preview/index do inbox quando volume ou defasagem exigirem,
+4. grava trilha em `_state/auto-sanitize-state.json`.
+
+Regra de segurança: autosanitização não toca arquivos pessoais (`CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`, `IDEIAS.md`).
 
 ### Runtime sem shell (paridade obrigatória)
 
@@ -142,16 +162,27 @@ Prumo/
 ├── SKILL.md
 ├── skills/
 │   ├── briefing/SKILL.md
-│   └── handover/SKILL.md
+│   ├── handover/SKILL.md
+│   └── sanitize/SKILL.md
 ├── skills-briefing-SKILL.md
 ├── skills-handover-SKILL.md
+├── skills-sanitize-SKILL.md
 ├── references/
 │   ├── prumo-core.md
 │   ├── claude-md-template.md
 │   ├── agents-md-template.md
 │   ├── file-templates.md
 │   ├── mobile-shortcut-guide.md
-│   └── prumo-google-dual-snapshot.sh
+│   ├── prumo-google-dual-snapshot.sh
+│   └── modules/
+│       ├── load-policy.md
+│       ├── briefing-fast-path.md
+│       └── sanitization.md
+├── scripts/
+│   ├── generate_inbox_preview.py
+│   ├── prumo_auto_sanitize.py
+│   ├── prumo_google_dual_snapshot.sh
+│   └── prumo_sanitize_state.py
 └── test-output/
 ```
 

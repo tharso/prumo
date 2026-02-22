@@ -7,11 +7,9 @@ Saida padrao: inbox-preview.html na raiz do workspace atual.
 from __future__ import annotations
 
 import argparse
-import base64
 import datetime as dt
 import html
 import json
-import mimetypes
 import os
 import re
 from pathlib import Path
@@ -46,7 +44,6 @@ TEXT_EXTENSIONS = {
     ".yml",
     ".xml",
 }
-MAX_INLINE_IMAGE_BYTES = 4 * 1024 * 1024
 MAX_TEXT_PREVIEW_CHARS = 12000
 URL_RE = re.compile(r"https?://[^\s<>\"]+")
 
@@ -64,6 +61,11 @@ def parse_args() -> argparse.Namespace:
         "--output",
         default="inbox-preview.html",
         help="Arquivo HTML de saida (default: inbox-preview.html).",
+    )
+    parser.add_argument(
+        "--index-output",
+        default="_preview-index.json",
+        help="Arquivo JSON com indice leve dos itens (default: _preview-index.json ao lado do HTML).",
     )
     return parser.parse_args()
 
@@ -86,8 +88,8 @@ def escape(value: str) -> str:
     return html.escape(value, quote=True)
 
 
-def rel_url(from_dir: Path, target_path: Path) -> str:
-    rel = os.path.relpath(target_path, from_dir)
+def rel_url(base_dir: Path, target_path: Path) -> str:
+    rel = os.path.relpath(target_path, base_dir)
     return "/".join(quote(part) for part in Path(rel).parts)
 
 
@@ -138,17 +140,9 @@ def parse_url_file_contents(text: str) -> str | None:
     return extract_first_url(text)
 
 
-def preview_image(path: Path) -> str:
-    mime, _ = mimetypes.guess_type(path.name)
-    mime = mime or "image/*"
-    size = path.stat().st_size
-    if size <= MAX_INLINE_IMAGE_BYTES:
-        data = base64.b64encode(path.read_bytes()).decode("ascii")
-        src = f"data:{mime};base64,{data}"
-        extra = ""
-    else:
-        src = rel_url(Path.cwd(), path)
-        extra = "<p class='hint'>Imagem grande: exibindo por caminho relativo.</p>"
+def preview_image(path: Path, output_dir: Path) -> str:
+    src = rel_url(output_dir, path)
+    extra = "<p class='hint'>Imagem exibida por caminho local (sem inline base64).</p>"
     return (
         f"<div class='preview image'>"
         f"<img src='{escape(src)}' alt='{escape(path.name)}' loading='lazy'/>"
@@ -156,8 +150,8 @@ def preview_image(path: Path) -> str:
     )
 
 
-def preview_pdf(path: Path) -> str:
-    src = rel_url(Path.cwd(), path)
+def preview_pdf(path: Path, output_dir: Path) -> str:
+    src = rel_url(output_dir, path)
     return (
         "<div class='preview pdf'>"
         f"<iframe title='{escape(path.name)}' src='{escape(src)}#view=FitH'></iframe>"
@@ -199,8 +193,8 @@ def preview_text(path: Path) -> tuple[str, bool]:
     return "".join(blocks), is_youtube
 
 
-def preview_generic(path: Path) -> str:
-    src = rel_url(Path.cwd(), path)
+def preview_generic(path: Path, output_dir: Path) -> str:
+    src = rel_url(output_dir, path)
     return (
         "<div class='preview generic'>"
         "<p>Sem preview dedicado para este tipo de arquivo.</p>"
@@ -220,21 +214,21 @@ def resolve_kind(path: Path) -> str:
     return "generic"
 
 
-def item_card(index: int, path: Path) -> str:
+def item_card(index: int, path: Path, output_dir: Path) -> str:
     stat = path.stat()
     kind = resolve_kind(path)
     is_youtube = False
     if kind == "image":
-        preview_html = preview_image(path)
+        preview_html = preview_image(path, output_dir)
         type_label = "Imagem"
     elif kind == "pdf":
-        preview_html = preview_pdf(path)
+        preview_html = preview_pdf(path, output_dir)
         type_label = "PDF"
     elif kind == "text":
         preview_html, is_youtube = preview_text(path)
         type_label = "Texto/Link"
     else:
-        preview_html = preview_generic(path)
+        preview_html = preview_generic(path, output_dir)
         type_label = "Arquivo"
 
     cmd_process = f"processar item {index}"
@@ -271,11 +265,37 @@ def item_card(index: int, path: Path) -> str:
     )
 
 
-def iter_files(inbox_dir: Path) -> Iterable[Path]:
-    for path in sorted(inbox_dir.iterdir(), key=lambda p: (p.stat().st_mtime, p.name.lower())):
+def build_index_entry(path: Path) -> dict[str, str | int | None]:
+    stat = path.stat()
+    kind = resolve_kind(path)
+    first_url: str | None = None
+    if kind == "text":
+        text = read_text_file(path)
+        ext = path.suffix.lower()
+        first_url = parse_url_file_contents(text) if ext in {".url", ".webloc"} else extract_first_url(text)
+
+    return {
+        "filename": path.name,
+        "absolute_path": str(path.resolve()),
+        "kind": kind,
+        "size_bytes": stat.st_size,
+        "mtime_iso": dt.datetime.fromtimestamp(stat.st_mtime).isoformat(),
+        "fingerprint": f"{stat.st_mtime_ns}:{stat.st_size}",
+        "first_url": first_url,
+    }
+
+
+def iter_files(inbox_dir: Path, exclude_paths: set[Path]) -> Iterable[Path]:
+    for path in sorted(
+        inbox_dir.iterdir(),
+        key=lambda p: (p.stat().st_mtime, p.name.lower()),
+        reverse=True,
+    ):
         if not path.is_file():
             continue
         if path.name == "_processed.json":
+            continue
+        if path.resolve() in exclude_paths:
             continue
         yield path
 
@@ -464,17 +484,40 @@ def main() -> int:
     root = Path.cwd()
     inbox_dir = (root / args.inbox_dir).resolve()
     output_path = (root / args.output).resolve()
+    index_output_raw = Path(args.index_output)
+    if index_output_raw.is_absolute():
+        index_output_path = index_output_raw
+    else:
+        index_output_path = output_path.parent / index_output_raw
 
     if not inbox_dir.exists() or not inbox_dir.is_dir():
         raise SystemExit(f"Inbox não encontrado: {inbox_dir}")
 
+    output_dir = output_path.parent
+
+    excluded = {output_path.resolve()}
+    if index_output_path.exists():
+        excluded.add(index_output_path.resolve())
+
     cards: list[str] = []
-    for idx, file_path in enumerate(iter_files(inbox_dir), start=1):
-        cards.append(item_card(idx, file_path))
+    index_entries: list[dict[str, str | int | None]] = []
+    for idx, file_path in enumerate(iter_files(inbox_dir, excluded), start=1):
+        cards.append(item_card(idx, file_path, output_dir))
+        index_entries.append(build_index_entry(file_path))
 
     html_doc = build_html("\n".join(cards), len(cards))
     output_path.write_text(html_doc, encoding="utf-8")
+    index_payload = {
+        "generated_at": dt.datetime.now().isoformat(),
+        "inbox_dir": str(inbox_dir),
+        "items": index_entries,
+    }
+    index_output_path.write_text(
+        json.dumps(index_payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
     print(f"ok: {output_path}")
+    print(f"index: {index_output_path}")
     print(f"items: {len(cards)}")
     return 0
 

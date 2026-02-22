@@ -47,18 +47,28 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
 
 1. Leia `PAUTA.md` — este é o arquivo mais importante.
 2. Leia `INBOX.md` — se tiver itens, serão processados no passo 5.
-3. Se existir `_state/HANDOVER.md`, identificar itens em `PENDING_VALIDATION` ou `REJECTED`.
+3. Verifique handovers em modo leve:
+   - se existir `_state/HANDOVER.summary.md`, use como fonte principal;
+   - se não existir ou estiver desatualizado, leia `_state/HANDOVER.md`;
+   - identifique itens em `PENDING_VALIDATION` ou `REJECTED`.
+4. Se existir `_state/auto-sanitize-state.json`, leia para telemetria de manutenção (última execução/último apply).
 
 ## Passo 4: Canais de entrada
 
 Verificar TODOS os canais, sem pular nenhum:
 
-1. **Pasta `Inbox4Mobile/`**: Listar TODOS os arquivos. Abrir cada um, inclusive imagens (screenshots, fotos, prints de WhatsApp contêm informações críticas).
+0. **Autosanitização preventiva (quando shell disponível)**:
+   - Rodar `if [ -f scripts/prumo_auto_sanitize.py ]; then python3 scripts/prumo_auto_sanitize.py --workspace . --apply; else python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply; fi`.
+   - Se falhar, reportar em 1 linha e seguir briefing (não bloquear rotina).
+
+1. **Pasta `Inbox4Mobile/`**: Listar TODOS os arquivos e iniciar por triagem leve (não abrir bruto de todos por padrão).
    - Se existir `Inbox4Mobile/_processed.json`, usar como filtro para não reapresentar como "novos" os itens já processados em sessão anterior sem deleção física.
-   - Se houver muitos itens multimídia, oferecer preview visual opcional:
-     - com shell: executar `python3 scripts/generate_inbox_preview.py` para gerar `inbox-preview.html` na raiz do workspace.
-     - sem shell: gerar o mesmo `inbox-preview.html` inline (HTML local equivalente) com os mesmos blocos: metadados, preview e botões de clipboard.
-     - se a geração falhar, seguir com a lista numerada no chat (fallback universal).
+   - Rodar em **2 estágios obrigatórios**:
+     - Estágio A (triagem leve): gerar `Inbox4Mobile/inbox-preview.html` + `Inbox4Mobile/_preview-index.json`.
+     - com shell: `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; fi`.
+     - sem shell: gerar HTML equivalente inline + índice textual equivalente (tipo, tamanho, data, link).
+     - Estágio B (aprofundamento): abrir conteúdo bruto completo apenas para itens `P1`, ambíguos, risco legal/financeiro/documental, ou solicitação explícita do usuário.
+   - Se a geração falhar, seguir com lista numerada no chat (fallback universal), mantendo a regra de aprofundamento seletivo.
 2. **Google dual via Gemini CLI (prioridade quando disponível)**:
    - Se existir `scripts/prumo_google_dual_snapshot.sh`, executar esse script.
    - Usar a saída do script como fonte principal para agenda (`AGENDA_HOJE` + `AGENDA_AMANHA`) e curadoria de emails (`TRIAGEM_RESPONDER`, `TRIAGEM_VER`, `TRIAGEM_SEM_ACAO`) das contas `pessoal` e `trabalho`.
@@ -80,7 +90,7 @@ Verificar TODOS os canais, sem pular nenhum:
 
 Se houver itens novos (de qualquer canal):
 - Numerar cada item
-- Sugerir categoria e próxima ação
+- Sugerir categoria e próxima ação com `Responder`/`Ver`/`Sem ação` e `P1`/`P2`/`P3`
 - Perguntar ao usuário se concorda ou quer ajustar
 - Montar plano único de commit com todas as operações pendentes
 - Pedir confirmação explícita antes de executar: "Vou executar estas N operações. Confirma?"
@@ -115,6 +125,7 @@ Apresentar de forma direta (no tom configurado no CLAUDE.md):
      - `Responder`: exige ação de resposta.
      - `Ver`: exige leitura/checagem, sem resposta imediata.
      - `Sem ação`: pode ignorar por ora.
+   - Informar quais itens ficaram só na triagem leve e quais exigiram abertura completa.
 7. **Pendências de handover** — se houver `_state/HANDOVER.md` com `PENDING_VALIDATION`/`REJECTED`, listar e propor ação
 
 Se a PAUTA estiver vazia: não fazer o briefing padrão. Pedir um brain dump.
@@ -124,6 +135,7 @@ Se a PAUTA estiver vazia: não fazer o briefing padrão. Pedir um brain dump.
 Atualizar PAUTA.md se algo mudou. Registrar itens processados no REGISTRO.md.
 Se houve validação de handover, atualizar status no `_state/HANDOVER.md`.
 Se o script dual foi usado e o briefing foi concluído, executar `scripts/prumo_google_dual_snapshot.sh --mark-briefing-complete` para atualizar a referência temporal do próximo briefing.
+Se existir `_state/HANDOVER.summary.md`, atualizar via sanitização quando houver grande volume de handovers fechados.
 Se o script dual NÃO foi usado (fallback sem shell), atualizar `_state/briefing-state.json` manualmente com o timestamp atual em `last_briefing_at`.
 Se houve fallback sem deleção física, manter `Inbox4Mobile/_processed.json` atualizado para evitar reapresentação de itens já processados.
 

@@ -16,6 +16,8 @@ Você está executando o morning briefing do sistema Prumo. Esta é a rotina mai
 1. Leia o arquivo `CLAUDE.md` na pasta workspace do usuário. Ele contém: nome, áreas de vida, tom de comunicação, integrações configuradas, lembretes recorrentes.
 2. Leia o arquivo `PRUMO-CORE.md` na mesma pasta. Ele contém as regras do sistema.
 3. Extraia o fuso do usuário do `CLAUDE.md` (default: `America/Sao_Paulo`) e use esse fuso para qualquer referência de data relativa (`hoje`, `amanhã`, dia da semana).
+4. Determine a data local por fonte verificável (ordem de preferência): ferramenta de tempo com timezone, relógio do sistema com TZ explícito, APIs de calendário no mesmo fuso.
+5. Se não houver fonte confiável, NÃO anunciar dia/data textual no cabeçalho do briefing.
 
 Se algum desses arquivos não existir, informe o usuário que o Prumo não está configurado e sugira rodar o setup.
 
@@ -96,6 +98,8 @@ Apresentar de forma direta (no tom configurado no CLAUDE.md):
 
 1. **Abertura com data correta** (obrigatório)
    - Mostrar data e dia da semana no fuso do usuário (não usar UTC para anunciar "hoje").
+   - Use formato absoluto: `Sábado, 21 de fevereiro de 2026 (America/Sao_Paulo)`.
+   - Se data não for verificável com confiança, omitir a linha de dia/data.
 2. **Compromissos do dia** (do calendário, se disponível)
    - Quando usar o script dual, consolidar compromissos das duas contas e identificar a origem (`pessoal`/`trabalho`).
 3. **Itens quentes** que precisam de atenção hoje

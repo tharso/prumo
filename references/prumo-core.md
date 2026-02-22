@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.6.6**
+> **prumo_version: 3.6.7**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -70,19 +70,24 @@
 Quando o usuário iniciar o briefing (via `/prumo:briefing`, alias legado `/briefing`, "bom dia", "briefing", ou similar), o agente deve:
 
 1. Ler CLAUDE.md (configuração pessoal, áreas, tom)
-2. Ler PAUTA.md
-3. Verificar `_state/HANDOVER.md` (se existir) e identificar itens em `PENDING_VALIDATION` ou `REJECTED`
-4. Verificar pasta `Inbox4Mobile/` (notas e arquivos do celular) — **ABRIR TODOS OS ARQUIVOS, INCLUSIVE IMAGENS**
-5. Definir janela temporal de email:
+2. Resolver data local por fonte verificável no fuso do usuário (`CLAUDE.md`; default `America/Sao_Paulo`):
+   - prioridade 1: ferramenta de tempo com timezone/local date;
+   - prioridade 2: data local do sistema com timezone explícito;
+   - prioridade 3: data inferida por APIs de calendário no mesmo fuso.
+   - Se nenhuma fonte for confiável, não anunciar dia/data textual no cabeçalho.
+3. Ler PAUTA.md
+4. Verificar `_state/HANDOVER.md` (se existir) e identificar itens em `PENDING_VALIDATION` ou `REJECTED`
+5. Verificar pasta `Inbox4Mobile/` (notas e arquivos do celular) — **ABRIR TODOS OS ARQUIVOS, INCLUSIVE IMAGENS**
+6. Definir janela temporal de email:
    - Se `_state/briefing-state.json` existir com `last_briefing_at`, usar esse timestamp.
    - Senão, usar fallback de 24h.
-6. Se Gmail configurado: buscar emails na janela e classificar por ação:
+7. Se Gmail configurado: buscar emails na janela e classificar por ação:
    - `Responder` (exige resposta ativa)
    - `Ver` (exige leitura/checagem sem resposta imediata)
    - `Sem ação` (baixo valor imediato)
    - Sempre incluir prioridade `P1/P2/P3` e motivo objetivo.
-7. Se Calendar configurado: verificar calendário de hoje e amanhã
-8. Apresentar:
+8. Se Calendar configurado: verificar calendário de hoje e amanhã
+9. Apresentar:
    - Data e dia da semana no fuso do usuário (definido no `CLAUDE.md`; default `America/Sao_Paulo`)
    - Compromissos do dia
    - Itens quentes que precisam de atenção
@@ -408,6 +413,10 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 - Novo comando `/prumo:handover` para operação manual de handovers fora do briefing
 - Briefing passa a usar janela temporal via `_state/briefing-state.json` e curadoria de emails orientada à ação (`Responder`/`Ver`/`Sem ação`)
 
+### v3.6.7 (22/02/2026)
+- Hardening da abertura do briefing: dia/data só podem ser anunciados com fonte de tempo verificável no fuso do usuário.
+- Regra de segurança: se a fonte de tempo não for confiável, não cravar dia/data textual.
+
 ### v3.6.6 (22/02/2026)
 - Briefing passa a exigir data/dia da semana no fuso do usuário (`CLAUDE.md`), evitando virada indevida por UTC.
 - Regra explícita: nunca inferir "hoje" pelo UTC quando o fuso configurado estiver em dia diferente.
@@ -468,4 +477,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.6.6 — https://github.com/tharso/prumo*
+*Prumo Core v3.6.7 — https://github.com/tharso/prumo*

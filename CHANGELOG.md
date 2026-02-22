@@ -4,6 +4,14 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.6.7] - 2026-02-22
+
+### Changed
+- Hardening da abertura de briefing para evitar data errada por UTC:
+  - dia/data só podem ser anunciados com fonte de tempo verificável no fuso do usuário;
+  - sem fonte confiável, o briefing não deve cravar dia/data textual.
+- Skills de briefing atualizadas para exigir formato absoluto de data no cabeçalho quando houver fonte confiável.
+
 ## [3.6.6] - 2026-02-22
 
 ### Changed

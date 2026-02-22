@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.6.5**
+> **prumo_version: 3.6.6**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -83,6 +83,7 @@ Quando o usuário iniciar o briefing (via `/prumo:briefing`, alias legado `/brie
    - Sempre incluir prioridade `P1/P2/P3` e motivo objetivo.
 7. Se Calendar configurado: verificar calendário de hoje e amanhã
 8. Apresentar:
+   - Data e dia da semana no fuso do usuário (definido no `CLAUDE.md`; default `America/Sao_Paulo`)
    - Compromissos do dia
    - Itens quentes que precisam de atenção
    - Lembretes do dia (consultar seção de lembretes recorrentes no CLAUDE.md)
@@ -407,6 +408,10 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 - Novo comando `/prumo:handover` para operação manual de handovers fora do briefing
 - Briefing passa a usar janela temporal via `_state/briefing-state.json` e curadoria de emails orientada à ação (`Responder`/`Ver`/`Sem ação`)
 
+### v3.6.6 (22/02/2026)
+- Briefing passa a exigir data/dia da semana no fuso do usuário (`CLAUDE.md`), evitando virada indevida por UTC.
+- Regra explícita: nunca inferir "hoje" pelo UTC quando o fuso configurado estiver em dia diferente.
+
 ### v3.6.5 (22/02/2026)
 - Correção da checagem de update: falha de acesso (404/auth/rede) não pode ser tratada como "sem update".
 - Atualização da URL canônica do core remoto para `references/prumo-core.md`.
@@ -463,4 +468,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.6.5 — https://github.com/tharso/prumo*
+*Prumo Core v3.6.6 — https://github.com/tharso/prumo*

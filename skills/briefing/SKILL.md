@@ -15,6 +15,7 @@ Você está executando o morning briefing do sistema Prumo. Esta é a rotina mai
 
 1. Leia o arquivo `CLAUDE.md` na pasta workspace do usuário. Ele contém: nome, áreas de vida, tom de comunicação, integrações configuradas, lembretes recorrentes.
 2. Leia o arquivo `PRUMO-CORE.md` na mesma pasta. Ele contém as regras do sistema.
+3. Extraia o fuso do usuário do `CLAUDE.md` (default: `America/Sao_Paulo`) e use esse fuso para qualquer referência de data relativa (`hoje`, `amanhã`, dia da semana).
 
 Se algum desses arquivos não existir, informe o usuário que o Prumo não está configurado e sugira rodar o setup.
 
@@ -93,17 +94,19 @@ Se houver itens novos (de qualquer canal):
 
 Apresentar de forma direta (no tom configurado no CLAUDE.md):
 
-1. **Compromissos do dia** (do calendário, se disponível)
+1. **Abertura com data correta** (obrigatório)
+   - Mostrar data e dia da semana no fuso do usuário (não usar UTC para anunciar "hoje").
+2. **Compromissos do dia** (do calendário, se disponível)
    - Quando usar o script dual, consolidar compromissos das duas contas e identificar a origem (`pessoal`/`trabalho`).
-2. **Itens quentes** que precisam de atenção hoje
-3. **Lembretes do dia** (consultar lembretes recorrentes no CLAUDE.md — ex: "quarta = lanche da escola")
-4. **Itens envelhecendo** — cobrar coisas paradas há muito tempo, com a data `(desde DD/MM)` visível
-5. **Novidades do inbox** — se processou itens, mostrar resumo do que entrou
+3. **Itens quentes** que precisam de atenção hoje
+4. **Lembretes do dia** (consultar lembretes recorrentes no CLAUDE.md — ex: "quarta = lanche da escola")
+5. **Itens envelhecendo** — cobrar coisas paradas há muito tempo, com a data `(desde DD/MM)` visível
+6. **Novidades do inbox** — se processou itens, mostrar resumo do que entrou
    - Em qualquer modo (script dual ou fallback sem shell), incluir curadoria por conta quando disponível:
      - `Responder`: exige ação de resposta.
      - `Ver`: exige leitura/checagem, sem resposta imediata.
      - `Sem ação`: pode ignorar por ora.
-6. **Pendências de handover** — se houver `_state/HANDOVER.md` com `PENDING_VALIDATION`/`REJECTED`, listar e propor ação
+7. **Pendências de handover** — se houver `_state/HANDOVER.md` com `PENDING_VALIDATION`/`REJECTED`, listar e propor ação
 
 Se a PAUTA estiver vazia: não fazer o briefing padrão. Pedir um brain dump.
 

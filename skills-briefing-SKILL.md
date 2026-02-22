@@ -21,17 +21,24 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
 ## Passo 2: Verificar atualização
 
 1. Leia o campo `prumo_version` no topo do `PRUMO-CORE.md` local.
-2. Busque a versão remota em: `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
-3. Se a versão remota for **igual ou menor**: prossiga sem mencionar nada.
-4. Se a versão remota for **maior**:
-   a. Busque o PRUMO-CORE.md remoto em: `https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md`
-   b. Leia a seção "Changelog do Core" do arquivo remoto. Extraia as entradas entre a versão local e a remota.
-   c. Apresente ao usuário: "Há uma atualização do Prumo (v[local] → v[remota]). O que mudou: [itens do changelog]. A atualização pode tocar SOMENTE `PRUMO-CORE.md`. Seus arquivos pessoais e operacionais não podem ser alterados. Atualizar?"
-   d. Se aceitar:
+2. Tente fonte remota:
+   - versão: `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
+   - core: `https://raw.githubusercontent.com/tharso/prumo/main/references/prumo-core.md`
+3. Se a fonte remota falhar (404/auth/rede), tente fonte local (se existir no workspace):
+   - versão: `Prumo/VERSION`
+   - core: `Prumo/references/prumo-core.md`
+4. Se nenhuma fonte estiver acessível:
+   - informe: "Não consegui verificar atualização do Prumo agora (falha de acesso à fonte de versão)."
+   - prossiga sem afirmar que está atualizado.
+5. Se a versão encontrada for **igual ou menor**: prossiga sem mencionar nada.
+6. Se a versão encontrada for **maior**:
+   a. Leia a seção "Changelog do Core" do core da fonte válida. Extraia as entradas entre a versão local e a remota.
+   b. Apresente ao usuário: "Há uma atualização do Prumo (v[local] → v[remota]). O que mudou: [itens do changelog]. A atualização pode tocar SOMENTE `PRUMO-CORE.md`. Seus arquivos pessoais e operacionais não podem ser alterados. Atualizar?"
+   c. Se aceitar:
       - criar backup de `PRUMO-CORE.md` em `_backup/PRUMO-CORE.md.YYYY-MM-DD-HHMMSS` (criando `_backup/` se necessário)
-      - substituir apenas `PRUMO-CORE.md`
+      - substituir apenas `PRUMO-CORE.md` com o core da fonte válida
       - abortar se qualquer outra escrita for necessária
-   e. Se recusar: prossiga sem insistir.
+   d. Se recusar: prossiga sem insistir.
 
 ## Passo 3: Estado atual
 

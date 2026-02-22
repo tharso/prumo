@@ -4,6 +4,15 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.6.5] - 2026-02-22
+
+### Changed
+- Correção da estratégia de checagem de atualização no briefing:
+  - URLs remotas atualizadas para o caminho atual do core (`references/prumo-core.md`).
+  - falha de acesso remoto (`404`, auth, rede) não pode mais ser interpretada como "sem update".
+  - fallback documentado para fonte local de manutenção (`Prumo/VERSION` + `Prumo/references/prumo-core.md`) quando disponível.
+- Ajuste no core de referência para refletir o novo fluxo de verificação de versão.
+
 ## [3.6.4] - 2026-02-22
 
 ### Added

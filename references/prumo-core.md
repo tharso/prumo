@@ -1,13 +1,13 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.6.4**
+> **prumo_version: 3.6.5**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
 > Suas personalizações estão em `CLAUDE.md`.
 >
 > Repositório: https://github.com/tharso/prumo
-> Arquivo remoto: https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md
+> Arquivo remoto: https://raw.githubusercontent.com/tharso/prumo/main/references/prumo-core.md
 
 ---
 
@@ -354,25 +354,33 @@ Prumo pode ser operado por mais de um agente (ex: Cowork + Codex). Isso só func
 
 No início de cada sessão (ou no briefing), o agente deve verificar se há atualização disponível:
 
-1. Ler a versão local: campo `prumo_version` no topo deste arquivo
-2. Buscar a versão remota em: `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
-3. Se a versão remota for igual ou menor: nada a fazer, seguir em silêncio.
-4. Se a versão remota for maior:
-   a. Buscar o PRUMO-CORE.md remoto em `https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md`
-   b. Extrair a seção "Changelog do Core" do arquivo remoto. Identificar todas as entradas entre a versão local e a versão remota.
-   c. **PARAR.** Apresentar SOMENTE o aviso de atualização (sem briefing, sem processar inbox, sem nada mais):
+1. Ler a versão local: campo `prumo_version` no topo deste arquivo.
+2. Tentar fonte primária (remota):
+   - `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
+   - `https://raw.githubusercontent.com/tharso/prumo/main/references/prumo-core.md`
+3. Se a fonte remota falhar (404, auth, timeout, rede), tentar fonte secundária local (quando existir no workspace):
+   - `Prumo/VERSION`
+   - `Prumo/references/prumo-core.md`
+4. Se não houver fonte válida para comparação:
+   - informar: "Não consegui verificar atualização do Prumo agora (erro de acesso à fonte de versão)."
+   - **não** afirmar "já está atualizado".
+   - prosseguir com o briefing normalmente.
+5. Se a versão encontrada for igual ou menor: nada a fazer, seguir em silêncio.
+6. Se a versão encontrada for maior:
+   a. Extrair a seção "Changelog do Core" da fonte válida.
+   b. **PARAR.** Apresentar SOMENTE o aviso de atualização (sem briefing, sem processar inbox, sem nada mais):
       "Antes do briefing: tem uma atualização do Prumo (v[local] → v[remota]).
       O que mudou: [changelog]
       É só o motor (PRUMO-CORE.md). Seus arquivos não são tocados. Leva 5 segundos.
       a) Atualizar agora (recomendado)
       b) Depois (pergunto de novo amanhã)"
-   d. **ESPERAR** a resposta do usuário. Não prosseguir.
-   e. Se (a):
+   c. **ESPERAR** a resposta do usuário. Não prosseguir.
+   d. Se (a):
       - Criar backup em `_backup/PRUMO-CORE.md.YYYY-MM-DD-HHMMSS`.
-      - Substituir **somente** `PRUMO-CORE.md` local pelo remoto.
+      - Substituir **somente** `PRUMO-CORE.md` local pelo core da fonte válida.
       - Se qualquer outra escrita em arquivo for necessária, **ABORTAR** e pedir confirmação explícita.
       - Confirmar. Reler o core atualizado. Prosseguir com o briefing.
-   f. Se (b): prosseguir com o briefing usando a versão atual. Perguntar de novo no próximo briefing.
+   e. Se (b): prosseguir com o briefing usando a versão atual. Perguntar de novo no próximo briefing.
 
 **Frequência:** Verificar no máximo 1x por sessão. Não verificar se já verificou hoje.
 
@@ -398,6 +406,11 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 - Briefing passa a checar automaticamente pendências de handover (`PENDING_VALIDATION`/`REJECTED`)
 - Novo comando `/prumo:handover` para operação manual de handovers fora do briefing
 - Briefing passa a usar janela temporal via `_state/briefing-state.json` e curadoria de emails orientada à ação (`Responder`/`Ver`/`Sem ação`)
+
+### v3.6.5 (22/02/2026)
+- Correção da checagem de update: falha de acesso (404/auth/rede) não pode ser tratada como "sem update".
+- Atualização da URL canônica do core remoto para `references/prumo-core.md`.
+- Fallback oficial de versão/core por fonte local (`Prumo/VERSION` + `Prumo/references/prumo-core.md`) quando remoto estiver indisponível.
 
 ### v3.6.4 (22/02/2026)
 - Preview visual opcional para triagem do `Inbox4Mobile` via `inbox-preview.html`.
@@ -450,4 +463,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.6.4 — https://github.com/tharso/prumo*
+*Prumo Core v3.6.5 — https://github.com/tharso/prumo*

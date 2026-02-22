@@ -41,6 +41,7 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
 Verificar TODOS os canais, sem pular nenhum:
 
 1. **Pasta `Inbox4Mobile/`**: Listar TODOS os arquivos. Abrir cada um, inclusive imagens (screenshots, fotos, prints de WhatsApp contêm informações críticas).
+   - Se existir `Inbox4Mobile/_processed.json`, usar como filtro para não reapresentar como "novos" os itens já processados em sessão anterior sem deleção física.
 2. **Google dual via Gemini CLI (prioridade quando disponível)**:
    - Se existir `scripts/prumo_google_dual_snapshot.sh`, executar esse script.
    - Usar a saída do script como fonte principal para agenda (`AGENDA_HOJE` + `AGENDA_AMANHA`) e curadoria de emails (`TRIAGEM_RESPONDER`, `TRIAGEM_VER`, `TRIAGEM_SEM_ACAO`) das contas `pessoal` e `trabalho`.
@@ -64,11 +65,20 @@ Se houver itens novos (de qualquer canal):
 - Numerar cada item
 - Sugerir categoria e próxima ação
 - Perguntar ao usuário se concorda ou quer ajustar
-- Mover para PAUTA.md ou README da área
-- Adicionar `(desde DD/MM)` em cada item
-- Renomear arquivos com nomes descritivos
-- Registrar no REGISTRO.md
-- Deletar original do inbox
+- Montar plano único de commit com todas as operações pendentes
+- Pedir confirmação explícita antes de executar: "Vou executar estas N operações. Confirma?"
+- Executar em lote:
+  - mover para PAUTA.md ou README da área
+  - adicionar `(desde DD/MM)` em cada item
+  - renomear arquivos com nomes descritivos
+  - registrar no REGISTRO.md
+  - deletar original do inbox com ação real de filesystem
+- Tratar permissão de deleção por runtime:
+  - quando necessário, solicitar proativamente permissão (ex.: `allow_cowork_file_delete`) antes de deletar
+  - se falhar por permissão, solicitar e tentar novamente
+  - se continuar falhando, registrar `DELECAO_FALHOU` no REGISTRO.md (com motivo) e marcar item em `Inbox4Mobile/_processed.json`
+- Verificar pós-commit: listar `Inbox4Mobile/` e confirmar que itens processados não ficaram para trás
+- Reportar fechamento: quantos processados, quantos deletados, quantos falharam e por quê
 
 ## Passo 6: Montar o briefing
 
@@ -94,6 +104,7 @@ Atualizar PAUTA.md se algo mudou. Registrar itens processados no REGISTRO.md.
 Se houve validação de handover, atualizar status no `_state/HANDOVER.md`.
 Se o script dual foi usado e o briefing foi concluído, executar `scripts/prumo_google_dual_snapshot.sh --mark-briefing-complete` para atualizar a referência temporal do próximo briefing.
 Se o script dual NÃO foi usado (fallback sem shell), atualizar `_state/briefing-state.json` manualmente com o timestamp atual em `last_briefing_at`.
+Se houve fallback sem deleção física, manter `Inbox4Mobile/_processed.json` atualizado para evitar reapresentação de itens já processados.
 
 ---
 

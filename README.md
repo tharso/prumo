@@ -6,7 +6,7 @@ Estado deste documento: **21/02/2026**.
 
 ## Estado atual
 
-- Core local: `prumo_version 3.6` (`PRUMO-CORE.md`).
+- Core de referência no produto: `prumo_version 3.6.3` (`references/prumo-core.md`).
 - Skill principal de setup: `v3.4` (`SKILL.md`).
 - Skill de briefing: `v2.2` (com curadoria por ação em runtime com e sem shell).
 - Coexistência multiagente ativa e validada.

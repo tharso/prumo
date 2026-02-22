@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.6**
+> **prumo_version: 3.6.3**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -155,13 +155,29 @@ Itens no inbox devem ser:
 - Categorizados (qual área/projeto?)
 - Transformados em ação (qual a próxima ação concreta?)
 - Movidos para PAUTA.md ou README.md da área, **com renomeação descritiva** ao salvar no destino. O nome do arquivo deve ser autoexplicativo: `Fonte_Titulo-Curto_Ano.extensão` para referências, `Descricao_Contexto.extensão` para documentos pessoais. Ninguém deveria precisar abrir um arquivo pra saber o que tem dentro.
-- Fisicamente removidos do inbox (deletar original). Documentar no REGISTRO antes de deletar.
+- Fisicamente removidos do inbox (deletar original com ação real de filesystem, como `rm` ou equivalente). Documentar no REGISTRO antes de deletar.
+
+**Commit do inbox (obrigatório):**
+
+1. Após a triagem, montar plano único com operações pendentes (mover, descartar, arquivar, deletar original).
+2. Pedir confirmação explícita do usuário: "Vou executar estas N operações. Confirma?"
+3. Executar em lote.
+4. Verificar cada operação:
+   - Se a deleção falhar por permissão, solicitar permissão explícita do runtime (ex.: `allow_cowork_file_delete`) e tentar novamente.
+   - Se continuar falhando, registrar no `REGISTRO.md` com status `DELECAO_FALHOU` e motivo objetivo.
+5. Reportar fechamento do commit: quantos itens processados, quantos deletados com sucesso, quantos falharam.
+
+**Fallback para runtime sem deleção:**
+
+1. Se o agente não puder deletar arquivo no runtime atual, registrar o item em `Inbox4Mobile/_processed.json`.
+2. No próximo briefing, filtrar itens marcados nesse arquivo para não reapresentar como "novos".
+3. Manter transparência: informar no briefing quais itens estão marcados como processados, mas pendentes de deleção física.
 
 **Apresentação**: Numerar os itens do inbox ao apresentá-los. Oferecer alternativas de categorização/ação para agilizar decisão.
 
 Ao mover itens para PAUTA.md ou README de área, sempre incluir a data de entrada no formato `(desde DD/MM)`. Isso torna visível o envelhecimento de cada item e facilita cobranças na revisão semanal.
 
-Inbox vazio = sistema saudável.
+Inbox vazio = sistema saudável. Se restar item no inbox após o commit, listar os remanescentes e explicar por quê.
 
 ### 4. PROCESSAR MATERIAL DE REFERÊNCIA
 
@@ -376,6 +392,11 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 - Novo comando `/prumo:handover` para operação manual de handovers fora do briefing
 - Briefing passa a usar janela temporal via `_state/briefing-state.json` e curadoria de emails orientada à ação (`Responder`/`Ver`/`Sem ação`)
 
+### v3.6.3 (22/02/2026)
+- Regra 3 reforçada com commit explícito de inbox (confirmar, executar em lote e verificar resultado).
+- Deleção do inbox passou a exigir ação real de filesystem, com tratamento explícito de falha por permissão.
+- Fallback oficial para runtime sem deleção: `Inbox4Mobile/_processed.json` + filtro no briefing para evitar reapresentação.
+
 ### v3.6 (19/02/2026)
 - Curadoria de emails no briefing virou regra do core: classificar por ação com prioridade e motivo objetivo.
 - Janela temporal "desde o último briefing" oficializada com `_state/briefing-state.json` (fallback 24h).
@@ -417,4 +438,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.6 — https://github.com/tharso/prumo*
+*Prumo Core v3.6.3 — https://github.com/tharso/prumo*

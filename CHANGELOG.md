@@ -4,6 +4,17 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.6.3] - 2026-02-22
+
+### Changed
+- Regra de processamento do inbox reforçada com commit explícito (confirmar, executar em lote e verificar).
+- Skills de briefing (`skills/briefing/SKILL.md` e `skills-briefing-SKILL.md`) agora exigem:
+  - confirmação de commit antes da execução;
+  - deleção real do original no inbox;
+  - tratamento explícito de falha por permissão (incluindo `allow_cowork_file_delete` quando aplicável);
+  - relatório final de sucesso/falha por item.
+- Fallback oficial para runtimes sem deleção física: marcação em `Inbox4Mobile/_processed.json` e filtro no briefing para não reapresentar itens já processados.
+
 ## [3.6.2] - 2026-02-21
 
 ### Added

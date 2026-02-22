@@ -4,6 +4,21 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.6.4] - 2026-02-22
+
+### Added
+- Script `scripts/generate_inbox_preview.py` para gerar `inbox-preview.html` local a partir de `Inbox4Mobile/`.
+- Preview por tipo no HTML:
+  - imagens (inline em base64, com fallback por caminho relativo),
+  - PDFs em `iframe`,
+  - textos/links inline,
+  - embed de YouTube quando URL detectada.
+- Botões de clipboard por item para comandos de triagem (`processar`, `mover para IDEIAS`, `descartar`).
+
+### Changed
+- Skills de briefing (`skills/briefing/SKILL.md` e `skills-briefing-SKILL.md`) agora instruem oferta opcional de preview visual para inbox multimídia.
+- Core de referência (`references/prumo-core.md`) atualizado para documentar o preview visual opcional com fallback inline sem shell.
+
 ## [3.6.3] - 2026-02-22
 
 ### Changed

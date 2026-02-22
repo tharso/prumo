@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.7.3**
+> **prumo_version: 3.7.6**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -433,15 +433,18 @@ No início de cada sessão (ou no briefing), o agente deve verificar se há atua
 2. Tentar fonte primária (remota):
    - `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
    - `https://raw.githubusercontent.com/tharso/prumo/main/references/prumo-core.md`
-3. Se a fonte remota falhar (404, auth, timeout, rede), tentar fonte secundária local (quando existir no workspace):
+3. Validar integridade da fonte primária:
+   - tratar como inválida se o core remoto vier incompleto/truncado (ex.: sem `## Changelog do Core` ou sem rodapé `Prumo Core v...`);
+   - fonte inválida conta como falha para fins de fallback.
+4. Se a fonte remota falhar (404, auth, timeout, rede) **ou for inválida/incompleta**, tentar fonte secundária local (quando existir no workspace):
    - `Prumo/VERSION`
    - `Prumo/references/prumo-core.md`
-4. Se não houver fonte válida para comparação:
+5. Se não houver fonte válida para comparação:
    - informar: "Não consegui verificar atualização do Prumo agora (erro de acesso à fonte de versão)."
    - **não** afirmar "já está atualizado".
    - prosseguir com o briefing normalmente.
-5. Se a versão encontrada for igual ou menor: nada a fazer, seguir em silêncio.
-6. Se a versão encontrada for maior:
+6. Se a versão encontrada for igual ou menor: nada a fazer, seguir em silêncio.
+7. Se a versão encontrada for maior:
    a. Extrair a seção "Changelog do Core" da fonte válida.
    b. **PARAR.** Apresentar SOMENTE o aviso de atualização (sem briefing, sem processar inbox, sem nada mais):
       "Antes do briefing: tem uma atualização do Prumo (v[local] → v[remota]).
@@ -473,6 +476,20 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 ---
 
 ## Changelog do Core
+
+### v3.7.6 (22/02/2026)
+- Alinhamento de versão do motor com `VERSION` do repositório para evitar divergência no briefing de update.
+- Changelog interno do core sincronizado com as mudanças já publicadas até 3.7.5.
+- Fonte remota incompleta/truncada passa a ser tratada como inválida no fluxo de update (fallback local obrigatório).
+
+### v3.7.5 (22/02/2026)
+- Adoção de preview no briefing endurecida como regra bloqueante:
+  - se `_preview-index.json` existir, `inbox-preview.html` deve ser linkado antes de abrir arquivos individuais;
+  - abertura individual antes do preview só é válida em falha objetiva de geração/leitura.
+- Fallback de triagem passa a exigir explicitação de falha de preview ao usuário.
+
+### v3.7.4 (22/02/2026)
+- Smoke de briefing ficou agnóstico de runner: fallback para `grep` quando `rg` não estiver disponível.
 
 ### v3.7.3 (22/02/2026)
 - Adoção do preview virou regra bloqueante do briefing: se `_preview-index.json` existir, `inbox-preview.html` deve ser linkado antes de qualquer abertura de arquivo bruto.
@@ -567,4 +584,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.7.3 — https://github.com/tharso/prumo*
+*Prumo Core v3.7.6 — https://github.com/tharso/prumo*

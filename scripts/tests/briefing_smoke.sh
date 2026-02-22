@@ -26,10 +26,17 @@ assert_contains() {
 CORE_FILE="references/prumo-core.md"
 SKILL_FILE="skills/briefing/SKILL.md"
 SKILL_MIRROR_FILE="skills-briefing-SKILL.md"
+VERSION_FILE="VERSION"
 
-for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
+for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE" "$VERSION_FILE"; do
   [[ -f "$file" ]] || fail "Arquivo obrigatório ausente: $file"
 done
+
+VERSION_VALUE="$(cat "$VERSION_FILE")"
+CORE_VERSION="$(grep -Eo '^> \*\*prumo_version: [0-9]+\.[0-9]+\.[0-9]+\*\*$' "$CORE_FILE" | sed -E 's/^> \*\*prumo_version: ([0-9]+\.[0-9]+\.[0-9]+)\*\*$/\1/' | head -n1)"
+[[ -n "$CORE_VERSION" ]] || fail "Não foi possível extrair prumo_version do core"
+[[ "$VERSION_VALUE" == "$CORE_VERSION" ]] || fail "Divergência de versão: VERSION=$VERSION_VALUE vs prumo_version=$CORE_VERSION"
+assert_contains "$CORE_FILE" "^### v$CORE_VERSION \\(" "Changelog do core não contém seção da versão atual"
 
 for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
   assert_contains "$file" "Responder" "Taxonomia: ausência de 'Responder'"

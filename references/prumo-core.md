@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.7.2**
+> **prumo_version: 3.7.3**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -101,6 +101,8 @@ Quando o usuário iniciar o briefing (via `/prumo:briefing`, alias legado `/brie
    - se falhar, seguir briefing normalmente e reportar falha de manutenção.
 6. Verificar pasta `Inbox4Mobile/` em 2 estágios:
    - Estágio A (triagem leve): listar itens, gerar preview/índice e classificar ação+prioridade.
+   - Regra bloqueante de adoção: se `Inbox4Mobile/_preview-index.json` existir, o agente DEVE linkar `Inbox4Mobile/inbox-preview.html` como primeiro passo da triagem.
+   - Abrir arquivo bruto individual antes de linkar o preview só é permitido se a geração/leitura do preview falhar.
    - Estágio B (aprofundamento seletivo): abrir conteúdo bruto completo só para `P1`, ambíguos, risco legal/financeiro/documental, ou pedido explícito do usuário.
 7. Definir janela temporal de email:
    - Se `_state/briefing-state.json` existir com `last_briefing_at`, usar esse timestamp.
@@ -217,7 +219,8 @@ Itens no inbox devem ser:
 1. Quando houver 4+ itens multimídia ou 8+ itens totais no `Inbox4Mobile/`, gerar por padrão `inbox-preview.html` + `_preview-index.json`.
 2. Com shell: usar `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; fi`.
 3. Sem shell: gerar HTML equivalente inline e um índice textual equivalente (metadados mínimos + tipo + tamanho + data).
-4. Se a geração falhar, manter o fluxo padrão em lista numerada no chat.
+4. Se `_preview-index.json` existir, linkar `inbox-preview.html` no briefing como primeiro passo obrigatório da triagem (antes de abrir arquivos individuais).
+5. Se a geração falhar, manter o fluxo padrão em lista numerada no chat e registrar no briefing que a etapa de preview falhou.
 
 Ao mover itens para PAUTA.md ou README de área, sempre incluir a data de entrada no formato `(desde DD/MM)`. Isso torna visível o envelhecimento de cada item e facilita cobranças na revisão semanal.
 
@@ -471,6 +474,10 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ## Changelog do Core
 
+### v3.7.3 (22/02/2026)
+- Adoção do preview virou regra bloqueante do briefing: se `_preview-index.json` existir, `inbox-preview.html` deve ser linkado antes de qualquer abertura de arquivo bruto.
+- Abertura individual antes do preview passa a ser permitida apenas em caso de falha de geração/leitura do preview.
+
 ### v3.7.2 (22/02/2026)
 - Autosanitização passa a calibrar thresholds por usuário/workspace via `_state/auto-sanitize-history.json`.
 - Novo estado explícito de calibração (modo, amostra, thresholds efetivos e overrides) em `_state/auto-sanitize-state.json`.
@@ -560,4 +567,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.7.2 — https://github.com/tharso/prumo*
+*Prumo Core v3.7.3 — https://github.com/tharso/prumo*

@@ -4,6 +4,17 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.7.5] - 2026-02-22
+
+### Changed
+- Adoção de preview no briefing endurecida como regra bloqueante no core e nas skills:
+  - se `Inbox4Mobile/_preview-index.json` existir, o agente deve linkar `Inbox4Mobile/inbox-preview.html` antes de abrir arquivos individuais;
+  - abertura de arquivo bruto antes do preview só é válida em falha objetiva de geração/leitura.
+- Fallback de triagem agora exige explicitar no briefing quando houve falha de preview.
+
+### Added
+- Smoke test de briefing reforçado para validar regra de adoção do preview (presença explícita de `_preview-index.json` e obrigação de linkar `inbox-preview.html`).
+
 ## [3.7.4] - 2026-02-22
 
 ### Fixed

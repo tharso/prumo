@@ -63,8 +63,10 @@ Verificar TODOS os canais, sem pular nenhum:
      - Estágio A (triagem leve): gerar `Inbox4Mobile/inbox-preview.html` + `Inbox4Mobile/_preview-index.json`.
      - com shell: `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; fi`.
      - sem shell: gerar HTML equivalente inline + índice textual equivalente (tipo, tamanho, data, link).
+     - Regra bloqueante de adoção: se `Inbox4Mobile/_preview-index.json` existir, o agente DEVE linkar `Inbox4Mobile/inbox-preview.html` no briefing como primeiro passo da triagem.
+     - Não abrir arquivos brutos individuais antes desse link, exceto em caso de falha objetiva de geração/leitura do preview.
      - Estágio B (aprofundamento): abrir conteúdo bruto completo apenas para itens `P1`, ambíguos, risco legal/financeiro/documental, ou solicitação explícita do usuário.
-   - Se a geração falhar, seguir com lista numerada no chat (fallback universal), mantendo a regra de aprofundamento seletivo.
+   - Se a geração falhar, seguir com lista numerada no chat (fallback universal), mantendo a regra de aprofundamento seletivo e explicitando a falha de preview ao usuário.
 2. **Google dual via Gemini CLI (prioridade quando disponível)**:
    - Se existir `scripts/prumo_google_dual_snapshot.sh`, executar esse script.
    - Usar a saída do script como fonte principal para agenda (`AGENDA_HOJE` + `AGENDA_AMANHA`) e curadoria de emails (`TRIAGEM_RESPONDER`, `TRIAGEM_VER`, `TRIAGEM_SEM_ACAO`) das contas `pessoal` e `trabalho`.

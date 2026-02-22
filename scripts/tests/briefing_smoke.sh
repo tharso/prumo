@@ -43,6 +43,11 @@ for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
   assert_contains "$file" "24h|24 h|24 horas" "Janela temporal: falta fallback de 24h"
 done
 
+for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
+  assert_contains "$file" "_preview-index\\.json" "Preview adoption: falta referência ao índice de preview"
+  assert_contains "$file" "DEVE linkar .*inbox-preview\\.html|inbox-preview\\.html.*DEVE" "Preview adoption: regra bloqueante de link ausente"
+done
+
 assert_contains "$SKILL_FILE" "Google dual via Gemini CLI|script dual" "Modo com shell não descrito na skill principal"
 assert_contains "$SKILL_FILE" "Fallback sem shell" "Fallback sem shell não descrito na skill principal"
 assert_contains "$SKILL_MIRROR_FILE" "Google dual via Gemini CLI|script dual" "Modo com shell não descrito na skill espelhada"

@@ -4,6 +4,15 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.8.3] - 2026-02-23
+
+### Fixed
+- `scripts/generate_inbox_preview.py` agora degrada preview de YouTube em `file://` para fallback seguro (thumbnail + link), evitando iframe quebrado com erro 153.
+- Corrigido bug de interpolação no HTML/JS gerado (`NameError` em `safeWatch`/`safeThumb`) que podia abortar a geração do `inbox-preview.html`.
+
+### Added
+- Regressão no smoke test para garantir presença do fallback de YouTube local (`location.protocol === 'file:'` + `yt-fallback-caption`) no HTML gerado.
+
 ## [3.8.2] - 2026-02-23
 
 ### Fixed

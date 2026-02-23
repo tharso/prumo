@@ -99,5 +99,7 @@ EOF
 
 [[ -f "$TMP_DIR/Inbox4Mobile/_preview-index.json" ]] || fail "Regressão de path: índice não gerado no local esperado"
 [[ ! -f "$TMP_DIR/Inbox4Mobile/Inbox4Mobile/_preview-index.json" ]] || fail "Regressão de path: índice duplicado em Inbox4Mobile/Inbox4Mobile"
+assert_contains "$TMP_DIR/Inbox4Mobile/inbox-preview.html" "location\\.protocol === 'file:'" "Regressão YouTube local: fallback para file:// ausente"
+assert_contains "$TMP_DIR/Inbox4Mobile/inbox-preview.html" "yt-fallback-caption" "Regressão YouTube local: bloco de fallback ausente"
 
 echo "[OK] Briefing smoke checks passaram."

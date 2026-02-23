@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.8.2**
+> **prumo_version: 3.8.3**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -499,6 +499,11 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ## Changelog do Core
 
+### v3.8.3 (23/02/2026)
+- Preview de YouTube no `inbox-preview.html` passa a usar fallback local em `file://` (thumbnail + link), evitando erro 153 de embed bloqueado.
+- Corrigido bug de interpolação no bloco JS do gerador que podia interromper a criação do HTML de preview.
+- Smoke test reforçado para validar fallback de YouTube local no artefato gerado.
+
 ### v3.8.2 (23/02/2026)
 - Correção de resolução de path no `generate_inbox_preview.py`: `--index-output` relativo passa a ser independente de `--output`.
 - Comando canônico de geração de preview atualizado para usar `--index-output Inbox4Mobile/_preview-index.json` explicitamente.
@@ -625,4 +630,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.8.2 — https://github.com/tharso/prumo*
+*Prumo Core v3.8.3 — https://github.com/tharso/prumo*

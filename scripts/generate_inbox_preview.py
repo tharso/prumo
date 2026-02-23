@@ -172,9 +172,14 @@ def preview_text(path: Path) -> tuple[str, bool]:
     if youtube_id:
         is_youtube = True
         embed = f"https://www.youtube.com/embed/{youtube_id}"
+        thumb = f"https://i.ytimg.com/vi/{youtube_id}/hqdefault.jpg"
+        watch = link_url or f"https://www.youtube.com/watch?v={youtube_id}"
         blocks.append(
-            "<div class='youtube-wrap'>"
-            f"<iframe title='YouTube preview' src='{escape(embed)}' allowfullscreen></iframe>"
+            "<div class='youtube-preview' "
+            f"data-embed='{escape(embed)}' "
+            f"data-watch='{escape(watch)}' "
+            f"data-thumb='{escape(thumb)}'>"
+            "<div class='youtube-loading'>Preparando preview do YouTube...</div>"
             "</div>"
         )
         if link_url:
@@ -391,17 +396,46 @@ def build_html(cards: str, count: int) -> str:
       font-size: 0.9rem;
       word-break: break-all;
     }}
-    .youtube-wrap {{
+    .youtube-preview {{
       position: relative;
       width: 100%;
-      padding-top: 56.25%;
       margin-bottom: 8px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #111;
+      border: 1px solid #1f2a33;
     }}
-    .youtube-wrap iframe {{
-      position: absolute;
-      inset: 0;
+    .youtube-preview iframe {{
       width: 100%;
-      height: 100%;
+      height: 280px;
+      border: 0;
+      border-radius: 8px;
+      display: block;
+      background: #111;
+    }}
+    .youtube-loading {{
+      color: #c7d7e1;
+      font-size: 0.86rem;
+      padding: 14px;
+    }}
+    .yt-fallback-link {{
+      display: block;
+      color: #fff;
+      text-decoration: none;
+      background: #111;
+    }}
+    .yt-fallback-thumb {{
+      width: 100%;
+      display: block;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #111;
+    }}
+    .yt-fallback-caption {{
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      color: #d7e3ea;
+      border-top: 1px solid rgba(255,255,255,0.12);
     }}
     .actions {{
       display: flex;
@@ -453,6 +487,48 @@ def build_html(cards: str, count: int) -> str:
   </main>
   <div id="toast" class="toast">Comando copiado.</div>
   <script>
+    function renderYouTubeFallback(el) {{
+      const watch = el.dataset.watch || '';
+      const thumb = el.dataset.thumb || '';
+      const safeWatch = watch.replace(/"/g, '&quot;');
+      const safeThumb = thumb.replace(/"/g, '&quot;');
+      el.innerHTML = `
+        <a class="yt-fallback-link" href="${{safeWatch}}" target="_blank" rel="noopener noreferrer">
+          <img class="yt-fallback-thumb" src="${{safeThumb}}" alt="Thumbnail do YouTube" loading="lazy" />
+          <div class="yt-fallback-caption">Abrir video no YouTube</div>
+        </a>
+      `;
+    }}
+
+    function renderYouTubeEmbed(el) {{
+      const embed = el.dataset.embed || '';
+      if (!embed) {{
+        renderYouTubeFallback(el);
+        return;
+      }}
+      const iframe = document.createElement('iframe');
+      iframe.title = 'YouTube preview';
+      iframe.src = embed;
+      iframe.allowFullscreen = true;
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.addEventListener('error', () => renderYouTubeFallback(el));
+      el.innerHTML = '';
+      el.appendChild(iframe);
+    }}
+
+    function hydrateYouTubePreviews() {{
+      document.querySelectorAll('.youtube-preview').forEach((el) => {{
+        if (window.location.protocol === 'file:') {{
+          // YouTube costuma bloquear embeds sem referer em arquivo local (erro 153).
+          renderYouTubeFallback(el);
+          return;
+        }}
+        renderYouTubeEmbed(el);
+      }});
+    }}
+
     async function copyCmd(text) {{
       try {{
         if (navigator.clipboard && navigator.clipboard.writeText) {{
@@ -473,6 +549,8 @@ def build_html(cards: str, count: int) -> str:
         alert('Falha ao copiar. Comando: ' + text);
       }}
     }}
+
+    hydrateYouTubePreviews();
   </script>
 </body>
 </html>

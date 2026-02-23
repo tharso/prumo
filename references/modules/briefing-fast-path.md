@@ -11,7 +11,7 @@ Quando houver shell, rodar antes da triagem:
 ## Estágio A — Triagem leve (obrigatório)
 
 1. Gerar preview local:
-   - `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; fi`
+   - `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; fi`
 2. Ler o índice leve: `Inbox4Mobile/_preview-index.json`.
 3. Classificar cada item em:
    - ação (`Responder`, `Ver`, `Sem ação`)

@@ -488,7 +488,7 @@ def main() -> int:
     if index_output_raw.is_absolute():
         index_output_path = index_output_raw
     else:
-        index_output_path = output_path.parent / index_output_raw
+        index_output_path = (root / index_output_raw).resolve()
 
     if not inbox_dir.exists() or not inbox_dir.is_dir():
         raise SystemExit(f"Inbox não encontrado: {inbox_dir}")

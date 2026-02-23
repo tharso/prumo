@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.8.1**
+> **prumo_version: 3.8.2**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -225,7 +225,7 @@ Itens no inbox devem ser:
 **Preview visual prioritário (inbox multimídia):**
 
 1. No início de todo briefing diário, regenerar `inbox-preview.html` + `_preview-index.json` antes de qualquer triagem individual (quando shell disponível).
-2. Com shell: usar `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; fi`.
+2. Com shell: usar `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; fi`.
 3. Sem shell: gerar HTML equivalente inline e um índice textual equivalente (metadados mínimos + tipo + tamanho + data).
 4. Se `_preview-index.json` existir, o agente **DEVE linkar** `inbox-preview.html` no briefing como primeiro passo obrigatório da triagem (antes de abrir arquivos individuais).
 5. Se a geração falhar mas houver preview anterior, ainda assim linkar o preview existente e sinalizar que pode estar defasado.
@@ -499,6 +499,11 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ## Changelog do Core
 
+### v3.8.2 (23/02/2026)
+- Correção de resolução de path no `generate_inbox_preview.py`: `--index-output` relativo passa a ser independente de `--output`.
+- Comando canônico de geração de preview atualizado para usar `--index-output Inbox4Mobile/_preview-index.json` explicitamente.
+- Regressão alvo: evita criação acidental de `Inbox4Mobile/Inbox4Mobile/_preview-index.json`.
+
 ### v3.8.1 (23/02/2026)
 - Briefing passa a regenerar preview do inbox no início da rotina (quando shell disponível), reduzindo risco de preview defasado.
 - Guardrail explícito: primeira interação do briefing não pode abrir arquivo bruto de `Inbox4Mobile/*`.
@@ -620,4 +625,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.8.1 — https://github.com/tharso/prumo*
+*Prumo Core v3.8.2 — https://github.com/tharso/prumo*

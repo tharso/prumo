@@ -81,4 +81,23 @@ assert_contains "$SKILL_MIRROR_FILE" "Fallback sem shell" "Fallback sem shell n�
 assert_contains "$CORE_FILE" "com shell" "Modo com shell não descrito no core"
 assert_contains "$CORE_FILE" "sem shell" "Modo sem shell não descrito no core"
 
+# Regressão: --index-output relativo deve ser path independente de --output
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+mkdir -p "$TMP_DIR/Inbox4Mobile"
+cat > "$TMP_DIR/Inbox4Mobile/item.txt" <<'EOF'
+https://example.com/test
+EOF
+
+(
+  cd "$TMP_DIR"
+  python3 "$ROOT_DIR/scripts/generate_inbox_preview.py" \
+    --inbox-dir Inbox4Mobile \
+    --output Inbox4Mobile/inbox-preview.html \
+    --index-output Inbox4Mobile/_preview-index.json >/dev/null
+)
+
+[[ -f "$TMP_DIR/Inbox4Mobile/_preview-index.json" ]] || fail "Regressão de path: índice não gerado no local esperado"
+[[ ! -f "$TMP_DIR/Inbox4Mobile/Inbox4Mobile/_preview-index.json" ]] || fail "Regressão de path: índice duplicado em Inbox4Mobile/Inbox4Mobile"
+
 echo "[OK] Briefing smoke checks passaram."

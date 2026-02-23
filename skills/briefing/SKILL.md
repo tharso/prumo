@@ -71,7 +71,7 @@ Verificar TODOS os canais, sem pular nenhum:
    - Se existir `Inbox4Mobile/_processed.json`, usar como filtro para não reapresentar como "novos" os itens já processados em sessão anterior sem deleção física.
    - Rodar em **2 estágios obrigatórios**:
      - Estágio A (triagem leve): regenerar SEMPRE `Inbox4Mobile/inbox-preview.html` + `Inbox4Mobile/_preview-index.json` no início do briefing (quando shell disponível).
-     - com shell: `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; fi`.
+     - com shell: `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; fi`.
      - sem shell: gerar HTML equivalente inline + índice textual equivalente (tipo, tamanho, data, link).
      - Regra bloqueante de adoção: se `Inbox4Mobile/_preview-index.json` existir, o agente DEVE linkar `Inbox4Mobile/inbox-preview.html` no briefing como primeiro passo da triagem.
      - Não abrir arquivos brutos individuais antes desse link, exceto em caso de falha objetiva de geração/leitura do preview.

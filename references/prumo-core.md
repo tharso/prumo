@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.8.0**
+> **prumo_version: 3.8.1**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -106,6 +106,7 @@ Quando o usuário iniciar o briefing (via `/prumo:briefing`, alias legado `/brie
 7. Executar briefing em **blocos progressivos**:
    - **Bloco 1 — Panorama (automático, sem interação):**
      - agenda do dia (compromissos + horário);
+     - regenerar `inbox-preview.html` + `_preview-index.json` antes de anunciar o panorama (quando shell disponível);
      - preview do inbox mobile (`inbox-preview.html`) e link obrigatório quando `_preview-index.json` existir;
      - contagem silenciosa de agendados (sem listar item por item).
    - **Bloco 2 — Proposta do dia (uma única interação):**
@@ -127,6 +128,9 @@ Quando o usuário iniciar o briefing (via `/prumo:briefing`, alias legado `/brie
 11. Fechamento:
    - se briefing concluir, atualizar `last_briefing_at` e limpar `interrupted_at`/`resume_point`;
    - se briefing for interrompido, manter estado de retomada.
+12. Guardrail de primeira interação:
+   - na primeira resposta do briefing, é proibido abrir arquivos brutos de `Inbox4Mobile/*`;
+   - primeiro vem panorama + proposta; detalhe só depois de `c` ou `--detalhe`.
 
 **Se a PAUTA estiver vazia ou quase vazia**: Não fazer o briefing padrão. Pedir um dump: "Sua pauta tá vazia. Me conta o que tá rolando na sua vida agora — pendências, projetos, coisas que estão te incomodando. Eu organizo."
 
@@ -220,11 +224,12 @@ Itens no inbox devem ser:
 
 **Preview visual prioritário (inbox multimídia):**
 
-1. Quando houver 4+ itens multimídia ou 8+ itens totais no `Inbox4Mobile/`, gerar por padrão `inbox-preview.html` + `_preview-index.json`.
+1. No início de todo briefing diário, regenerar `inbox-preview.html` + `_preview-index.json` antes de qualquer triagem individual (quando shell disponível).
 2. Com shell: usar `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; fi`.
 3. Sem shell: gerar HTML equivalente inline e um índice textual equivalente (metadados mínimos + tipo + tamanho + data).
 4. Se `_preview-index.json` existir, o agente **DEVE linkar** `inbox-preview.html` no briefing como primeiro passo obrigatório da triagem (antes de abrir arquivos individuais).
-5. Se a geração falhar, manter o fluxo padrão em lista numerada no chat e registrar no briefing que a etapa de preview falhou.
+5. Se a geração falhar mas houver preview anterior, ainda assim linkar o preview existente e sinalizar que pode estar defasado.
+6. Se não houver preview utilizável, manter o fluxo padrão em lista numerada no chat e registrar no briefing que a etapa de preview falhou.
 
 Ao mover itens para PAUTA.md ou README de área, sempre incluir a data de entrada no formato `(desde DD/MM)`. Isso torna visível o envelhecimento de cada item e facilita cobranças na revisão semanal.
 
@@ -494,6 +499,11 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ## Changelog do Core
 
+### v3.8.1 (23/02/2026)
+- Briefing passa a regenerar preview do inbox no início da rotina (quando shell disponível), reduzindo risco de preview defasado.
+- Guardrail explícito: primeira interação do briefing não pode abrir arquivo bruto de `Inbox4Mobile/*`.
+- Se geração falhar e existir preview anterior, ainda deve linkar o preview com aviso de possível defasagem.
+
 ### v3.8.0 (23/02/2026)
 - Briefing diário reestruturado em blocos progressivos:
   - Bloco 1 automático (agenda + preview inbox + contagem silenciosa),
@@ -610,4 +620,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.8.0 — https://github.com/tharso/prumo*
+*Prumo Core v3.8.1 — https://github.com/tharso/prumo*

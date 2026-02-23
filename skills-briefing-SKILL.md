@@ -70,13 +70,14 @@ Verificar TODOS os canais, sem pular nenhum:
 1. **Pasta `Inbox4Mobile/`**: Listar TODOS os arquivos e iniciar por triagem leve (não abrir bruto de todos por padrão).
    - Se existir `Inbox4Mobile/_processed.json`, usar como filtro para não reapresentar como "novos" os itens já processados em sessão anterior sem deleção física.
    - Rodar em **2 estágios obrigatórios**:
-     - Estágio A (triagem leve): gerar `Inbox4Mobile/inbox-preview.html` + `Inbox4Mobile/_preview-index.json`.
+     - Estágio A (triagem leve): regenerar SEMPRE `Inbox4Mobile/inbox-preview.html` + `Inbox4Mobile/_preview-index.json` no início do briefing (quando shell disponível).
      - com shell: `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; fi`.
      - sem shell: gerar HTML equivalente inline + índice textual equivalente (tipo, tamanho, data, link).
      - Regra bloqueante de adoção: se `Inbox4Mobile/_preview-index.json` existir, o agente DEVE linkar `Inbox4Mobile/inbox-preview.html` no briefing como primeiro passo da triagem.
      - Não abrir arquivos brutos individuais antes desse link, exceto em caso de falha objetiva de geração/leitura do preview.
      - Estágio B (aprofundamento): abrir conteúdo bruto completo apenas para itens `P1`, ambíguos, risco legal/financeiro/documental, ou solicitação explícita do usuário.
-   - Se a geração falhar, seguir com lista numerada no chat (fallback universal), mantendo a regra de aprofundamento seletivo e explicitando a falha de preview ao usuário.
+   - Se a geração falhar e existir preview anterior, ainda linkar o preview e explicitar que pode estar defasado.
+   - Se a geração falhar sem preview utilizável, seguir com lista numerada no chat (fallback universal), mantendo a regra de aprofundamento seletivo e explicitando a falha de preview ao usuário.
    - No Bloco 1 (panorama), mostrar apenas o link do preview e a contagem de itens (sem abrir itens individuais).
 2. **Google dual via Gemini CLI (prioridade quando disponível)**:
    - Se existir `scripts/prumo_google_dual_snapshot.sh`, executar esse script.
@@ -144,6 +145,9 @@ Montar o briefing em blocos progressivos (não despejar tudo de uma vez):
    - se usuário disser "tá bom por hoje", "escape", "depois" ou equivalente em qualquer etapa, aplicar o mesmo fluxo de escape.
 6. **Modo detalhado direto**
    - se usuário chamar `/prumo:briefing --detalhe`, abrir contexto completo sem pular Bloco 1.
+7. **Guardrail da primeira interação**
+   - na primeira resposta do briefing, é proibido abrir `Inbox4Mobile/*` individualmente;
+   - primeiro vem panorama + proposta; arquivo bruto só após `c`/`--detalhe` ou solicitação explícita.
 
 Se a PAUTA estiver vazia: não fazer o briefing padrão. Pedir um brain dump.
 

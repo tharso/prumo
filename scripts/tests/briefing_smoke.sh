@@ -55,6 +55,8 @@ for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
   assert_contains "$file" "_preview-index\\.json" "Preview adoption: falta referência ao índice de preview"
   assert_contains "$file" "DEVE linkar|deve ser linkado|link obrigatório" "Preview adoption: regra bloqueante de link ausente"
   assert_contains "$file" "inbox-preview\\.html" "Preview adoption: referência ao html de preview ausente"
+  assert_contains "$file" "regenerar SEMPRE|regenerar .*inbox-preview|No início de todo briefing diário, regenerar" "Preview adoption: falta regra de regeneração no início"
+  assert_contains "$file" "primeira interação.*proibido abrir|na primeira resposta do briefing, é proibido abrir" "Preview adoption: falta guardrail da primeira interação"
 done
 
 for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do

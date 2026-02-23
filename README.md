@@ -6,7 +6,7 @@ Estado deste documento: **23/02/2026**.
 
 ## Estado atual
 
-- Core de referência no produto: `prumo_version 3.8.0` (`references/prumo-core.md`).
+- Core de referência no produto: `prumo_version 3.8.1` (`references/prumo-core.md`).
 - Skill principal de setup: `v3.4` (`SKILL.md`).
 - Skill de briefing: `v2.2` (com curadoria por ação em runtime com e sem shell).
 - Coexistência multiagente ativa e validada.
@@ -81,6 +81,7 @@ O briefing diário segue dois blocos:
 
 `c` abre contexto completo sob demanda (`/prumo:briefing --detalhe`).
 `d` aplica escape hatch (interrompe sem cobrança e salva ponto de retomada).
+Guardrail: na primeira interação do briefing, não abrir arquivos brutos do inbox.
 
 ### Canais lidos
 
@@ -145,6 +146,7 @@ Esse modo permite consolidar duas contas (ex.: pessoal/trabalho) no mesmo briefi
 
 1. Estágio A (leve): preview + índice (`inbox-preview.html` e `_preview-index.json`).
 2. Estágio B (seletivo): abrir bruto só para `P1`, ambíguos ou risco legal/financeiro/documental.
+3. No briefing diário, o preview é regenerado no início quando shell está disponível.
 
 ### Autosanitização (futuro operacional já habilitado)
 

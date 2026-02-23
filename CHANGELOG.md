@@ -4,6 +4,18 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.8.1] - 2026-02-23
+
+### Fixed
+- Hardening da adoção de preview no briefing para reduzir falha de compliance do agente:
+  - preview de inbox passa a ser regenerado no início do briefing (quando shell disponível),
+  - primeira interação do briefing não pode abrir arquivo bruto de `Inbox4Mobile/*`.
+- Quando a regeneração falha mas já existe preview anterior, o fluxo agora exige linkar o preview mesmo assim, com aviso de possível defasagem.
+
+### Changed
+- Core e skills de briefing atualizados com guardrail explícito de ordem (panorama/proposta antes de abertura individual).
+- Smoke test reforçado para validar regeneração de preview e bloqueio de abertura bruta na primeira interação.
+
 ## [3.8.0] - 2026-02-23
 
 ### Added

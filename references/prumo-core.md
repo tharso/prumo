@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.7.6**
+> **prumo_version: 3.8.0**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -28,7 +28,7 @@
 ├── [Áreas]/           ← Uma pasta por área de vida, cada uma com README.md
 ├── _logs/             ← Registros semanais de revisão
 └── _state/            ← Estado operacional (lock + handover + referência de briefing)
-    ├── briefing-state.json   ← Timestamp do último briefing concluído (`last_briefing_at`)
+    ├── briefing-state.json   ← Estado do briefing (`last_briefing_at`, `interrupted_at`, `resume_point`)
     ├── HANDOVER.summary.md   ← Resumo leve para briefing (quando existir)
     ├── auto-sanitize-state.json ← Estado da autosanitização (gatilhos, cooldown, ações)
     ├── auto-sanitize-history.json ← Histórico local para calibração por usuário
@@ -52,7 +52,7 @@
 | Comando | O que faz |
 |---------|-----------|
 | `/prumo:setup` | Configuração inicial ou reconfiguração (áreas, tom, rituais) |
-| `/prumo:briefing` | Rotina matinal completa (inbox + calendário + pauta + briefing) |
+| `/prumo:briefing` | Rotina matinal completa em blocos progressivos (panorama + proposta + detalhe sob demanda) |
 | `/prumo:inbox` | Processa inbox sob demanda (todos os canais) |
 | `/prumo:dump` | Captura rápida — o usuário despeja info e o Prumo organiza |
 | `/prumo:revisao` | Revisão semanal completa (análise por área, limpeza, prioridades) |
@@ -84,46 +84,49 @@ Referência operacional: `Prumo/references/modules/load-policy.md`.
 
 Quando o usuário iniciar o briefing (via `/prumo:briefing`, alias legado `/briefing`, "bom dia", "briefing", ou similar), o agente deve:
 
-1. Ler CLAUDE.md (configuração pessoal, áreas, tom)
+1. Ler `CLAUDE.md` (configuração pessoal, áreas, tom).
 2. Resolver data local por fonte verificável no fuso do usuário (`CLAUDE.md`; default `America/Sao_Paulo`):
    - prioridade 1: ferramenta de tempo com timezone/local date;
    - prioridade 2: data local do sistema com timezone explícito;
    - prioridade 3: data inferida por APIs de calendário no mesmo fuso.
    - Se nenhuma fonte for confiável, não anunciar dia/data textual no cabeçalho.
-3. Ler PAUTA.md
+3. Ler `PAUTA.md` e `INBOX.md`.
 4. Verificar handovers:
    - se existir `_state/HANDOVER.summary.md`, usar como leitura principal;
    - se não existir ou estiver inconsistente, ler `_state/HANDOVER.md`;
    - identificar itens em `PENDING_VALIDATION` ou `REJECTED`.
-5. Rodar autosanitização (quando shell disponível):
+5. Carregar `_state/briefing-state.json` (se existir):
+   - usar `last_briefing_at` para janela temporal de email;
+   - se houver `interrupted_at` + `resume_point` no mesmo dia local, oferecer retomada: `a) retomar` / `b) recomeçar`;
+   - se `interrupted_at` for de dia anterior, expirar silenciosamente (`interrupted_at`/`resume_point` limpos).
+6. Rodar autosanitização (quando shell disponível):
    - executar `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply` (ou `scripts/prumo_auto_sanitize.py` conforme layout);
    - respeitar cooldown e gatilhos internos;
    - se falhar, seguir briefing normalmente e reportar falha de manutenção.
-6. Verificar pasta `Inbox4Mobile/` em 2 estágios:
-   - Estágio A (triagem leve): listar itens, gerar preview/índice e classificar ação+prioridade.
-   - Regra bloqueante de adoção: se `Inbox4Mobile/_preview-index.json` existir, o agente DEVE linkar `Inbox4Mobile/inbox-preview.html` como primeiro passo da triagem.
-   - Abrir arquivo bruto individual antes de linkar o preview só é permitido se a geração/leitura do preview falhar.
-   - Estágio B (aprofundamento seletivo): abrir conteúdo bruto completo só para `P1`, ambíguos, risco legal/financeiro/documental, ou pedido explícito do usuário.
-7. Definir janela temporal de email:
-   - Se `_state/briefing-state.json` existir com `last_briefing_at`, usar esse timestamp.
-   - Senão, usar fallback de 24h.
-8. Se Gmail configurado: buscar emails na janela e classificar por ação:
-   - `Responder` (exige resposta ativa)
-   - `Ver` (exige leitura/checagem sem resposta imediata)
-   - `Sem ação` (baixo valor imediato)
-   - Sempre incluir prioridade `P1/P2/P3` e motivo objetivo.
-9. Se Calendar configurado: verificar calendário de hoje e amanhã
-10. Apresentar:
-   - Data e dia da semana no fuso do usuário (definido no `CLAUDE.md`; default `America/Sao_Paulo`)
-   - Compromissos do dia
-   - Itens quentes que precisam de atenção
-   - Lembretes do dia (consultar seção de lembretes recorrentes no CLAUDE.md)
-   - Coisas paradas há muito tempo (cobrar no tom configurado)
-   - Curadoria de emails na taxonomia (`Responder` / `Ver` / `Sem ação`)
-   - Pendências de handover entre agentes (se houver)
-   - Perguntas para clarificar prioridades se necessário
-
-Ao concluir o briefing, atualizar `_state/briefing-state.json` com o timestamp atual em `last_briefing_at`.
+7. Executar briefing em **blocos progressivos**:
+   - **Bloco 1 — Panorama (automático, sem interação):**
+     - agenda do dia (compromissos + horário);
+     - preview do inbox mobile (`inbox-preview.html`) e link obrigatório quando `_preview-index.json` existir;
+     - contagem silenciosa de agendados (sem listar item por item).
+   - **Bloco 2 — Proposta do dia (uma única interação):**
+     - propor foco do dia com base em deadlines de hoje, blockers, agenda disponível e itens com cobrança elegível hoje;
+     - oferecer exatamente: `a) aceitar e seguir`, `b) ajustar`, `c) ver lista completa`, `d) tá bom por hoje`.
+   - **Contexto completo (sob demanda):**
+     - só aparece em `c` ou via `/prumo:briefing --detalhe`;
+     - inclui itens em andamento, atrasados/parados (`desde DD/MM`), agendados da semana e cobranças elegíveis.
+8. Aplicar **supressão temporal** para itens agendados:
+   - formato canônico em `PAUTA.md`: `| cobrar: DD/MM` (ou `DD/MM/AAAA`);
+   - se `cobrar` estiver no futuro, item não entra no Bloco 1 nem na proposta do dia (apenas conta no agregado);
+   - na data de cobrança, item vira elegível para proposta/contexto;
+   - na revisão semanal, supressão não se aplica (mostrar tudo).
+9. Curadoria de email (quando disponível) mantém taxonomia obrigatória:
+   - `Responder`, `Ver`, `Sem ação`;
+   - prioridade `P1/P2/P3` e motivo objetivo.
+10. Escape hatch:
+   - se usuário disser "tá bom por hoje", "escape", "depois" ou equivalente, registrar `interrupted_at` + `resume_point` e encerrar sem cobrança.
+11. Fechamento:
+   - se briefing concluir, atualizar `last_briefing_at` e limpar `interrupted_at`/`resume_point`;
+   - se briefing for interrompido, manter estado de retomada.
 
 **Se a PAUTA estiver vazia ou quase vazia**: Não fazer o briefing padrão. Pedir um dump: "Sua pauta tá vazia. Me conta o que tá rolando na sua vida agora — pendências, projetos, coisas que estão te incomodando. Eu organizo."
 
@@ -134,6 +137,7 @@ No dia configurado no CLAUDE.md, revisar toda a PAUTA.md:
 - O que está parado demais?
 - O que deve ser desprioritizado ou removido?
 - Prioridades da próxima semana
+- Mostrar todos os agendados independentemente de `| cobrar: ...` (supressão temporal não vale na revisão semanal)
 - Atualizar todos os README.md das áreas com contexto novo
 - Atualizar `Pessoal/PESSOAS.md` (pendências, follow-ups, quem sumiu)
 - Revisar `IDEIAS.md` (alguma ideia amadureceu? migrar para PAUTA se sim)
@@ -177,7 +181,7 @@ No início de cada sessão (especialmente se for um chat novo):
 5. Verificar `Inbox4Mobile/` por triagem leve primeiro (`inbox-preview.html` + `_preview-index.json`); aprofundar só itens críticos
 6. Se Gmail configurado: buscar emails com subject do agente
 7. Se existir `_state/HANDOVER.summary.md`, verificar pendências por ele; fallback para `_state/HANDOVER.md`
-8. Se existir `_state/briefing-state.json`, usar `last_briefing_at` como referência de janela no briefing
+8. Se existir `_state/briefing-state.json`, usar `last_briefing_at` como referência de janela e respeitar `interrupted_at`/`resume_point` para retomada/expiração
 9. Se existir `_state/auto-sanitize-state.json`, usar como telemetria leve de manutenção
 10. Se existir `_state/agent-lock.json`, respeitar lock por escopo antes de escrever
 
@@ -219,10 +223,16 @@ Itens no inbox devem ser:
 1. Quando houver 4+ itens multimídia ou 8+ itens totais no `Inbox4Mobile/`, gerar por padrão `inbox-preview.html` + `_preview-index.json`.
 2. Com shell: usar `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output _preview-index.json; fi`.
 3. Sem shell: gerar HTML equivalente inline e um índice textual equivalente (metadados mínimos + tipo + tamanho + data).
-4. Se `_preview-index.json` existir, linkar `inbox-preview.html` no briefing como primeiro passo obrigatório da triagem (antes de abrir arquivos individuais).
+4. Se `_preview-index.json` existir, o agente **DEVE linkar** `inbox-preview.html` no briefing como primeiro passo obrigatório da triagem (antes de abrir arquivos individuais).
 5. Se a geração falhar, manter o fluxo padrão em lista numerada no chat e registrar no briefing que a etapa de preview falhou.
 
 Ao mover itens para PAUTA.md ou README de área, sempre incluir a data de entrada no formato `(desde DD/MM)`. Isso torna visível o envelhecimento de cada item e facilita cobranças na revisão semanal.
+
+Se o item entrar como **agendado futuro**, registrar semântica de cobrança no próprio item:
+
+1. Perguntar: "Devo te cobrar só no dia [data] ou antes pra você se preparar?"
+2. Registrar no formato `| cobrar: DD/MM` (ou `DD/MM/AAAA` quando necessário).
+3. Se o usuário responder "só no dia", usar a própria data de entrega.
 
 Inbox vazio = sistema saudável. Se restar item no inbox após o commit, listar os remanescentes e explicar por quê.
 
@@ -287,34 +297,22 @@ Se o usuário mencionar feedback, bug, sugestão ou melhoria sobre o sistema Pru
 
 O agente também sugere feedback proativamente quando observa sinais: briefings muito longos, revisões ignoradas, inbox mobile parado, frustrações expressas. No máximo 1 sugestão por semana. Na revisão semanal, sempre perguntar: "Algum feedback sobre o Prumo em si?"
 
-### 14. FORMATO DE RESPOSTA: LISTA NUMERADA CONTÍNUA
+### 14. BRIEFING PROGRESSIVO (PANORAMA → PROPOSTA → DETALHE)
 
-O briefing e qualquer mensagem que apresente múltiplos itens ao usuário DEVE usar **uma única lista numerada contínua** na mensagem inteira. Nunca resetar a numeração ao mudar de seção. Se o briefing tem compromissos, itens quentes, lembretes e cobranças, todos entram na mesma sequência: 1, 2, 3... até o fim.
+O briefing diário não deve despejar tudo de uma vez. A ordem obrigatória é:
 
-Dentro de cada item, sempre que houver decisão ou ação possível, oferecer **opções com letras** (a, b, c...). Isso permite ao usuário responder de forma ultra-rápida: "3b, 7a, 12c".
+1. **Bloco 1 — Panorama (automático, sem interação):**
+   - agenda do dia,
+   - link de preview do inbox (sem abrir item bruto),
+   - contagem silenciosa de agendados.
+2. **Bloco 2 — Proposta do dia (uma única interação):**
+   - `a) aceitar e seguir`
+   - `b) ajustar`
+   - `c) ver lista completa`
+   - `d) tá bom por hoje`
+3. **Detalhe só sob demanda** (`c` ou `/prumo:briefing --detalhe`).
 
-Exemplo:
-```
-1. Reunião com investidor às 14h (Google Meet)
-   a) Quer que eu prepare um resumo dos últimos números?
-   b) Só lembrar 10min antes
-
-2. Lembrete escolar recorrente (quarta-feira)
-   a) Já resolveu? Se sim, me diz que eu tiro da lista
-   b) Quer que eu sugira opções rápidas?
-
-3. Domínio principal vence em 13 dias — desde 10/02
-   a) Migrar para provedor com menor custo (eu te guio)
-   b) Só renovar no provedor atual
-   c) Deixar vencer (tem certeza?)
-
-4. PR do PersonalEditor parado há 8 dias — desde 06/02
-   a) Retomar hoje
-   b) Adiar pra próxima semana
-   c) Cancelar/arquivar
-```
-
-**Regra absoluta:** Em uma mesma mensagem, nunca pode existir dois itens com o mesmo número. Se a mensagem tem seções (compromissos, urgentes, lembretes), as seções podem ter subtítulos, mas a numeração é contínua.
+No modo de detalhe, usar lista numerada contínua + opções por letra.
 
 ### 15. PROATIVIDADE — ANTECIPAR E PROPOR
 
@@ -421,6 +419,25 @@ Autosanitização é manutenção preventiva, não limpeza destrutiva.
 
 Referência operacional: `Prumo/references/modules/sanitization.md`.
 
+### 19. SUPRESSÃO TEMPORAL + ESCAPE HATCH
+
+Supressão temporal é obrigatória para reduzir carga cognitiva no briefing diário.
+
+1. Itens em `Agendado` devem aceitar `| cobrar: DD/MM` (ou `DD/MM/AAAA`).
+2. Antes da data de cobrança, o item não aparece no panorama nem na proposta do dia.
+3. Antes da cobrança, o item entra apenas na contagem silenciosa de agendados.
+4. Na data de cobrança (ou depois), o item vira elegível para proposta e detalhe.
+5. Na revisão semanal, todos os itens aparecem (com ou sem cobrança futura).
+
+Escape hatch é obrigatório em qualquer ponto do briefing:
+
+1. Frases de saída ("tá bom por hoje", "escape", "depois" ou equivalente) encerram o briefing sem cobrança.
+2. Registrar `_state/briefing-state.json` com:
+   - `interrupted_at`
+   - `resume_point`
+3. No mesmo dia, `/prumo:briefing` deve oferecer `retomar` ou `recomeçar`.
+4. Em dia seguinte, o estado interrompido expira silenciosamente.
+
 ---
 
 ## Verificação de atualização
@@ -476,6 +493,15 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 ---
 
 ## Changelog do Core
+
+### v3.8.0 (23/02/2026)
+- Briefing diário reestruturado em blocos progressivos:
+  - Bloco 1 automático (agenda + preview inbox + contagem silenciosa),
+  - Bloco 2 com uma única interação (`a/b/c/d`),
+  - contexto completo apenas sob demanda (`c` ou `--detalhe`).
+- Supressão temporal formalizada para agendados com `| cobrar: DD/MM`.
+- Escape hatch formalizado com estado persistido (`interrupted_at` + `resume_point`) e retomada no mesmo dia.
+- Regra de revisão semanal explicitada: mostrar todos os agendados, sem supressão por cobrança.
 
 ### v3.7.6 (22/02/2026)
 - Alinhamento de versão do motor com `VERSION` do repositório para evitar divergência no briefing de update.
@@ -584,4 +610,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.7.6 — https://github.com/tharso/prumo*
+*Prumo Core v3.8.0 — https://github.com/tharso/prumo*

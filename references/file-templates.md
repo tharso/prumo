@@ -24,6 +24,9 @@ _Itens que têm progresso ativo. Formato: `- [Tag] Descrição. Próxima ação:
 ## Agendado / Lembretes
 
 _Itens com data específica ou lembretes recorrentes._
+_Quando houver agendamento futuro, registrar semântica de cobrança no próprio item:_
+_`- **25/02 (Qua)**: [Tag] Item... | cobrar: 25/02`_
+_`- **30/03 (Seg) 9h**: [Tag] Item... | cobrar: 28/03`_
 
 {{LEMBRETES_RECORRENTES_LISTA}}
 
@@ -143,7 +146,9 @@ _Última atualização: {{DATA_SETUP}}_
 --- INÍCIO ---
 
 {
-  "last_briefing_at": ""
+  "last_briefing_at": "",
+  "interrupted_at": "",
+  "resume_point": ""
 }
 
 --- FIM ---

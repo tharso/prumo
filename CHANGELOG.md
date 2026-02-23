@@ -4,6 +4,23 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [3.8.0] - 2026-02-23
+
+### Added
+- Briefing progressivo em dois blocos no core/skills:
+  - Bloco 1 automático (agenda + preview inbox + contagem silenciosa de agendados),
+  - Bloco 2 com interação única (`a/b/c/d`) e contexto completo sob demanda (`--detalhe`).
+- Escape hatch no briefing com estado persistido em `_state/briefing-state.json`:
+  - `interrupted_at`
+  - `resume_point`
+- Supressão temporal para agendados com formato `| cobrar: DD/MM` (ou `DD/MM/AAAA`).
+
+### Changed
+- Regra 14 do core reestruturada para briefing progressivo (substitui modelo de dump integral).
+- Revisão semanal explicitamente preservada como visão completa (sem supressão por cobrança).
+- Template de `PAUTA.md` e template de `_state/briefing-state.json` atualizados com o novo contrato.
+- Smoke test de briefing reforçado para validar blocos, escape e semântica de cobrança.
+
 ## [3.7.6] - 2026-02-22
 
 ### Fixed

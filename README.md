@@ -2,11 +2,11 @@
 
 Sistema de organização pessoal orientado à ação. O foco do Prumo não é listar pendência; é transformar entrada difusa em decisão clara.
 
-Estado deste documento: **22/02/2026**.
+Estado deste documento: **23/02/2026**.
 
 ## Estado atual
 
-- Core de referência no produto: `prumo_version 3.7.6` (`references/prumo-core.md`).
+- Core de referência no produto: `prumo_version 3.8.0` (`references/prumo-core.md`).
 - Skill principal de setup: `v3.4` (`SKILL.md`).
 - Skill de briefing: `v2.2` (com curadoria por ação em runtime com e sem shell).
 - Coexistência multiagente ativa e validada.
@@ -33,7 +33,7 @@ Arquivos de estado e operação:
 - `_state/agent-lock.json`: lock cooperativo por escopo entre agentes.
 - `_state/HANDOVER.md`: validações cruzadas e status de handovers.
 - `_state/HANDOVER.summary.md`: resumo leve de handover para briefing.
-- `_state/briefing-state.json`: referência temporal de briefing (`last_briefing_at`).
+- `_state/briefing-state.json`: estado do briefing (`last_briefing_at`, `interrupted_at`, `resume_point`).
 - `_state/auto-sanitize-state.json`: estado da última autosanitização.
 - `_state/auto-sanitize-history.json`: histórico local para calibrar thresholds por usuário/workspace.
 
@@ -71,6 +71,16 @@ Este repositório agora usa um fluxo padrão de produto com Issues, Project e ve
 
 ## Briefing: lógica atual
 
+### Fluxo progressivo
+
+O briefing diário segue dois blocos:
+
+1. Bloco 1 (automático): agenda + preview inbox + contagem silenciosa de agendados.
+2. Bloco 2 (uma interação): proposta do dia com `a/b/c/d`.
+
+`c` abre contexto completo sob demanda (`/prumo:briefing --detalhe`).
+`d` aplica escape hatch (interrompe sem cobrança e salva ponto de retomada).
+
 ### Canais lidos
 
 - `Inbox4Mobile/` (incluindo imagens)
@@ -96,6 +106,12 @@ Cada item deve vir com:
 - Se `_state/briefing-state.json` tiver `last_briefing_at`, essa é a âncora.
 - Se não tiver, fallback de 24h.
 - Ao concluir o briefing, atualizar `last_briefing_at`.
+
+### Supressão temporal (agendados)
+
+- Itens agendados podem registrar cobrança explícita com `| cobrar: DD/MM`.
+- Se a data de cobrança estiver no futuro, o item fica fora do briefing diário (entra só na contagem silenciosa).
+- Na revisão semanal, todos os itens aparecem, com ou sem cobrança futura.
 
 ### Garantia de não sobrescrita em updates
 

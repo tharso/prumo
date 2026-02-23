@@ -51,6 +51,13 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
    - identifique itens em `PENDING_VALIDATION` ou `REJECTED`.
 4. Se existir `_state/auto-sanitize-state.json`, leia para telemetria de manutenção (última execução/último apply).
 5. Se existir `_state/auto-sanitize-history.json`, use amostra leve quando precisar explicar thresholds adaptativos.
+6. Se existir `_state/briefing-state.json`, trate estado de retomada:
+   - se houver `interrupted_at` + `resume_point` no mesmo dia local, pergunte: `a) retomar` ou `b) recomeçar`;
+   - se `interrupted_at` for de dia anterior, expire silenciosamente (limpe `interrupted_at`/`resume_point`) e siga sem cobrar briefing antigo.
+7. Monte supressão temporal dos agendados:
+   - parsear `| cobrar: DD/MM` (ou `DD/MM/AAAA`) nos itens de `Agendado`;
+   - se `cobrar` estiver no futuro, item fica silenciado no briefing diário;
+   - se `cobrar` for hoje/passado, item fica elegível para proposta do dia.
 
 ## Passo 4: Canais de entrada
 
@@ -70,6 +77,7 @@ Verificar TODOS os canais, sem pular nenhum:
      - Não abrir arquivos brutos individuais antes desse link, exceto em caso de falha objetiva de geração/leitura do preview.
      - Estágio B (aprofundamento): abrir conteúdo bruto completo apenas para itens `P1`, ambíguos, risco legal/financeiro/documental, ou solicitação explícita do usuário.
    - Se a geração falhar, seguir com lista numerada no chat (fallback universal), mantendo a regra de aprofundamento seletivo e explicitando a falha de preview ao usuário.
+   - No Bloco 1 (panorama), mostrar apenas o link do preview e a contagem de itens (sem abrir itens individuais).
 2. **Google dual via Gemini CLI (prioridade quando disponível)**:
    - Se existir `scripts/prumo_google_dual_snapshot.sh`, executar esse script.
    - Usar a saída do script como fonte principal para agenda (`AGENDA_HOJE` + `AGENDA_AMANHA`) e curadoria de emails (`TRIAGEM_RESPONDER`, `TRIAGEM_VER`, `TRIAGEM_SEM_ACAO`) das contas `pessoal` e `trabalho`.
@@ -98,6 +106,7 @@ Se houver itens novos (de qualquer canal):
 - Executar em lote:
   - mover para PAUTA.md ou README da área
   - adicionar `(desde DD/MM)` em cada item
+  - se item for agendado futuro, perguntar data de cobrança e registrar `| cobrar: DD/MM`
   - renomear arquivos com nomes descritivos
   - registrar no REGISTRO.md
   - deletar original do inbox com ação real de filesystem
@@ -110,24 +119,31 @@ Se houver itens novos (de qualquer canal):
 
 ## Passo 6: Montar o briefing
 
-Apresentar de forma direta (no tom configurado no CLAUDE.md):
+Montar o briefing em blocos progressivos (não despejar tudo de uma vez):
 
-1. **Abertura com data correta** (obrigatório)
-   - Mostrar data e dia da semana no fuso do usuário (não usar UTC para anunciar "hoje").
-   - Use formato absoluto: `Sábado, 21 de fevereiro de 2026 (America/Sao_Paulo)`.
-   - Se data não for verificável com confiança, omitir a linha de dia/data.
-2. **Compromissos do dia** (do calendário, se disponível)
-   - Quando usar o script dual, consolidar compromissos das duas contas e identificar a origem (`pessoal`/`trabalho`).
-3. **Itens quentes** que precisam de atenção hoje
-4. **Lembretes do dia** (consultar lembretes recorrentes no CLAUDE.md — ex: "quarta = lanche da escola")
-5. **Itens envelhecendo** — cobrar coisas paradas há muito tempo, com a data `(desde DD/MM)` visível
-6. **Novidades do inbox** — se processou itens, mostrar resumo do que entrou
-   - Em qualquer modo (script dual ou fallback sem shell), incluir curadoria por conta quando disponível:
-     - `Responder`: exige ação de resposta.
-     - `Ver`: exige leitura/checagem, sem resposta imediata.
-     - `Sem ação`: pode ignorar por ora.
-   - Informar quais itens ficaram só na triagem leve e quais exigiram abertura completa.
-7. **Pendências de handover** — se houver `_state/HANDOVER.md` com `PENDING_VALIDATION`/`REJECTED`, listar e propor ação
+1. **Bloco 1 — Panorama (automático, sem interação)**
+   - abertura com data correta (formato absoluto no fuso do usuário);
+   - agenda do dia (consolidada por conta quando aplicável);
+   - link para `Inbox4Mobile/inbox-preview.html` quando `_preview-index.json` existir;
+   - contagem silenciosa de agendados da semana (incluindo os suprimidos por `| cobrar: ...`, sem listar individualmente);
+   - pendências de handover (`PENDING_VALIDATION`/`REJECTED`) em 1 linha objetiva.
+2. **Bloco 2 — Proposta do dia (uma única interação obrigatória)**
+   - propor foco com base em: deadlines de hoje, blockers, tempo disponível na agenda e itens com cobrança elegível hoje;
+   - apresentar exatamente:
+     - `a) Aceitar e seguir`
+     - `b) Ajustar (me diz o que muda)`
+     - `c) Ver lista completa`
+     - `d) Tá bom por hoje`
+3. **Opção c (contexto completo sob demanda)**
+   - mostrar andamento, atrasados/parados (`desde DD/MM`), agendados da semana e cobranças elegíveis;
+   - após mostrar, voltar para a mesma decisão do Bloco 2 sem resetar briefing.
+4. **Opção d (escape hatch)**
+   - registrar `interrupted_at` e `resume_point` em `_state/briefing-state.json`;
+   - encerrar briefing sem cobrança adicional.
+5. **Escape por linguagem natural**
+   - se usuário disser "tá bom por hoje", "escape", "depois" ou equivalente em qualquer etapa, aplicar o mesmo fluxo de escape.
+6. **Modo detalhado direto**
+   - se usuário chamar `/prumo:briefing --detalhe`, abrir contexto completo sem pular Bloco 1.
 
 Se a PAUTA estiver vazia: não fazer o briefing padrão. Pedir um brain dump.
 
@@ -137,7 +153,10 @@ Atualizar PAUTA.md se algo mudou. Registrar itens processados no REGISTRO.md.
 Se houve validação de handover, atualizar status no `_state/HANDOVER.md`.
 Se o script dual foi usado e o briefing foi concluído, executar `scripts/prumo_google_dual_snapshot.sh --mark-briefing-complete` para atualizar a referência temporal do próximo briefing.
 Se existir `_state/HANDOVER.summary.md`, atualizar via sanitização quando houver grande volume de handovers fechados.
-Se o script dual NÃO foi usado (fallback sem shell), atualizar `_state/briefing-state.json` manualmente com o timestamp atual em `last_briefing_at`.
+Se o script dual NÃO foi usado (fallback sem shell), atualizar `_state/briefing-state.json` manualmente:
+- briefing concluído: atualizar `last_briefing_at` e limpar `interrupted_at`/`resume_point`.
+- briefing interrompido (escape): manter `last_briefing_at` como está e gravar `interrupted_at`/`resume_point`.
+- no início de novo dia, expirar silenciosamente estado interrompido antigo.
 Se houve fallback sem deleção física, manter `Inbox4Mobile/_processed.json` atualizado para evitar reapresentação de itens já processados.
 
 ---

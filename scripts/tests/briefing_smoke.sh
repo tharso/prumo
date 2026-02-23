@@ -14,11 +14,11 @@ assert_contains() {
   local pattern="$2"
   local label="$3"
   if command -v rg >/dev/null 2>&1; then
-    rg -q --pcre2 "$pattern" "$file" || fail "$label (arquivo: $file)"
+    rg -q --pcre2 -- "$pattern" "$file" || fail "$label (arquivo: $file)"
     return 0
   fi
 
-  if ! grep -Eq "$pattern" "$file"; then
+  if ! grep -Eq -- "$pattern" "$file"; then
     fail "$label (arquivo: $file)"
   fi
 }
@@ -26,9 +26,10 @@ assert_contains() {
 CORE_FILE="references/prumo-core.md"
 SKILL_FILE="skills/briefing/SKILL.md"
 SKILL_MIRROR_FILE="skills-briefing-SKILL.md"
+TEMPLATES_FILE="references/file-templates.md"
 VERSION_FILE="VERSION"
 
-for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE" "$VERSION_FILE"; do
+for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE" "$TEMPLATES_FILE" "$VERSION_FILE"; do
   [[ -f "$file" ]] || fail "Arquivo obrigatório ausente: $file"
 done
 
@@ -52,8 +53,23 @@ done
 
 for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
   assert_contains "$file" "_preview-index\\.json" "Preview adoption: falta referência ao índice de preview"
-  assert_contains "$file" "DEVE linkar .*inbox-preview\\.html|inbox-preview\\.html.*DEVE" "Preview adoption: regra bloqueante de link ausente"
+  assert_contains "$file" "DEVE linkar|deve ser linkado|link obrigatório" "Preview adoption: regra bloqueante de link ausente"
+  assert_contains "$file" "inbox-preview\\.html" "Preview adoption: referência ao html de preview ausente"
 done
+
+for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
+  assert_contains "$file" "Bloco 1" "Briefing progressivo: ausência de Bloco 1"
+  assert_contains "$file" "Bloco 2" "Briefing progressivo: ausência de Bloco 2"
+  assert_contains "$file" "Tá bom por hoje|tá bom por hoje|escape|depois" "Escape hatch: gatilhos ausentes"
+  assert_contains "$file" "interrupted_at" "Escape hatch: ausência de interrupted_at"
+  assert_contains "$file" "resume_point" "Escape hatch: ausência de resume_point"
+  assert_contains "$file" "--detalhe|briefing --detalhe" "Modo detalhe: ausência de gatilho explícito"
+  assert_contains "$file" "\\| cobrar: DD/MM|cobrar: DD/MM" "Supressão temporal: formato cobrar não documentado"
+done
+
+assert_contains "$TEMPLATES_FILE" "interrupted_at" "Template de briefing-state sem interrupted_at"
+assert_contains "$TEMPLATES_FILE" "resume_point" "Template de briefing-state sem resume_point"
+assert_contains "$TEMPLATES_FILE" "\\| cobrar: 25/02|cobrar: DD/MM" "Template de pauta sem exemplo de cobrança"
 
 assert_contains "$SKILL_FILE" "Google dual via Gemini CLI|script dual" "Modo com shell não descrito na skill principal"
 assert_contains "$SKILL_FILE" "Fallback sem shell" "Fallback sem shell não descrito na skill principal"

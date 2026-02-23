@@ -62,12 +62,13 @@ Este repositório agora usa um fluxo padrão de produto com Issues, Project e ve
 6. Guia operacional: `docs/WORKFLOW.md`
 7. Manual prático (Projects/Issues + Codex autônomo): `docs/MANUAL_GITHUB_CODEX_AUTONOMO.md`
 8. Guia de autosanitização: `docs/AUTOSANITIZACAO.md`
-9. Versão pública: `VERSION`
-10. Histórico de mudanças: `CHANGELOG.md`
-11. Bootstrap de labels: `scripts/github/bootstrap_labels.sh`
-12. Bootstrap de project: `scripts/github/bootstrap_project.sh`
-13. Sync de schema de project existente: `scripts/github/sync_project_schema.sh`
-14. Smoke test de briefing: `scripts/tests/briefing_smoke.sh`
+9. Checklist de validação rápida do briefing (Cowork): `docs/CHECKLIST_VALIDACAO_BRIEFING_3MIN.md`
+10. Versão pública: `VERSION`
+11. Histórico de mudanças: `CHANGELOG.md`
+12. Bootstrap de labels: `scripts/github/bootstrap_labels.sh`
+13. Bootstrap de project: `scripts/github/bootstrap_project.sh`
+14. Sync de schema de project existente: `scripts/github/sync_project_schema.sh`
+15. Smoke test de briefing: `scripts/tests/briefing_smoke.sh`
 
 ## Briefing: lógica atual
 

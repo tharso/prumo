@@ -185,20 +185,7 @@ Perguntar ao usuário via AskUserQuestion:
 - **Android**: "Quer configurar captura rápida pelo celular?"
 - **Depois**: "Pode configurar depois."
 
-**iPhone/iPad/Mac:**
-Enviar o link de instalação direta:
-"Instala esse atalho: https://www.icloud.com/shortcuts/02a3b96c0829419eaa628e5f9361cc12
-Toca no link, confirma, e o 'Send2Prumo' aparece no app Atalhos. Ele captura texto, fotos, áudio, links — tudo vai pra uma pasta que eu leio no briefing."
-
-Após instalar, guiar a configuração (ler `references/mobile-shortcut-guide.md` seção "Configuração pós-instalação"):
-1. Apontar a pasta de destino pra `Inbox4Mobile/` do workspace
-2. Colocar o email do usuário na opção de enviar email
-3. Opcional: adicionar à Home Screen
-
-Verificar se a pasta do workspace está acessível via nuvem (iCloud Drive, Google Drive, etc.). Se não está, oferecer alternativa de email: "Pode usar só a opção de email do atalho. Ele abre o Gmail com subject '{{AGENT_NAME}}', eu busco no briefing."
-
-**Android:**
-Não há atalho pronto. Recomendar o método de email: criar atalho na home screen que abre email pré-preenchido com subject "{{AGENT_NAME}}". Detalhes em `references/mobile-shortcut-guide.md` seção "Android".
+Conforme a resposta, ler `references/mobile-shortcut-guide.md` e seguir o guia de instalação para a plataforma escolhida.
 
 ### Etapa 8: Rituais
 
@@ -210,64 +197,21 @@ Usar AskUserQuestion:
 
 Após coletar todas as respostas:
 
-1. Ler `references/claude-md-template.md` → gerar CLAUDE.md (configuração pessoal)
-2. Copiar `references/prumo-core.md` → gerar PRUMO-CORE.md (motor do sistema, cópia direta)
-3. Ler `references/agents-md-template.md` → gerar AGENTS.md (adapter para agentes que não leem CLAUDE.md)
-4. Ler `references/file-templates.md` → gerar arquivos auxiliares
-5. Se Google dual via Gemini CLI foi habilitado na Etapa 5: ler `references/prumo-google-dual-snapshot.sh` e gerar `scripts/prumo_google_dual_snapshot.sh` no workspace (permissão de execução).
-6. Gerar `_state/briefing-state.json` com `last_briefing_at` vazio (base para janela "desde o último briefing", inclusive sem shell).
-7. Gerar todos os arquivos na pasta workspace do usuário
-
-**⚠️ Proteção de arquivos existentes:**
-
-Antes de gerar QUALQUER arquivo, verificar se ele já existe na pasta do usuário. Isso é crítico em cenários de reconfiguração, migração, ou re-setup onde a pasta já contém dados acumulados.
-
-Regras de proteção:
-
-| Arquivo | Se já existir |
-|---------|---------------|
-| CLAUDE.md | **Não sobrescrever silenciosamente.** Em setup inicial pode criar; em reconfiguração, pedir confirmação explícita antes de regenerar. Sempre criar backup em `_backup/CLAUDE.md.YYYY-MM-DD-HHMMSS`. |
-| PRUMO-CORE.md | **Sobrescrever** apenas em atualização de motor ou setup explícito. Sempre criar backup em `_backup/PRUMO-CORE.md.YYYY-MM-DD-HHMMSS` antes da troca. |
-| AGENTS.md | **Não sobrescrever silenciosamente.** Se existir, pedir confirmação explícita, criar backup em `_backup/AGENTS.md.YYYY-MM-DD-HHMMSS` e só então atualizar. |
-| PAUTA.md, INBOX.md, REGISTRO.md, IDEIAS.md | **NÃO sobrescrever.** Informar: "Encontrei [arquivo] com conteúdo existente. Mantendo o atual." |
-| Pessoal/PESSOAS.md, Referencias/INDICE.md | **NÃO sobrescrever.** Informar: "Encontrei [arquivo] com conteúdo existente. Mantendo o atual." |
-| [Area]/README.md | **NÃO sobrescrever.** Informar: "A pasta [Area] já tem um README com contexto. Mantendo." |
-| Pastas (_logs/, Inbox4Mobile/, Referencias/, _state/) | **Criar apenas se não existirem.** |
-
-Ao final da Etapa 9, mostrar resumo claro:
-- **Criados** (novos): listar arquivos que não existiam
-- **Mantidos** (existentes): listar arquivos preservados
-- **Sobrescritos**: apenas arquivos com confirmação explícita (sempre indicando backup e motivo)
-
-**Arquivos a gerar (respeitando proteção acima):**
-
-| Arquivo | Fonte | Descrição |
-|---------|-------|-----------|
-| CLAUDE.md | claude-md-template.md | Configuração pessoal. Nunca atualizado automaticamente. |
-| PRUMO-CORE.md | prumo-core.md | Motor do sistema. Atualizável automaticamente. |
-| AGENTS.md | agents-md-template.md | Adapter para Codex e outros agentes não-Cowork; aponta para CLAUDE.md + PRUMO-CORE.md. |
-| PAUTA.md | file-templates.md | Estado atual. Itens quentes, andamento, agendados. |
-| INBOX.md | file-templates.md | Itens não processados. |
-| REGISTRO.md | file-templates.md | Audit trail de itens processados. |
-| IDEIAS.md | file-templates.md | Ideias sem ação imediata. |
-| Pessoal/PESSOAS.md | file-templates.md | Tracking de pessoas e pendências de relacionamento. |
-| [Area]/README.md | Gerar dinamicamente | Um README por área/projeto com nome e descrição breve. |
-| _logs/ | Criar pasta vazia | Para registros semanais de revisão. |
-| _state/ | Criar pasta vazia | Estado operacional (lock + handover). |
-| _state/briefing-state.json | Gerar JSON inicial | Estado de referência temporal do briefing (`last_briefing_at`). |
-| scripts/prumo_google_dual_snapshot.sh | prumo-google-dual-snapshot.sh | Script opcional para briefing Google dual (agenda + curadoria de emails desde último briefing). |
-| scripts/prumo_sanitize_state.py | Gerar arquivo | Sanitização de estado operacional (`HANDOVER`) com backup e resumo leve. |
-| scripts/prumo_auto_sanitize.py | Gerar arquivo | Autosanitização por gatilhos (handover/inbox) com cooldown e calibração por workspace via `_state/auto-sanitize-history.json`. |
-| Inbox4Mobile/ | Criar pasta vazia | Para notas/arquivos do celular. |
-| Referencias/ | Criar pasta vazia | Para material de referência. |
-| Referencias/INDICE.md | file-templates.md | Índice de material de referência. |
+1. Ler `references/file-protection-rules.md` → aplicar regras de proteção
+2. Ler `references/claude-md-template.md` → gerar CLAUDE.md (configuração pessoal)
+3. Copiar `references/prumo-core.md` → gerar PRUMO-CORE.md (motor do sistema, cópia direta)
+4. Ler `references/agents-md-template.md` → gerar AGENTS.md (adapter para agentes não-Cowork)
+5. Ler `references/file-templates.md` → gerar arquivos auxiliares
+6. Se Google dual via Gemini CLI foi habilitado na Etapa 5: ler `references/prumo-google-dual-snapshot.sh` e gerar `scripts/prumo_google_dual_snapshot.sh` no workspace (permissão de execução).
+7. Gerar `_state/briefing-state.json` com `last_briefing_at` vazio (base para janela "desde o último briefing", inclusive sem shell).
+8. Gerar todos os arquivos na pasta workspace do usuário
 
 **Arquitetura de três arquivos (com adapter):**
 O sistema usa três arquivos separados por design. O `CLAUDE.md` contém apenas a configuração pessoal (nome, áreas, tom, integrações) e nunca é tocado por atualizações. O `PRUMO-CORE.md` contém as regras e rituais do sistema e pode ser atualizado automaticamente quando sair versão nova. O `AGENTS.md` é um adapter fino para agentes que não leem `CLAUDE.md` nativamente (ex: Codex), apontando para os dois arquivos principais sem duplicar conteúdo.
 
 **Comando `/prumo:briefing`:**
 Após o setup, o usuário pode usar `/prumo:briefing` para acionar o morning briefing completo. Alias legado `/briefing` continua aceito por compatibilidade. O comando dispara a skill `briefing` que lê os arquivos de configuração, verifica atualizações, processa todos os canais de inbox, e apresenta o briefing do dia.
-Se o script `scripts/prumo_google_dual_snapshot.sh` existir e estiver funcional, ele vira a fonte primária para agenda e curadoria de emails por prioridade (`Responder`, `Ver`, `Sem ação`) na janela "desde o último briefing".
+Se o script `scripts/prumo_google_dual_snapshot.sh` existir e estiver funcional, ele vira a fonte primária para agenda e curadoria de emails.
 Se o script não existir ou não puder rodar (runtime sem shell), a curadoria segue obrigatória via integrações nativas com a mesma taxonomia e usando `_state/briefing-state.json`.
 
 **Comando `/prumo:handover`:**
@@ -309,98 +253,7 @@ Se o usuário parecer estar "testando" com itens genéricos ou fake ("comprar le
 
 ## Feedback loop
 
-O Prumo tem um canal nativo de feedback para o time mantenedor. Isso é fundamental: o feedback mais valioso vem de quem usa o sistema no dia a dia, e essas pessoas nem sempre vão abrir issues no GitHub.
-
-### Como funciona
-
-O agente reconhece variações naturais de "feedback pro Prumo":
-- "feedback: achei o briefing confuso"
-- "quero dar um feedback pro prumo"
-- "tem uma coisa que podia melhorar no sistema"
-- "bug no prumo"
-
-Quando detectar, o agente:
-
-1. **Captura** o que o usuário disse (pode pedir pra elaborar se for vago)
-2. **Formata** em estrutura limpa: o que aconteceu, o que esperava, sugestão (se houver)
-3. **Monta o email** com link `mailto:` pronto:
-   - To: email de suporte configurado no produto (`email-de-feedback@dominio-do-produto.com`)
-   - Subject: `PRUMO-FEEDBACK: [resumo curto]`
-   - Body: feedback formatado + metadados (nome do agente, data do setup, tom configurado)
-4. **Apresenta** pro usuário: mostra o email montado e oferece o link clicável
-5. O usuário **clica e envia** (um toque)
-
-Exemplo de apresentação ao usuário:
-
-```
-Montei o feedback pra mandar para o time do Prumo:
-
----
-**Assunto:** PRUMO-FEEDBACK: Briefing não mostra itens por prioridade
-**Para:** email-de-feedback@dominio-do-produto.com
-
-O briefing diário lista os itens na ordem que entraram, mas seria mais útil
-ver os urgentes primeiro. Quando tem muita coisa, os itens quentes se perdem
-no meio da lista.
-
-Sugestão: agrupar por urgência (quente → andamento → agendado).
-
-[Prumo v1.0 | Agente: "Atlas" | Tom: direto | Setup: 13/02/2026]
----
-
-[Clica aqui pra enviar](mailto:...)
-
-Só apertar "Enviar" no email que abre. Sem editar nada (mas pode, se quiser).
-```
-
-### Onde isso entra no CLAUDE.md gerado
-
-Na seção de regras de ouro, adicionar como regra 13:
-
-**REGRA 13: FEEDBACK PRO PRUMO**
-Se o usuário mencionar feedback, bug, sugestão ou melhoria do sistema Prumo em si (não do conteúdo da pauta), montar email formatado com link mailto pronto para o canal de suporte configurado no produto (ex: `email-de-feedback@dominio-do-produto.com`) com subject "PRUMO-FEEDBACK: [resumo]". Incluir no body: descrição do feedback, metadados do sistema (nome do agente, tom, data do setup). Apresentar pro usuário com link clicável. Um clique pra enviar.
-
-### Feedback proativo (o diferencial)
-
-O agente tem algo que nenhum formulário de feedback tem: contexto. Ele sabe quando algo não funcionou bem. O agente deve observar sinais e, quando tiver insumo, sugerir o feedback pronto.
-
-**Sinais que geram feedback proativo:**
-- Usuário ignorou a revisão semanal 2+ vezes → "Parece que a revisão semanal não tá funcionando pra você. Quer que eu mande isso pro criador do Prumo?"
-- Inbox mobile ficou vazio por 5+ dias → captura mobile pode não estar funcionando
-- Briefing muito longo (10+ itens quentes) → sistema pode estar acumulando demais
-- Usuário fez dump de algo que o sistema deveria ter lembrado → gap no briefing
-- Usuário pediu algo que o sistema não suporta → feature request natural
-- Qualquer "isso é chato", "podia ser melhor", "não gostei" durante interações
-
-**Quando oferecer:**
-- No final do morning briefing, se houver sinal acumulado: "Notei que [observação]. Quer mandar isso como feedback pro Prumo? Já escrevi o rascunho."
-- Na revisão semanal: "Algum feedback sobre o Prumo em si? Bug, ideia, coisa que te irritou?"
-- Imediatamente quando o usuário expressar frustração com o sistema
-
-**Como oferecer:**
-O agente apresenta o texto sugerido já pronto, com o link mailto. O usuário só precisa confirmar e clicar. Se quiser editar, edita. Se não, um clique.
-
-Exemplo:
-```
-Notei que nas últimas 3 sessões o briefing listou mais de 12 itens quentes.
-Isso pode significar que os critérios de "quente" estão frouxos demais.
-
-Montei um feedback:
-
----
-PRUMO-FEEDBACK: Critérios de prioridade "quente" podem ser mais restritivos
-
-Nos últimos briefings, a seção "quente" teve 12-15 itens. Quando tudo é quente,
-nada é quente. Sugiro critérios mais agressivos pra priorização ou um limite
-visual (top 5 quentes, resto em "andamento").
-
-[Prumo v1.0 | Agente: "Mia" | Tom: direto | Uso: 3 semanas]
----
-
-[Enviar feedback](mailto:...) — um clique, sem editar nada.
-```
-
-**Frequência:** No máximo 1 sugestão de feedback por semana. Não ser chato. Se o usuário recusar, esperar pelo menos 2 semanas antes de sugerir de novo.
+Se o usuário mencionar feedback, bug, sugestão ou melhoria sobre o Prumo em si (não sobre conteúdo da pauta), ler `references/feedback-loop.md` e seguir o protocolo.
 
 ---
 
@@ -412,7 +265,7 @@ Se o CLAUDE.md já existe na pasta, o sistema já está configurado. Oferecer:
 2. **Mudar tom**: Atualizar a seção de tom no CLAUDE.md
 3. **Ajustar rituais**: Atualizar horários/dias no CLAUDE.md
 4. **Adicionar integração**: Atualizar seção de integrações no CLAUDE.md
-5. **Reset completo**: Reconfigurar do zero. Usa a mesma proteção da Etapa 9: CLAUDE.md e PRUMO-CORE.md são regenerados (com backup do CLAUDE.md), todos os outros arquivos com dados acumulados são preservados.
+5. **Reset completo**: Reconfigurar do zero. Ler `references/file-protection-rules.md` antes de regenerar: CLAUDE.md e PRUMO-CORE.md são regenerados (com backup do CLAUDE.md), todos os outros arquivos com dados acumulados são preservados.
 
 Sempre atualizar o changelog no final do CLAUDE.md após qualquer reconfiguração.
 
@@ -425,62 +278,4 @@ Sempre atualizar o changelog no final do CLAUDE.md após qualquer reconfiguraç�
 - Todas as datas no formato DD/MM/AAAA
 - Tags usam formato `[Area]` ou `[Area/Subarea]`
 - O fuso padrão é o do usuário (perguntar se necessário, default: América/São_Paulo)
-
----
-
-## Changelog
-
-### v3.4 (19/02/2026)
-- **Paridade sem shell no briefing**: fallback oficial para runtimes sem shell/Gemini CLI mantendo curadoria por ação (`Responder`, `Ver`, `Sem ação`) com prioridade `P1/P2/P3`.
-- **Estado temporal explícito**: setup passa a gerar `_state/briefing-state.json` para suportar janela "desde o último briefing" em qualquer runtime.
-- **Template de automação local**: `references/prumo-google-dual-snapshot.sh` incorporado como ativo de produto (modo avançado opcional).
-
-### v3.1 (14/02/2026)
-- **Trigger `/Prumo`**: Comando principal de ativação trocado de "quero organizar minha vida" para `/Prumo`. Mais claro, sem soar autoajuda.
-- **Etapa 0 reescrita (detectar, não instruir)**: A Etapa 0 anterior tentava guiar a seleção de pasta no meio da conversa, o que é impossível no Cowork (pasta precisa ser escolhida ANTES de iniciar a sessão). Nova versão detecta automaticamente se a pasta é real ou temporária. Se for temporária, manda o usuário fechar, selecionar a pasta, e voltar. Sem workarounds.
-- **Localização correta do seletor**: Corrigido de "ícone de pasta na barra lateral" para "abaixo e à esquerda da caixa de input".
-
-### v3.0 (14/02/2026)
-- **Etapa 0 — Verificação de pasta**: Setup agora começa verificando se o Cowork tem uma pasta real selecionada. Se não tem, guia o usuário a selecionar antes de qualquer pergunta. Se o usuário já tem estrutura organizada, adapta-se ao que existe.
-- **Uma pergunta por vez**: Todas as etapas do setup agora fazem uma pergunta por mensagem. Opções claras via AskUserQuestion, mínimo de digitação. UX radicalmente melhorada.
-- **Decisões reversíveis**: Comunicado desde o início que todas as escolhas do setup podem ser ajustadas depois. "O Prumo vai te conhecendo melhor com o uso."
-- **Tom mais acessível**: Removido "sócio chato", "Admin". Linguagem amigável durante setup ("amigo que te lembra de tudo na hora certa").
-- **Terminologia clara**: "Admin" → "Burocracias do dia a dia".
-
-### v2.1 (13/02/2026)
-- **Proteção de arquivos no setup**: Etapa 9 agora verifica se arquivos já existem antes de gerar. Dados acumulados (PAUTA, REGISTRO, IDEIAS, READMEs) nunca são sobrescritos. CLAUDE.md ganha backup automático antes de regenerar. Seguro para re-setup, migração e reconfiguração.
-
-### v3.2 (19/02/2026)
-- **Adapter AGENTS.md**: Setup agora gera `AGENTS.md` como ponteiro para `CLAUDE.md` + `PRUMO-CORE.md` (sem duplicação de conteúdo).
-- **Comando canônico**: `/prumo:briefing` definido como padrão; `/briefing` mantido como alias legado.
-- **Estado operacional**: setup cria pasta `_state/` para lock e handover entre agentes.
-- **Comando manual de handover**: `/prumo:handover` para validação cruzada fora do briefing.
-
-### v3.3 (19/02/2026)
-- **Curadoria de email no briefing**: troca do critério "não lidos mais recentes" por triagem orientada à ação (`Responder`, `Ver`, `Sem ação`) com justificativa objetiva.
-- **Janela temporal de briefing**: integração com estado `_state/briefing-state.json` para analisar emails desde o último briefing concluído.
-- **Integração Google dual opcional**: suporte a script local (`scripts/prumo_google_dual_snapshot.sh`) gerado via setup quando o usuário habilitar modo avançado com Gemini CLI.
-
-### v2.0 (13/02/2026)
-- **Arquitetura de dois arquivos**: CLAUDE.md (pessoal, imutável) + PRUMO-CORE.md (sistema, atualizável). Permite updates sem perder personalizações.
-- **Auto-update**: PRUMO-CORE.md verifica versão no GitHub e oferece atualização automática. Mensagem explícita de que dados/personalizações não são afetados.
-- **Comando /briefing**: Skill dedicada que executa o morning briefing completo (7 passos). Legado; atual canônico é `/prumo:briefing`.
-- **Arquivo VERSION no repo**: Controle de versão simplificado para o mecanismo de update.
-
-### v1.2 (13/02/2026)
-- **Datas em itens pendentes**: Regra 3 agora exige `(desde DD/MM)` ao mover itens pro destino. Torna o envelhecimento visível.
-- **Links clicáveis**: Regra 1 agora exige `computer://` links ao referenciar arquivos na conversa. Entregar, não só informar.
-- **Seção de concluídos na PAUTA**: Template da PAUTA agora inclui "Semana atual — Concluídos" e "Semana passada — Concluídos". Rotação automática na revisão semanal.
-- **Renomeação descritiva**: Regra 3 agora exige renomeação autoexplicativa ao mover qualquer arquivo do inbox (não só referências).
-
-### v1.1 (13/02/2026)
-- Feedback loop nativo (regra 13 no CLAUDE.md)
-- Feedback proativo (detecção de sinais + sugestão automática)
-- Template do CLAUDE.md com regra 13
-
-### v1.0 (12/02/2026)
-- Setup wizard com 10 etapas
-- Templates: CLAUDE.md, PAUTA.md, INBOX.md, REGISTRO.md, IDEIAS.md, PESSOAS.md
-- 3 tons de comunicação (direto, equilibrado, gentil)
-- Captura mobile (iOS shortcut + email)
-- Integrações: Gmail, Google Calendar
+- Changelog desta skill: `references/changelog-setup.md`

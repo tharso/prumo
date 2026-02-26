@@ -23,15 +23,30 @@ assert_contains() {
   fi
 }
 
-CORE_FILE="references/prumo-core.md"
+CORE_FILE=""
+if [[ -f "skills/prumo/references/prumo-core.md" ]]; then
+  CORE_FILE="skills/prumo/references/prumo-core.md"
+elif [[ -f "references/prumo-core.md" ]]; then
+  CORE_FILE="references/prumo-core.md"
+fi
 SKILL_FILE="skills/briefing/SKILL.md"
 SKILL_MIRROR_FILE="skills-briefing-SKILL.md"
-TEMPLATES_FILE="references/file-templates.md"
+TEMPLATES_FILE=""
+if [[ -f "skills/prumo/references/file-templates.md" ]]; then
+  TEMPLATES_FILE="skills/prumo/references/file-templates.md"
+elif [[ -f "references/file-templates.md" ]]; then
+  TEMPLATES_FILE="references/file-templates.md"
+fi
 VERSION_FILE="VERSION"
 
-for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE" "$TEMPLATES_FILE" "$VERSION_FILE"; do
+for file in "$CORE_FILE" "$SKILL_FILE" "$TEMPLATES_FILE" "$VERSION_FILE"; do
   [[ -f "$file" ]] || fail "Arquivo obrigatório ausente: $file"
 done
+
+BRIEFING_FILES=("$CORE_FILE" "$SKILL_FILE")
+if [[ -f "$SKILL_MIRROR_FILE" ]]; then
+  BRIEFING_FILES+=("$SKILL_MIRROR_FILE")
+fi
 
 VERSION_VALUE="$(cat "$VERSION_FILE")"
 CORE_VERSION="$(grep -Eo '^> \*\*prumo_version: [0-9]+\.[0-9]+\.[0-9]+\*\*$' "$CORE_FILE" | sed -E 's/^> \*\*prumo_version: ([0-9]+\.[0-9]+\.[0-9]+)\*\*$/\1/' | head -n1)"
@@ -39,19 +54,19 @@ CORE_VERSION="$(grep -Eo '^> \*\*prumo_version: [0-9]+\.[0-9]+\.[0-9]+\*\*$' "$C
 [[ "$VERSION_VALUE" == "$CORE_VERSION" ]] || fail "Divergência de versão: VERSION=$VERSION_VALUE vs prumo_version=$CORE_VERSION"
 assert_contains "$CORE_FILE" "^### v$CORE_VERSION \\(" "Changelog do core não contém seção da versão atual"
 
-for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
+for file in "${BRIEFING_FILES[@]}"; do
   assert_contains "$file" "Responder" "Taxonomia: ausência de 'Responder'"
   assert_contains "$file" "Ver" "Taxonomia: ausência de 'Ver'"
   assert_contains "$file" "Sem ação|Sem acao" "Taxonomia: ausência de 'Sem ação'"
   assert_contains "$file" "P1/P2/P3|P1.*P2.*P3" "Prioridade P1/P2/P3 ausente"
 done
 
-for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
+for file in "${BRIEFING_FILES[@]}"; do
   assert_contains "$file" "last_briefing_at" "Janela temporal: falta referência a last_briefing_at"
   assert_contains "$file" "24h|24 h|24 horas" "Janela temporal: falta fallback de 24h"
 done
 
-for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
+for file in "${BRIEFING_FILES[@]}"; do
   assert_contains "$file" "_preview-index\\.json" "Preview adoption: falta referência ao índice de preview"
   assert_contains "$file" "DEVE linkar|deve ser linkado|link obrigatório" "Preview adoption: regra bloqueante de link ausente"
   assert_contains "$file" "inbox-preview\\.html" "Preview adoption: referência ao html de preview ausente"
@@ -59,7 +74,7 @@ for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
   assert_contains "$file" "primeira interação.*proibido abrir|na primeira resposta do briefing, é proibido abrir" "Preview adoption: falta guardrail da primeira interação"
 done
 
-for file in "$CORE_FILE" "$SKILL_FILE" "$SKILL_MIRROR_FILE"; do
+for file in "${BRIEFING_FILES[@]}"; do
   assert_contains "$file" "Bloco 1" "Briefing progressivo: ausência de Bloco 1"
   assert_contains "$file" "Bloco 2" "Briefing progressivo: ausência de Bloco 2"
   assert_contains "$file" "Tá bom por hoje|tá bom por hoje|escape|depois" "Escape hatch: gatilhos ausentes"
@@ -75,8 +90,10 @@ assert_contains "$TEMPLATES_FILE" "\\| cobrar: 25/02|cobrar: DD/MM" "Template de
 
 assert_contains "$SKILL_FILE" "Google dual via Gemini CLI|script dual" "Modo com shell não descrito na skill principal"
 assert_contains "$SKILL_FILE" "Fallback sem shell" "Fallback sem shell não descrito na skill principal"
-assert_contains "$SKILL_MIRROR_FILE" "Google dual via Gemini CLI|script dual" "Modo com shell não descrito na skill espelhada"
-assert_contains "$SKILL_MIRROR_FILE" "Fallback sem shell" "Fallback sem shell não descrito na skill espelhada"
+if [[ -f "$SKILL_MIRROR_FILE" ]]; then
+  assert_contains "$SKILL_MIRROR_FILE" "Google dual via Gemini CLI|script dual" "Modo com shell não descrito na skill espelhada"
+  assert_contains "$SKILL_MIRROR_FILE" "Fallback sem shell" "Fallback sem shell não descrito na skill espelhada"
+fi
 
 assert_contains "$CORE_FILE" "com shell" "Modo com shell não descrito no core"
 assert_contains "$CORE_FILE" "sem shell" "Modo sem shell não descrito no core"

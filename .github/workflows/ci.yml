@@ -28,12 +28,18 @@ jobs:
 
       - name: Validate core version alignment
         run: |
-          test -f references/prumo-core.md
           VERSION_VALUE=$(cat VERSION)
-          CORE_VERSION=$(grep -Eo '^> \*\*prumo_version: [0-9]+\.[0-9]+\.[0-9]+\*\*$' references/prumo-core.md | sed -E 's/^> \*\*prumo_version: ([0-9]+\.[0-9]+\.[0-9]+)\*\*$/\1/' | head -n1)
+          CORE_FILE=""
+          if [ -f skills/prumo/references/prumo-core.md ]; then
+            CORE_FILE="skills/prumo/references/prumo-core.md"
+          elif [ -f references/prumo-core.md ]; then
+            CORE_FILE="references/prumo-core.md"
+          fi
+          test -n "$CORE_FILE"
+          CORE_VERSION=$(grep -Eo '^> \*\*prumo_version: [0-9]+\.[0-9]+\.[0-9]+\*\*$' "$CORE_FILE" | sed -E 's/^> \*\*prumo_version: ([0-9]+\.[0-9]+\.[0-9]+)\*\*$/\1/' | head -n1)
           test -n "$CORE_VERSION"
           test "$VERSION_VALUE" = "$CORE_VERSION"
-          grep -q "^### v$CORE_VERSION (" references/prumo-core.md
+          grep -q "^### v$CORE_VERSION (" "$CORE_FILE"
 
       - name: Validate issue templates exist
         run: |

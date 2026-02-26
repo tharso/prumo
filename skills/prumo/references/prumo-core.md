@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 3.8.3**
+> **prumo_version: 4.0.0**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -499,6 +499,12 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ## Changelog do Core
 
+### v4.0.0 (26/02/2026)
+- Reorganização estrutural do plugin para o padrão `skills/<nome>/SKILL.md`.
+- Referências do setup modularizadas em `skills/prumo/references/` (progressive discovery).
+- Novas skills operacionais oficializadas no pacote: `handover`, `sanitize` e `start`.
+- Caminhos internos de referência atualizados para a nova estrutura de diretórios.
+
 ### v3.8.3 (23/02/2026)
 - Preview de YouTube no `inbox-preview.html` passa a usar fallback local em `file://` (thumbnail + link), evitando erro 153 de embed bloqueado.
 - Corrigido bug de interpolação no bloco JS do gerador que podia interromper a criação do HTML de preview.
@@ -630,4 +636,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v3.8.3 — https://github.com/tharso/prumo*
+*Prumo Core v4.0.0 — https://github.com/tharso/prumo*

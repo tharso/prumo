@@ -26,13 +26,13 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
 1. Leia o campo `prumo_version` no topo do `PRUMO-CORE.md` local.
 2. Tente fonte remota:
    - versão: `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
-   - core: `https://raw.githubusercontent.com/tharso/prumo/main/references/prumo-core.md`
+   - core: `https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md`
 3. Validar integridade da fonte remota antes de usar:
    - tratar como inválida se o core remoto estiver truncado (ex.: sem `## Changelog do Core` ou sem rodapé `Prumo Core v...`);
    - em fonte inválida, cair para fallback local.
 4. Se a fonte remota falhar (404/auth/rede) **ou for inválida/incompleta**, tente fonte local (se existir no workspace):
    - versão: `Prumo/VERSION`
-   - core: `Prumo/references/prumo-core.md`
+   - core: `Prumo/skills/prumo/references/prumo-core.md`
 5. Se nenhuma fonte estiver acessível, informe: "Não consegui verificar atualização do Prumo agora (falha de acesso à fonte de versão)." e prossiga. Nunca afirmar "já está atualizado" sem fonte válida.
 6. Se a versão encontrada for maior, informe: "Há uma atualização do Prumo (v[local] → v[remota]). A atualização pode tocar SOMENTE `PRUMO-CORE.md`. `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`, `IDEIAS.md`, `AGENTS.md` e demais arquivos pessoais não podem ser alterados. Quer atualizar?"
 7. Se aceitar:

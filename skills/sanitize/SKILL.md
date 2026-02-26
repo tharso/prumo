@@ -13,6 +13,7 @@ Use este fluxo para manter arquivos de estado enxutos.
 
 1. Ler `PRUMO-CORE.md` e validar lock em `_state/agent-lock.json`.
 2. Confirmar existência de `_state/HANDOVER.md`.
+3. Se necessário, consultar `references/sanitization.md` para regras detalhadas de compactação e thresholds.
 
 ## Passo 2: Simulação (dry-run)
 

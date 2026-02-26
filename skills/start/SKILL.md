@@ -297,8 +297,7 @@ Usar os mesmos templates do setup wizard:
    - `scripts/prumo_auto_sanitize.py`
    - Se Google dual habilitado: `scripts/prumo_google_dual_snapshot.sh`
 
-**Proteção de arquivos existentes:** mesma lógica do setup wizard (Etapa 9
-do SKILL.md de setup). Se algum arquivo já existir, não sobrescrever.
+**Proteção de arquivos existentes:** consultar `../prumo/references/file-protection-rules.md` para regras detalhadas. Se algum arquivo já existir, não sobrescrever.
 
 **5.3 — Popular a PAUTA.md com itens reais**
 

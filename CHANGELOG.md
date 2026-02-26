@@ -4,6 +4,24 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.0.0] - 2026-02-26
+
+### Changed
+- Reorganização estrutural das skills para o padrão de plugin do Cowork: `skills/<nome>/SKILL.md`.
+- Skill de setup (`skills/prumo/SKILL.md`) refatorada com progressive discovery (conteúdo de suporte movido para `skills/prumo/references/`).
+- Referências modulares de briefing e sanitização movidas para dentro das respectivas skills (`skills/briefing/references/` e `skills/sanitize/references/`).
+
+### Added
+- Estrutura de plugin no repositório em `.claude-plugin/plugin.json` e `.claude-plugin/marketplace.json`.
+- Nova skill de onboarding dump-first em `skills/start/SKILL.md`.
+- Referências dedicadas do setup: `feedback-loop.md`, `file-protection-rules.md` e `changelog-setup.md`.
+
+### Removed
+- Arquivos legados/duplicados na raiz: `SKILL.md`, `skills-briefing-SKILL.md`, `skills-handover-SKILL.md` e `skills-sanitize-SKILL.md`.
+
+### Fixed
+- Correções de paths em `skills/briefing/SKILL.md`, `skills/sanitize/SKILL.md` e `skills/start/SKILL.md` após a migração de estrutura.
+
 ## [3.8.3] - 2026-02-23
 
 ### Fixed

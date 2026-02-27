@@ -10,14 +10,22 @@
   "plugins": [
     {
       "name": "prumo",
-      "source": ".",
+      "source": "./",
       "description": "Sistema de organização de vida que transforma o Claude em interface única para capturar, processar, lembrar e cobrar. Setup conversacional em 10 etapas, onboarding dump-first, briefings diários, handover entre agentes, e sanitização de estado.",
       "version": "4.0.0",
       "author": {
         "name": "Tharso"
       },
       "license": "MIT",
-      "keywords": ["productivity", "life-organization", "personal-assistant", "gtd", "task-management", "produtividade", "organização"]
+      "keywords": [
+        "productivity",
+        "life-organization",
+        "personal-assistant",
+        "gtd",
+        "task-management",
+        "produtividade",
+        "organização"
+      ]
     }
   ]
 }

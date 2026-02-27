@@ -4,6 +4,15 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.0.2] - 2026-02-27
+
+### Fixed
+- Fluxo de instalação via marketplace por URL (`raw`) ajustado para não depender de `source` relativo no cache local.
+- `source` do plugin no marketplace agora usa fetch Git explícito (`https://github.com/tharso/prumo.git` + `ref: main`) com `strict: false` e skills declaradas.
+
+### Added
+- Manifestos em `.claude-plugin/` (`marketplace.json` e `plugin.json`) para compatibilidade com adição de marketplace por URL de repositório `.git`.
+
 ## [4.0.1] - 2026-02-27
 
 ### Changed

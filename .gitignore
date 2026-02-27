@@ -20,7 +20,9 @@ _state/
 
 # Artefatos internos de desenvolvimento (fora da distribuição pública)
 .github/
-.claude-plugin/
+.claude-plugin/*
+!.claude-plugin/marketplace.json
+!.claude-plugin/plugin.json
 docs/
 scripts/
 skills/

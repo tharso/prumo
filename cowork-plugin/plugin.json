@@ -1,11 +1,18 @@
 {
   "name": "prumo",
   "description": "Sistema de organização de vida pessoal. Transforma o Claude em interface única para capturar, processar, lembrar e cobrar. Micromanagement. Sem o idiota.",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "author": {
     "name": "Prumo Maintainers"
   },
   "homepage": "https://tharso.github.io/prumo",
   "repository": "https://github.com/tharso/prumo",
-  "license": "MIT"
+  "license": "MIT",
+  "skills": [
+    "./skills/prumo",
+    "./skills/briefing",
+    "./skills/handover",
+    "./skills/sanitize",
+    "./skills/start"
+  ]
 }

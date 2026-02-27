@@ -15,19 +15,12 @@
         "ref": "main"
       },
       "description": "Sistema de organização de vida que transforma o Claude em interface única para capturar, processar, lembrar e cobrar. Setup conversacional em 10 etapas, onboarding dump-first, briefings diários, handover entre agentes, e sanitização de estado.",
-      "version": "4.0.2",
+      "version": "4.0.3",
       "author": {
         "name": "Prumo Maintainers"
       },
       "license": "MIT",
-      "strict": false,
-      "skills": [
-        "./cowork-plugin/skills/prumo",
-        "./cowork-plugin/skills/briefing",
-        "./cowork-plugin/skills/handover",
-        "./cowork-plugin/skills/sanitize",
-        "./cowork-plugin/skills/start"
-      ],
+      "strict": true,
       "keywords": [
         "productivity",
         "life-organization",

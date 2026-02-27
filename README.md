@@ -43,4 +43,4 @@ Use o pacote local gerado para instalacao offline/manual.
 
 ## Versao
 
-Versao atual: `4.0.2`.
+Versao atual: `4.0.3`.

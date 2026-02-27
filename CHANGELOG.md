@@ -4,6 +4,14 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.0.3] - 2026-02-27
+
+### Fixed
+- Conflito de manifest no loader de plugins do Cowork resolvido:
+  - `marketplace.json` agora usa `strict: true` no entry do plugin.
+  - definição de skills migrou para `plugin.json` (raiz e `.claude-plugin/plugin.json`), evitando dupla origem de componentes.
+- `cowork-plugin/plugin.json` atualizado com skills explícitas para manter paridade com instalação por pacote local.
+
 ## [4.0.2] - 2026-02-27
 
 ### Fixed

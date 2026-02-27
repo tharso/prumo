@@ -9,6 +9,7 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 ### Fixed
 - Fluxo de instalação via marketplace por URL (`raw`) ajustado para não depender de `source` relativo no cache local.
 - `source` do plugin no marketplace agora usa fetch Git explícito (`https://github.com/tharso/prumo.git` + `ref: main`) com `strict: false` e skills declaradas.
+- `marketplace.name` alterado para `prumo-marketplace` para evitar recursão de cache no instalador quando slug do marketplace e slug do plugin são idênticos.
 
 ### Added
 - Manifestos em `.claude-plugin/` (`marketplace.json` e `plugin.json`) para compatibilidade com adição de marketplace por URL de repositório `.git`.

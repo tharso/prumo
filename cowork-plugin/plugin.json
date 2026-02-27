@@ -1,10 +1,9 @@
 {
   "name": "prumo",
   "description": "Sistema de organização de vida pessoal. Transforma o Claude em interface única para capturar, processar, lembrar e cobrar. Micromanagement. Sem o idiota.",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "author": {
-    "name": "Tharso",
-    "email": "tharso@gmail.com"
+    "name": "Prumo Maintainers"
   },
   "homepage": "https://tharso.github.io/prumo",
   "repository": "https://github.com/tharso/prumo",

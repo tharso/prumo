@@ -1,13 +1,13 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 4.0.0**
+> **prumo_version: 4.0.1**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
 > Suas personalizações estão em `CLAUDE.md`.
 >
 > Repositório: https://github.com/tharso/prumo
-> Arquivo remoto: https://raw.githubusercontent.com/tharso/prumo/main/references/prumo-core.md
+> Arquivo remoto: https://raw.githubusercontent.com/tharso/prumo/main/cowork-plugin/skills/prumo/references/prumo-core.md
 
 ---
 
@@ -499,6 +499,11 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ## Changelog do Core
 
+### v4.0.1 (27/02/2026)
+- Repositório público sanitizado para distribuição: remoção de artefatos internos de desenvolvimento.
+- Manifests e metadados públicos ajustados para instalação no marketplace sem dependência de arquivos internos.
+- Pacote de runtime consolidado em `cowork-plugin/` como fonte única de distribuição.
+
 ### v4.0.0 (26/02/2026)
 - Reorganização estrutural do plugin para o padrão `skills/<nome>/SKILL.md`.
 - Referências do setup modularizadas em `skills/prumo/references/` (progressive discovery).
@@ -636,4 +641,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v4.0.0 — https://github.com/tharso/prumo*
+*Prumo Core v4.0.1 — https://github.com/tharso/prumo*

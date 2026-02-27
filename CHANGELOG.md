@@ -4,6 +4,16 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.0.1] - 2026-02-27
+
+### Changed
+- Repositório público sanitizado para distribuição: remoção de artefatos internos de desenvolvimento e operação.
+- Fonte do marketplace consolidada para `./cowork-plugin` (pacote enxuto e orientado a runtime).
+- Metadados públicos dos manifests ajustados para reduzir exposição de dados pessoais.
+
+### Removed
+- Estruturas internas de engenharia no repositório público: `.github/`, `.claude-plugin/`, `docs/`, `scripts/`, `skills/` e `prumo-landing-v2.html`.
+
 ## [4.0.0] - 2026-02-26
 
 ### Changed

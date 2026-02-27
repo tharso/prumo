@@ -40,6 +40,12 @@ Use o pacote local gerado para instalacao offline/manual.
 - Atualizacoes do pacote do plugin dependem do canal de distribuicao (marketplace ou reinstall do pacote local).
 - Atualizacao do motor operacional no workspace do usuario segue o fluxo de versao descrito pelas skills do proprio plugin.
 
+## Diagnostico rapido
+
+Se aparecer "comando desconhecido" apos instalar/atualizar, siga o protocolo de 60 segundos:
+
+- `COWORK-MARKETPLACE-PLAYBOOK.md` (secao "Protocolo de 60 segundos")
+
 ## Versao
 
-Versao atual: `4.0.4`.
+Versao atual: `4.0.5`.

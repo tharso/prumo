@@ -14,6 +14,7 @@ Se você só ler uma parte, leia esta.
 4. Se marketplace e plugin manifest declararem componentes ao mesmo tempo, ocorre conflito de manifest.
 5. Se o pacote distribuído tiver dois `plugin.json` com o mesmo `name`, o discovery de slash command pode ficar inconsistente no app.
 6. O erro visual no app costuma ser genérico. A causa real aparece nos logs do desktop.
+7. Se a sessão/chat foi aberta antes da instalação do plugin, o slash command pode continuar "desconhecido" nessa sessão mesmo após instalar.
 
 ## 2) Causas raiz encontradas neste caso
 
@@ -36,6 +37,11 @@ Se você só ler uma parte, leia esta.
 
 - Sintoma: skill funciona por invocação interna, mas slash command não aparece no autocomplete ou retorna "comando desconhecido".
 - Motivo: pacote com múltiplos `plugin.json` para o mesmo plugin (`name` igual), com bases de paths diferentes, pode gerar source of truth ambígua no discovery do frontend.
+
+### Causa E: sessão iniciada sem plugin carregado
+
+- Sintoma: `/plugin:comando` retorna "comando desconhecido" em uma conversa, mas funciona em outra.
+- Motivo: a lista de slash commands é montada no `init` da sessão. Se o plugin foi instalado depois, a sessão antiga pode continuar sem o comando até abrir sessão nova (ou reinit efetivo).
 
 ## 3) Padrão seguro recomendado (copiar e adaptar)
 
@@ -107,6 +113,7 @@ Exemplo:
   - `plugin.json` (raiz)
   - `.claude-plugin/plugin.json`
 - Inclua `.claude-plugin/marketplace.json` e `.claude-plugin/plugin.json` para compatibilidade com add por URL de repositório.
+- Depois de instalar/atualizar plugin, teste em conversa nova (sessão nova) antes de concluir que "não funcionou".
 
 ### Não faça
 
@@ -116,6 +123,7 @@ Exemplo:
 - Não declarar componentes ao mesmo tempo no marketplace entry e no `plugin.json` (a menos que saiba exatamente o contrato de precedência).
 - Não distribuir dois `plugin.json` com o mesmo `name` em caminhos diferentes dentro do mesmo pacote.
 - Não validar apenas no CLI headless e concluir sobre UX do app sem testar no Cowork Desktop.
+- Não usar como evidência final uma conversa que começou antes da instalação do plugin.
 
 ## 5) Sequência de validação mínima (antes de anunciar pronto)
 
@@ -130,7 +138,8 @@ Exemplo:
    - sincronizar
    - instalar
 4. Verificar `claude plugin list --json` sem `errors`.
-5. Validar no Cowork Desktop (não só CLI), incluindo os comandos de runtime.
+5. Abrir conversa nova no Cowork Desktop (ou forçar reinit) antes do teste de slash.
+6. Validar no Cowork Desktop (não só CLI), incluindo os comandos de runtime.
 
 ## 6) Logs e observabilidade (onde olhar quando der erro genérico)
 
@@ -143,6 +152,20 @@ Padrões úteis:
 - `Source path does not exist`
 - `ENAMETOOLONG`
 - `conflicting manifests`
+
+### Quando o problema é só daquela sessão
+
+Olhe o `audit.jsonl` da sessão:
+- em `subtype: "init"`, confira `slash_commands`, `skills` e `plugins`.
+- se não houver entradas `prumo:*` e não houver plugin `prumo` em `plugins`, a sessão nasceu sem esse plugin.
+- se outra sessão mais nova mostrar `prumo:*`, o problema é de bootstrap de sessão, não de manifesto.
+
+### Quando o toast aparece, mas o plugin está carregado
+
+Se o `init` da sessão já tiver `prumo:*` em `slash_commands` e `prumo` em `plugins`, mas o app mostrar "comando desconhecido":
+- verifique se o comando realmente foi enviado ao backend (no `audit.jsonl` deve aparecer mensagem do usuário com `/prumo:...` ou `tool_use` da skill).
+- se não houver esse evento, o bloqueio aconteceu no parser de input do cliente (caractere extra, formatação inválida, ou rejeição local antes de enviar).
+- teste de forma controlada: digitar exatamente `/prumo:briefing`, sem ponto/espaço extra, e preferir seleção pelo autocomplete.
 
 ### Evidência típica de falha por source relativo
 
@@ -189,3 +212,24 @@ Use o app para teste final de comandos.
 - Instalação conclui sem “Falha ao instalar plugin”.
 - `claude plugin list --json` mostra plugin sem campo `errors`.
 - Comandos principais respondem no runtime do Cowork Desktop.
+
+## 12) Protocolo de 60 segundos (anti "comando desconhecido")
+
+Use este roteiro toda vez que instalar/atualizar plugin e o slash command falhar.
+
+1. Instale/atualize o plugin no Cowork.
+2. Feche a conversa onde você testou antes (não precisa apagar nada).
+3. Abra uma conversa nova.
+4. Digite `/` e confira se aparece `prumo:briefing` no autocomplete.
+5. Se aparecer, execute `/prumo:briefing` e siga a vida.
+6. Se não aparecer:
+   - faça restart do app Cowork;
+   - abra nova conversa e teste de novo.
+7. Se ainda não aparecer, só então trate como incidente técnico e colete logs.
+
+Regra de ouro:
+- Se o teste foi feito numa sessão aberta antes da instalação, esse teste não vale. Refaça em sessão nova.
+
+Armadilha de UI (importante):
+- o submenu `Plugins` do `/` não é prova de disponibilidade de slash commands do plugin.
+- valide no submenu `Comandos` (ou digitando `/prumo` para filtrar).

@@ -4,6 +4,18 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.0.5] - 2026-02-27
+
+### Fixed
+- Corrigidos comandos de manutenção no briefing/sanitize para suportar layout atual do workspace:
+  - `scripts/*` (workspace local)
+  - `Prumo/cowork-plugin/scripts/*` (layout atual do repo Prumo no workspace)
+  - `Prumo/scripts/*` (fallback legado)
+- Corrigido caminho remoto/local usado na checagem de update do core no briefing:
+  - remoto: `.../cowork-plugin/skills/prumo/references/prumo-core.md`
+  - fallback local: `Prumo/cowork-plugin/skills/prumo/references/prumo-core.md` (com fallback legado mantido).
+- Referências de execução (`briefing-fast-path`, `sanitize`, `prumo-core`) alinhadas para evitar erro `python3: can't open file` em instalações via marketplace.
+
 ## [4.0.4] - 2026-02-27
 
 ### Fixed

@@ -4,9 +4,9 @@ Objetivo: manter arquivos operacionais enxutos sem apagar histórico.
 
 ## Comando
 
-- `python3 Prumo/scripts/prumo_sanitize_state.py --workspace . --apply`
-- `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply`
-- `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --adaptive auto`
+- `if [ -f scripts/prumo_sanitize_state.py ]; then python3 scripts/prumo_sanitize_state.py --workspace . --apply; elif [ -f Prumo/cowork-plugin/scripts/prumo_sanitize_state.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_sanitize_state.py --workspace . --apply; else python3 Prumo/scripts/prumo_sanitize_state.py --workspace . --apply; fi`
+- `if [ -f scripts/prumo_auto_sanitize.py ]; then python3 scripts/prumo_auto_sanitize.py --workspace . --apply; elif [ -f Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py --workspace . --apply; else python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply; fi`
+- `if [ -f scripts/prumo_auto_sanitize.py ]; then python3 scripts/prumo_auto_sanitize.py --workspace . --adaptive auto; elif [ -f Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py --workspace . --adaptive auto; else python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --adaptive auto; fi`
 
 ## O que faz
 

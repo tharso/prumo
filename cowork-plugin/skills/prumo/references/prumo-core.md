@@ -100,7 +100,7 @@ Quando o usuário iniciar o briefing (via `/prumo:briefing`, alias legado `/brie
    - se houver `interrupted_at` + `resume_point` no mesmo dia local, oferecer retomada: `a) retomar` / `b) recomeçar`;
    - se `interrupted_at` for de dia anterior, expirar silenciosamente (`interrupted_at`/`resume_point` limpos).
 6. Rodar autosanitização (quando shell disponível):
-   - executar `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply` (ou `scripts/prumo_auto_sanitize.py` conforme layout);
+   - executar `if [ -f scripts/prumo_auto_sanitize.py ]; then python3 scripts/prumo_auto_sanitize.py --workspace . --apply; elif [ -f Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py --workspace . --apply; else python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply; fi`;
    - respeitar cooldown e gatilhos internos;
    - se falhar, seguir briefing normalmente e reportar falha de manutenção.
 7. Executar briefing em **blocos progressivos**:
@@ -225,7 +225,7 @@ Itens no inbox devem ser:
 **Preview visual prioritário (inbox multimídia):**
 
 1. No início de todo briefing diário, regenerar `inbox-preview.html` + `_preview-index.json` antes de qualquer triagem individual (quando shell disponível).
-2. Com shell: usar `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; fi`.
+2. Com shell: usar `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; elif [ -f Prumo/cowork-plugin/scripts/generate_inbox_preview.py ]; then python3 Prumo/cowork-plugin/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; fi`.
 3. Sem shell: gerar HTML equivalente inline e um índice textual equivalente (metadados mínimos + tipo + tamanho + data).
 4. Se `_preview-index.json` existir, o agente **DEVE linkar** `inbox-preview.html` no briefing como primeiro passo obrigatório da triagem (antes de abrir arquivos individuais).
 5. Se a geração falhar mas houver preview anterior, ainda assim linkar o preview existente e sinalizar que pode estar defasado.
@@ -395,7 +395,7 @@ Prumo pode ser operado por mais de um agente (ex: Cowork + Codex). Isso só func
 
 Para reduzir latência e custo de contexto, o sistema deve manter arquivos operacionais enxutos:
 
-1. Sanitização recomendada semanal: `python3 Prumo/scripts/prumo_sanitize_state.py --workspace . --apply`.
+1. Sanitização recomendada semanal: `if [ -f scripts/prumo_sanitize_state.py ]; then python3 scripts/prumo_sanitize_state.py --workspace . --apply; elif [ -f Prumo/cowork-plugin/scripts/prumo_sanitize_state.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_sanitize_state.py --workspace . --apply; else python3 Prumo/scripts/prumo_sanitize_state.py --workspace . --apply; fi`.
 2. O processo deve:
    - compactar `CLOSED` antigos de `_state/HANDOVER.md`,
    - mover histórico para `_state/archive/HANDOVER-ARCHIVE.md`,
@@ -410,7 +410,7 @@ Referência operacional: `Prumo/references/modules/sanitization.md`.
 Autosanitização é manutenção preventiva, não limpeza destrutiva.
 
 1. Com shell disponível, o briefing pode executar:
-   - `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply`
+   - `if [ -f scripts/prumo_auto_sanitize.py ]; then python3 scripts/prumo_auto_sanitize.py --workspace . --apply; elif [ -f Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py --workspace . --apply; else python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply; fi`
 2. O script deve respeitar cooldown (default: 6h) para evitar execução em loop.
 3. Gatilhos padrão:
    - `HANDOVER.md` >= 120000 bytes ou >= 350 linhas, **e** existir `CLOSED` acima de `handover_keep_closed`;

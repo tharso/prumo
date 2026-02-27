@@ -18,15 +18,15 @@ Use este fluxo para manter arquivos de estado enxutos.
 ## Passo 2: Simulação (dry-run)
 
 1. Executar:
-   - `python3 Prumo/scripts/prumo_sanitize_state.py --workspace .`
-   - opcional (gatilhos automáticos + calibração por workspace): `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace .`
+   - `if [ -f scripts/prumo_sanitize_state.py ]; then python3 scripts/prumo_sanitize_state.py --workspace .; elif [ -f Prumo/cowork-plugin/scripts/prumo_sanitize_state.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_sanitize_state.py --workspace .; else python3 Prumo/scripts/prumo_sanitize_state.py --workspace .; fi`
+   - opcional (gatilhos automáticos + calibração por workspace): `if [ -f scripts/prumo_auto_sanitize.py ]; then python3 scripts/prumo_auto_sanitize.py --workspace .; elif [ -f Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py --workspace .; else python3 Prumo/scripts/prumo_auto_sanitize.py --workspace .; fi`
 2. Reportar ao usuário quantos handovers `CLOSED` podem ser movidos para archive.
 
 ## Passo 3: Aplicação
 
 1. Se o usuário confirmar, executar:
-   - `python3 Prumo/scripts/prumo_sanitize_state.py --workspace . --apply`
-   - opcional (automático): `python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply`
+   - `if [ -f scripts/prumo_sanitize_state.py ]; then python3 scripts/prumo_sanitize_state.py --workspace . --apply; elif [ -f Prumo/cowork-plugin/scripts/prumo_sanitize_state.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_sanitize_state.py --workspace . --apply; else python3 Prumo/scripts/prumo_sanitize_state.py --workspace . --apply; fi`
+   - opcional (automático): `if [ -f scripts/prumo_auto_sanitize.py ]; then python3 scripts/prumo_auto_sanitize.py --workspace . --apply; elif [ -f Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py --workspace . --apply; else python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply; fi`
 2. Confirmar arquivos gerados/atualizados:
    - `_state/archive/backups/HANDOVER.md.<timestamp>`
    - `_state/archive/HANDOVER-ARCHIVE.md` (quando houver itens movidos)

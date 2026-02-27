@@ -26,13 +26,14 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
 1. Leia o campo `prumo_version` no topo do `PRUMO-CORE.md` local.
 2. Tente fonte remota:
    - versão: `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
-   - core: `https://raw.githubusercontent.com/tharso/prumo/main/skills/prumo/references/prumo-core.md`
+   - core: `https://raw.githubusercontent.com/tharso/prumo/main/cowork-plugin/skills/prumo/references/prumo-core.md`
 3. Validar integridade da fonte remota antes de usar:
    - tratar como inválida se o core remoto estiver truncado (ex.: sem `## Changelog do Core` ou sem rodapé `Prumo Core v...`);
    - em fonte inválida, cair para fallback local.
 4. Se a fonte remota falhar (404/auth/rede) **ou for inválida/incompleta**, tente fonte local (se existir no workspace):
    - versão: `Prumo/VERSION`
-   - core: `Prumo/skills/prumo/references/prumo-core.md`
+   - core (layout atual): `Prumo/cowork-plugin/skills/prumo/references/prumo-core.md`
+   - core (layout legado): `Prumo/skills/prumo/references/prumo-core.md`
 5. Se nenhuma fonte estiver acessível, informe: "Não consegui verificar atualização do Prumo agora (falha de acesso à fonte de versão)." e prossiga. Nunca afirmar "já está atualizado" sem fonte válida.
 6. Se a versão encontrada for maior, informe: "Há uma atualização do Prumo (v[local] → v[remota]). A atualização pode tocar SOMENTE `PRUMO-CORE.md`. `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`, `IDEIAS.md`, `AGENTS.md` e demais arquivos pessoais não podem ser alterados. Quer atualizar?"
 7. Se aceitar:
@@ -64,14 +65,14 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
 Verificar TODOS os canais, sem pular nenhum:
 
 0. **Autosanitização preventiva (quando shell disponível)**:
-   - Rodar `if [ -f scripts/prumo_auto_sanitize.py ]; then python3 scripts/prumo_auto_sanitize.py --workspace . --apply; else python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply; fi`.
+   - Rodar `if [ -f scripts/prumo_auto_sanitize.py ]; then python3 scripts/prumo_auto_sanitize.py --workspace . --apply; elif [ -f Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py --workspace . --apply; else python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply; fi`.
    - Se falhar, reportar em 1 linha e seguir briefing (não bloquear rotina).
 
 1. **Pasta `Inbox4Mobile/`**: Listar TODOS os arquivos e iniciar por triagem leve (não abrir bruto de todos por padrão).
    - Se existir `Inbox4Mobile/_processed.json`, usar como filtro para não reapresentar como "novos" os itens já processados em sessão anterior sem deleção física.
    - Rodar em **2 estágios obrigatórios**:
      - Estágio A (triagem leve): regenerar SEMPRE `Inbox4Mobile/inbox-preview.html` + `Inbox4Mobile/_preview-index.json` no início do briefing (quando shell disponível).
-     - com shell: `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; fi`.
+     - com shell: `if [ -f scripts/generate_inbox_preview.py ]; then python3 scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; elif [ -f Prumo/cowork-plugin/scripts/generate_inbox_preview.py ]; then python3 Prumo/cowork-plugin/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; else python3 Prumo/scripts/generate_inbox_preview.py --output Inbox4Mobile/inbox-preview.html --index-output Inbox4Mobile/_preview-index.json; fi`.
      - sem shell: gerar HTML equivalente inline + índice textual equivalente (tipo, tamanho, data, link).
      - Regra bloqueante de adoção: se `Inbox4Mobile/_preview-index.json` existir, o agente DEVE linkar `Inbox4Mobile/inbox-preview.html` no briefing como primeiro passo da triagem.
      - Não abrir arquivos brutos individuais antes desse link, exceto em caso de falha objetiva de geração/leitura do preview.

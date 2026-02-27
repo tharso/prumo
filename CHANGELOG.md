@@ -4,6 +4,14 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.0.4] - 2026-02-27
+
+### Fixed
+- Hardening para discovery de slash command no Cowork Desktop:
+  - removido `cowork-plugin/plugin.json` para eliminar manifesto duplicado no pacote distribuído.
+  - mantido um único contrato de plugin de distribuição (`plugin.json` na raiz e cópia em `.claude-plugin/plugin.json`).
+- Versão sincronizada para forçar refresh limpo de cache no update via marketplace.
+
 ## [4.0.3] - 2026-02-27
 
 ### Fixed

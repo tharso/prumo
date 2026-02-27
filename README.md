@@ -22,12 +22,11 @@ Use o pacote local gerado para instalacao offline/manual.
 
 ## Comandos principais
 
-- `/prumo:setup`
+- `/prumo:prumo` (setup/menu do sistema)
 - `/prumo:briefing`
 - `/prumo:handover`
 - `/prumo:sanitize`
 - `/prumo:start`
-- `/prumo:menu`
 
 ## Estrutura publica do repositorio
 
@@ -43,4 +42,4 @@ Use o pacote local gerado para instalacao offline/manual.
 
 ## Versao
 
-Versao atual: `4.0.3`.
+Versao atual: `4.0.4`.

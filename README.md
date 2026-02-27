@@ -12,6 +12,10 @@ Use a URL:
 
 `https://raw.githubusercontent.com/tharso/prumo/main/marketplace.json`
 
+Opcao alternativa (repositorio Git):
+
+`https://github.com/tharso/prumo.git`
+
 ### Opcao 2: upload local (.zip)
 
 Use o pacote local gerado para instalacao offline/manual.
@@ -39,4 +43,4 @@ Use o pacote local gerado para instalacao offline/manual.
 
 ## Versao
 
-Versao atual: `4.0.1`.
+Versao atual: `4.0.2`.

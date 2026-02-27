@@ -1,8 +1,7 @@
 {
   "name": "prumo",
   "owner": {
-    "name": "Tharso",
-    "email": "tharso@gmail.com"
+    "name": "Prumo Maintainers"
   },
   "metadata": {
     "description": "Prumo — sistema de organização de vida pessoal via Claude"
@@ -12,9 +11,9 @@
       "name": "prumo",
       "source": "./cowork-plugin",
       "description": "Sistema de organização de vida que transforma o Claude em interface única para capturar, processar, lembrar e cobrar. Setup conversacional em 10 etapas, onboarding dump-first, briefings diários, handover entre agentes, e sanitização de estado.",
-      "version": "4.0.0",
+      "version": "4.0.1",
       "author": {
-        "name": "Tharso"
+        "name": "Prumo Maintainers"
       },
       "license": "MIT",
       "keywords": [

@@ -1,5 +1,8 @@
 .DS_Store
 imgs/
+dist/
+docs/TESTE_*.md
+docs/TESTE_*.csv
 
 # Materiais internos (não publicar no repositório de produto)
 Prumo-Ideias-e-Possibilidades.pdf
@@ -14,3 +17,10 @@ test-output/
 
 # Estado runtime local (handover, lock e telemetria de manutenção)
 _state/
+
+# Artefatos internos de desenvolvimento (fora da distribuição pública)
+.github/
+.claude-plugin/
+docs/
+scripts/
+skills/

@@ -15,7 +15,7 @@ assert_contains() {
   local pattern="$2"
   local label="$3"
   if command -v rg >/dev/null 2>&1; then
-    rg -q --pcre2 -- "$pattern" "$file" || fail "$label (arquivo: $file)"
+    rg -q -- "$pattern" "$file" || fail "$label (arquivo: $file)"
     return 0
   fi
 

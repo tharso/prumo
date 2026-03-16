@@ -4,6 +4,12 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.4.1] - 2026-03-16
+
+### Fixed
+- `prumo-core.md` voltou a ficar coerente consigo mesmo: header, rodapé e bloco de versão agora apontam para a mesma release.
+- Smokes deixaram de depender de `rg --pcre2`, que em alguns runtimes existe sem suporte PCRE2 e falhava por vaidade técnica, não por bug real da feature.
+
 ## [4.4.0] - 2026-03-16
 
 ### Added

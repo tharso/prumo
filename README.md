@@ -2,7 +2,7 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.4.0**
+Versão atual: **4.4.1**
 
 Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
 
@@ -95,7 +95,7 @@ Se aparecer "comando desconhecido" após instalar/atualizar, consulte `README-DE
 
 ## Versão
 
-Versão atual: `4.4.0`
+Versão atual: `4.4.1`
 
 ## Licença
 

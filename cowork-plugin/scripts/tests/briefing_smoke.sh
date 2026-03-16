@@ -74,6 +74,12 @@ for file in "${BRIEFING_FILES[@]}"; do
 done
 
 for file in "${BRIEFING_FILES[@]}"; do
+  assert_contains "$file" "Nunca usar WebFetch|Nunca use WebFetch" "Update seguro: proibição explícita de WebFetch ausente"
+  assert_contains "$file" "não consegue baixar o core bruto com segurança|não bloquear o briefing" "Update seguro: fallback para runtime sem transporte ausente"
+  assert_contains "$file" "transporte seguro de aplicação" "Update seguro: separação entre detectar e aplicar ausente"
+done
+
+for file in "${BRIEFING_FILES[@]}"; do
   if command -v rg >/dev/null 2>&1; then
     ! rg -q --fixed-strings -- "--mark-briefing-complete" "$file" || fail "Persistência direta: referência legada a --mark-briefing-complete ainda presente em $file"
   elif grep -Fq -- "--mark-briefing-complete" "$file"; then

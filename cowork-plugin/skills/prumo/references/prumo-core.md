@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 4.2.0**
+> **prumo_version: 4.2.1**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -451,40 +451,51 @@ Escape hatch é obrigatório em qualquer ponto do briefing:
 
 ## Verificação de atualização
 
-**⚠️ A verificação de update é BLOQUEANTE. Se houver atualização, o agente NÃO deve continuar com o briefing ou qualquer outra ação na mesma mensagem. Parar, informar, esperar decisão.**
+**⚠️ A verificação de update só é BLOQUEANTE quando houver transporte seguro de aplicação disponível. Se o runtime só conseguir detectar versão nova, o agente deve informar a limitação e seguir com o briefing.**
 
 No início de cada sessão (ou no briefing), o agente deve verificar se há atualização disponível:
 
 1. Ler a versão local: campo `prumo_version` no topo deste arquivo.
-2. Tentar fonte primária (remota):
+2. Tentar fonte primária remota **somente para comparar versão**:
    - `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
-   - `https://raw.githubusercontent.com/tharso/prumo/main/references/prumo-core.md`
-3. Validar integridade da fonte primária:
-   - tratar como inválida se o core remoto vier incompleto/truncado (ex.: sem `## Changelog do Core` ou sem rodapé `Prumo Core v...`);
-   - fonte inválida conta como falha para fins de fallback.
-4. Se a fonte remota falhar (404, auth, timeout, rede) **ou for inválida/incompleta**, tentar fonte secundária local (quando existir no workspace):
-   - `Prumo/VERSION`
-   - `Prumo/references/prumo-core.md`
+3. Nunca usar WebFetch, leitor inteligente, preview remoto ou qualquer resposta resumida/interpretada como fonte para sobrescrever `PRUMO-CORE.md`. Isso vale mesmo que a URL seja correta.
+4. Descobrir se existe transporte seguro de aplicação:
+   - fonte secundária local (quando existir no workspace):
+     - `Prumo/VERSION`
+     - `Prumo/cowork-plugin/skills/prumo/references/prumo-core.md`
+     - `Prumo/skills/prumo/references/prumo-core.md`
+   - updater via shell:
+     - `scripts/safe_core_update.sh`
+     - `Prumo/cowork-plugin/scripts/safe_core_update.sh`
+     - `Prumo/scripts/safe_core_update.sh`
 5. Se não houver fonte válida para comparação:
    - informar: "Não consegui verificar atualização do Prumo agora (erro de acesso à fonte de versão)."
    - **não** afirmar "já está atualizado".
    - prosseguir com o briefing normalmente.
 6. Se a versão encontrada for igual ou menor: nada a fazer, seguir em silêncio.
-7. Se a versão encontrada for maior:
-   a. Extrair a seção "Changelog do Core" da fonte válida.
+7. Se a versão encontrada for maior **e houver transporte seguro de aplicação**:
+   a. Extrair o changelog da fonte local válida quando existir. Se não houver changelog acessível, descrever a atualização apenas como "nova versão do motor".
    b. **PARAR.** Apresentar SOMENTE o aviso de atualização (sem briefing, sem processar inbox, sem nada mais):
       "Antes do briefing: tem uma atualização do Prumo (v[local] → v[remota]).
-      O que mudou: [changelog]
-      É só o motor (PRUMO-CORE.md). Seus arquivos não são tocados. Leva 5 segundos.
+      O que mudou: [changelog ou resumo curto].
+      É só o motor (PRUMO-CORE.md). Seus arquivos não são tocados.
       a) Atualizar agora (recomendado)
-      b) Depois (pergunto de novo amanhã)"
+      b) Depois"
    c. **ESPERAR** a resposta do usuário. Não prosseguir.
-   d. Se (a):
+   d. Se (a) e houver fonte local válida:
       - Criar backup em `_backup/PRUMO-CORE.md.YYYY-MM-DD-HHMMSS`.
-      - Substituir **somente** `PRUMO-CORE.md` local pelo core da fonte válida.
+      - Substituir **somente** `PRUMO-CORE.md` local pelo arquivo bruto da fonte local válida.
       - Se qualquer outra escrita em arquivo for necessária, **ABORTAR** e pedir confirmação explícita.
       - Confirmar. Reler o core atualizado. Prosseguir com o briefing.
-   e. Se (b): prosseguir com o briefing usando a versão atual. Perguntar de novo no próximo briefing.
+   e. Se (a) e houver updater via shell:
+      - Executar o updater seguro.
+      - Confirmar que `prumo_version` local mudou para a versão esperada.
+      - Prosseguir com o briefing.
+   f. Se (b): prosseguir com o briefing usando a versão atual. Perguntar de novo no próximo briefing.
+8. Se a versão encontrada for maior **mas não houver transporte seguro de aplicação**:
+   - informar: "Há uma atualização do Prumo (v[local] → v[remota]), mas este runtime não consegue baixar o core bruto com segurança."
+   - orientar: "Atualize/reinstale o plugin ou use um ambiente com shell/repo local para aplicar o novo PRUMO-CORE."
+   - **não bloquear** o briefing por causa disso.
 
 **Frequência:** Verificar no máximo 1x por sessão. Não verificar se já verificou hoje.
 
@@ -502,6 +513,12 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 ---
 
 ## Changelog do Core
+
+### v4.2.1 (16/03/2026)
+- **Hotfix de produto:** auto-update agora separa detecção de versão de aplicação da atualização.
+- WebFetch/leitura remota resumida passam a ser explicitamente proibidos como fonte para sobrescrever `PRUMO-CORE.md`.
+- Quando o runtime só consegue comparar `VERSION`, o Prumo informa a limitação e não bloqueia mais o briefing com uma atualização impossível de aplicar.
+- Aplicação automática do core fica restrita a fonte local bruta ou updater via shell.
 
 ### v4.2.0 (15/03/2026)
 - **Bugfix crítico:** fechamento do briefing não dependia mais de script externo (`prumo_google_dual_snapshot.sh`).
@@ -664,4 +681,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v4.2.0 — https://github.com/tharso/prumo*
+*Prumo Core v4.2.1 — https://github.com/tharso/prumo*

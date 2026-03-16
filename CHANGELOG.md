@@ -4,6 +4,24 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.2.1] - 2026-03-16
+
+### Fixed
+- Auto-update do core reescrito para separar detecção de versão de aplicação da atualização.
+- WebFetch/leitura remota resumida passam a ser tratadas como fonte inválida para sobrescrever `PRUMO-CORE.md`.
+- Quando o runtime só consegue comparar `VERSION`, o Prumo informa a limitação e não bloqueia mais o briefing com uma atualização impossível de aplicar.
+
+### Changed
+- Aplicação automática do core fica restrita a fonte local bruta ou updater via shell.
+- Versionamento sincronizado para `4.2.1` em:
+  - `VERSION`
+  - `cowork-plugin/VERSION`
+  - `plugin.json`
+  - `.claude-plugin/plugin.json`
+  - `marketplace.json`
+  - `.claude-plugin/marketplace.json`
+- Smoke test de briefing reforçado para validar a proibição de WebFetch como fonte de update e a distinção entre detectar e aplicar atualização.
+
 ## [4.2.0] - 2026-03-16
 
 ### Fixed

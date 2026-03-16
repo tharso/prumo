@@ -24,23 +24,33 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
 ## Passo 2: Verificar atualização
 
 1. Leia o campo `prumo_version` no topo do `PRUMO-CORE.md` local.
-2. Tente fonte remota:
+2. Tente fonte remota **apenas para comparar versão**:
    - versão: `https://raw.githubusercontent.com/tharso/prumo/main/VERSION`
-   - core: `https://raw.githubusercontent.com/tharso/prumo/main/cowork-plugin/skills/prumo/references/prumo-core.md`
-3. Validar integridade da fonte remota antes de usar:
-   - tratar como inválida se o core remoto estiver truncado (ex.: sem `## Changelog do Core` ou sem rodapé `Prumo Core v...`);
-   - em fonte inválida, cair para fallback local.
-4. Se a fonte remota falhar (404/auth/rede) **ou for inválida/incompleta**, tente fonte local (se existir no workspace):
-   - versão: `Prumo/VERSION`
-   - core (layout atual): `Prumo/cowork-plugin/skills/prumo/references/prumo-core.md`
-   - core (layout legado): `Prumo/skills/prumo/references/prumo-core.md`
-5. Se nenhuma fonte estiver acessível, informe: "Não consegui verificar atualização do Prumo agora (falha de acesso à fonte de versão)." e prossiga. Nunca afirmar "já está atualizado" sem fonte válida.
-6. Se a versão encontrada for maior, informe: "Há uma atualização do Prumo (v[local] → v[remota]). A atualização pode tocar SOMENTE `PRUMO-CORE.md`. `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`, `IDEIAS.md`, `AGENTS.md` e demais arquivos pessoais não podem ser alterados. Quer atualizar?"
-7. Se aceitar:
+3. Nunca use WebFetch, leitor inteligente, preview remoto ou qualquer resposta resumida/interpretada como fonte para reescrever `PRUMO-CORE.md`. Isso conta como fonte inválida para update, mesmo que o texto "pareça certo".
+4. Descubra se existe **transporte seguro de aplicação**:
+   - fonte local de manutenção no workspace:
+     - versão: `Prumo/VERSION`
+     - core (layout atual): `Prumo/cowork-plugin/skills/prumo/references/prumo-core.md`
+     - core (layout legado): `Prumo/skills/prumo/references/prumo-core.md`
+   - updater via shell:
+     - `scripts/safe_core_update.sh`
+     - `Prumo/cowork-plugin/scripts/safe_core_update.sh`
+     - `Prumo/scripts/safe_core_update.sh`
+5. Se nenhuma fonte de versão estiver acessível, informe: "Não consegui verificar atualização do Prumo agora (falha de acesso à fonte de versão)." e prossiga. Nunca afirmar "já está atualizado" sem fonte válida.
+6. Se a versão encontrada for maior **e houver transporte seguro de aplicação**, informe: "Há uma atualização do Prumo (v[local] → v[remota]). A atualização pode tocar SOMENTE `PRUMO-CORE.md`. `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`, `IDEIAS.md`, `AGENTS.md` e demais arquivos pessoais não podem ser alterados. Quer atualizar?"
+7. Se a versão encontrada for maior **e não houver transporte seguro de aplicação**, informe em 1 bloco objetivo:
+   - existe atualização disponível;
+   - este runtime consegue comparar versões, mas não consegue baixar o core bruto com segurança;
+   - a correção exige atualizar/reinstalar o plugin ou usar um ambiente com shell/repo local;
+   - não bloquear o briefing por causa disso.
+8. Se aceitar e houver fonte local válida:
    - Fazer backup de `PRUMO-CORE.md` em `_backup/PRUMO-CORE.md.YYYY-MM-DD-HHMMSS` (se a pasta `_backup/` não existir, criar).
-   - Substituir apenas `PRUMO-CORE.md` usando o core da fonte válida.
-   - Regra absoluta: se qualquer outra escrita for necessária, abortar a atualização e pedir confirmação explícita do usuário.
-8. Se recusar ou se já estiver atualizado: prossiga.
+   - Substituir apenas `PRUMO-CORE.md` usando o arquivo local bruto da fonte válida.
+9. Se aceitar e houver updater via shell:
+   - executar o updater seguro (`safe_core_update.sh`) apontando para o workspace atual;
+   - reler `PRUMO-CORE.md` e confirmar que `prumo_version` mudou para a versão esperada.
+10. Regra absoluta: se qualquer outra escrita for necessária, abortar a atualização e pedir confirmação explícita do usuário.
+11. Se recusar ou se já estiver atualizado: prossiga.
 
 ## Passo 3: Estado atual
 

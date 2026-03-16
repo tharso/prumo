@@ -77,6 +77,7 @@ for file in "${BRIEFING_FILES[@]}"; do
   assert_contains "$file" "Nunca usar WebFetch|Nunca use WebFetch" "Update seguro: proibição explícita de WebFetch ausente"
   assert_contains "$file" "não consegue baixar o core bruto com segurança|não bloquear o briefing" "Update seguro: fallback para runtime sem transporte ausente"
   assert_contains "$file" "transporte seguro de aplicação" "Update seguro: separação entre detectar e aplicar ausente"
+  assert_contains "$file" "Nunca buscar changelog remoto via WebFetch|sem changelog detalhado|nova versão do motor" "Update seguro: fallback sem changelog remoto ausente"
 done
 
 for file in "${BRIEFING_FILES[@]}"; do

@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 4.2.1**
+> **prumo_version: 4.2.2**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -474,7 +474,7 @@ No início de cada sessão (ou no briefing), o agente deve verificar se há atua
    - prosseguir com o briefing normalmente.
 6. Se a versão encontrada for igual ou menor: nada a fazer, seguir em silêncio.
 7. Se a versão encontrada for maior **e houver transporte seguro de aplicação**:
-   a. Extrair o changelog da fonte local válida quando existir. Se não houver changelog acessível, descrever a atualização apenas como "nova versão do motor".
+   a. Extrair o changelog da fonte local válida quando existir. Nunca buscar changelog remoto via WebFetch só para enriquecer o aviso. Se não houver changelog acessível por fonte local segura, descrever a atualização apenas como "nova versão do motor".
    b. **PARAR.** Apresentar SOMENTE o aviso de atualização (sem briefing, sem processar inbox, sem nada mais):
       "Antes do briefing: tem uma atualização do Prumo (v[local] → v[remota]).
       O que mudou: [changelog ou resumo curto].
@@ -513,6 +513,11 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 ---
 
 ## Changelog do Core
+
+### v4.2.2 (16/03/2026)
+- **Hotfix de contrato:** o aviso de update não deve mais buscar changelog remoto via WebFetch.
+- Quando não houver changelog acessível por fonte local segura, o Prumo anuncia a nova versão sem detalhes, em vez de improvisar resumo remoto.
+- Isso elimina a última dependência desnecessária de leitura web interpretada no fluxo de atualização do core.
 
 ### v4.2.1 (16/03/2026)
 - **Hotfix de produto:** auto-update agora separa detecção de versão de aplicação da atualização.
@@ -681,4 +686,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v4.2.1 — https://github.com/tharso/prumo*
+*Prumo Core v4.2.2 — https://github.com/tharso/prumo*

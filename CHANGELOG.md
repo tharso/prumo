@@ -4,6 +4,22 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.2.2] - 2026-03-16
+
+### Fixed
+- O aviso de atualização deixa de buscar changelog remoto via WebFetch só para enriquecer a mensagem.
+- Quando não houver changelog acessível por fonte local segura, o Prumo anuncia a nova versão sem detalhes em vez de depender de leitura web interpretada.
+
+### Changed
+- Versionamento sincronizado para `4.2.2` em:
+  - `VERSION`
+  - `cowork-plugin/VERSION`
+  - `plugin.json`
+  - `.claude-plugin/plugin.json`
+  - `marketplace.json`
+  - `.claude-plugin/marketplace.json`
+- Smoke test de briefing reforçado para validar fallback sem changelog remoto no fluxo de update.
+
 ## [4.2.1] - 2026-03-16
 
 ### Fixed

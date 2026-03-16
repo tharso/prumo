@@ -38,6 +38,7 @@ Se algum desses arquivos não existir, informe o usuário que o Prumo não está
      - `Prumo/scripts/safe_core_update.sh`
 5. Se nenhuma fonte de versão estiver acessível, informe: "Não consegui verificar atualização do Prumo agora (falha de acesso à fonte de versão)." e prossiga. Nunca afirmar "já está atualizado" sem fonte válida.
 6. Se a versão encontrada for maior **e houver transporte seguro de aplicação**, informe: "Há uma atualização do Prumo (v[local] → v[remota]). A atualização pode tocar SOMENTE `PRUMO-CORE.md`. `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`, `IDEIAS.md`, `AGENTS.md` e demais arquivos pessoais não podem ser alterados. Quer atualizar?"
+   - Nunca buscar changelog remoto via WebFetch só para enriquecer esse aviso. Se não houver changelog local seguro, anunciar a nova versão sem changelog detalhado.
 7. Se a versão encontrada for maior **e não houver transporte seguro de aplicação**, informe em 1 bloco objetivo:
    - existe atualização disponível;
    - este runtime consegue comparar versões, mas não consegue baixar o core bruto com segurança;

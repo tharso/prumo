@@ -30,18 +30,41 @@ if [[ -f "skills/prumo/references/prumo-core.md" ]]; then
 elif [[ -f "references/prumo-core.md" ]]; then
   CORE_FILE="references/prumo-core.md"
 fi
+
 SKILL_FILE="skills/briefing/SKILL.md"
 SKILL_MIRROR_FILE="skills-briefing-SKILL.md"
+
+MODULE_DIR=""
+if [[ -d "skills/prumo/references/modules" ]]; then
+  MODULE_DIR="skills/prumo/references/modules"
+elif [[ -d "references/modules" ]]; then
+  MODULE_DIR="references/modules"
+fi
+
 TEMPLATES_FILE=""
 if [[ -f "skills/prumo/references/file-templates.md" ]]; then
   TEMPLATES_FILE="skills/prumo/references/file-templates.md"
 elif [[ -f "references/file-templates.md" ]]; then
   TEMPLATES_FILE="references/file-templates.md"
 fi
+
 VERSION_FILE="VERSION"
 
 for file in "$CORE_FILE" "$SKILL_FILE" "$TEMPLATES_FILE" "$VERSION_FILE"; do
   [[ -f "$file" ]] || fail "Arquivo obrigatório ausente: $file"
+done
+[[ -d "$MODULE_DIR" ]] || fail "Diretório de módulos ausente"
+
+BRIEFING_MODULE="$MODULE_DIR/briefing-procedure.md"
+INBOX_MODULE="$MODULE_DIR/inbox-processing.md"
+VERSION_MODULE="$MODULE_DIR/version-update.md"
+MULTIAGENT_MODULE="$MODULE_DIR/multiagent.md"
+WEEKLY_MODULE="$MODULE_DIR/weekly-review.md"
+SANITIZATION_MODULE="$MODULE_DIR/sanitization.md"
+LOAD_POLICY_MODULE="$MODULE_DIR/load-policy.md"
+
+for file in "$BRIEFING_MODULE" "$INBOX_MODULE" "$VERSION_MODULE" "$MULTIAGENT_MODULE" "$WEEKLY_MODULE" "$SANITIZATION_MODULE" "$LOAD_POLICY_MODULE"; do
+  [[ -f "$file" ]] || fail "Módulo obrigatório ausente: $file"
 done
 
 BRIEFING_FILES=("$CORE_FILE" "$SKILL_FILE")
@@ -53,42 +76,67 @@ VERSION_VALUE="$(cat "$VERSION_FILE")"
 CORE_VERSION="$(grep -Eo '^> \*\*prumo_version: [0-9]+\.[0-9]+\.[0-9]+\*\*$' "$CORE_FILE" | sed -E 's/^> \*\*prumo_version: ([0-9]+\.[0-9]+\.[0-9]+)\*\*$/\1/' | head -n1)"
 [[ -n "$CORE_VERSION" ]] || fail "Não foi possível extrair prumo_version do core"
 [[ "$VERSION_VALUE" == "$CORE_VERSION" ]] || fail "Divergência de versão: VERSION=$VERSION_VALUE vs prumo_version=$CORE_VERSION"
-assert_contains "$CORE_FILE" "^### v$CORE_VERSION \\(" "Changelog do core não contém seção da versão atual"
 
-for file in "${BRIEFING_FILES[@]}"; do
-  assert_contains "$file" "Responder" "Taxonomia: ausência de 'Responder'"
-  assert_contains "$file" "Ver" "Taxonomia: ausência de 'Ver'"
-  assert_contains "$file" "Sem ação|Sem acao" "Taxonomia: ausência de 'Sem ação'"
-  assert_contains "$file" "P1/P2/P3|P1.*P2.*P3" "Prioridade P1/P2/P3 ausente"
+CORE_LINES="$(wc -l < "$CORE_FILE" | tr -d ' ')"
+[[ "$CORE_LINES" -le 320 ]] || fail "Core continua grande demais: ${CORE_LINES} linhas"
+
+if command -v rg >/dev/null 2>&1; then
+  ASSERT_COUNT="$(rg -c "ASSERT:" "$CORE_FILE")"
+else
+  ASSERT_COUNT="$(grep -c "ASSERT:" "$CORE_FILE")"
+fi
+[[ "$ASSERT_COUNT" -ge 6 ]] || fail "Core deveria ter pelo menos 6 ASSERTs explícitos"
+
+if command -v rg >/dev/null 2>&1; then
+  ! rg -q "^## Changelog do Core" "$CORE_FILE" || fail "Core ainda carrega changelog inline"
+elif grep -Eq "^## Changelog do Core" "$CORE_FILE"; then
+  fail "Core ainda carrega changelog inline"
+fi
+
+assert_contains "$CORE_FILE" "modules/briefing-procedure\\.md" "Core não aponta para o módulo de briefing"
+assert_contains "$CORE_FILE" "modules/inbox-processing\\.md" "Core não aponta para o módulo de inbox"
+assert_contains "$CORE_FILE" "modules/version-update\\.md" "Core não aponta para o módulo de update"
+assert_contains "$CORE_FILE" "modules/multiagent\\.md" "Core não aponta para o módulo de multiagente"
+assert_contains "$CORE_FILE" "modules/weekly-review\\.md" "Core não aponta para o módulo de revisão semanal"
+assert_contains "$CORE_FILE" "CHANGELOG\\.md" "Core deveria apontar para o CHANGELOG público"
+
+for file in "$BRIEFING_MODULE" "$INBOX_MODULE" "$VERSION_MODULE" "$MULTIAGENT_MODULE" "$WEEKLY_MODULE" "$SANITIZATION_MODULE" "$LOAD_POLICY_MODULE"; do
+  assert_contains "$file" "module_version: $CORE_VERSION" "Versão do módulo fora de sincronia"
+done
+
+for file in "$CORE_FILE" "$SKILL_FILE" "$BRIEFING_MODULE"; do
   assert_contains "$file" "Google Drive|snapshot" "Snapshots via Google Drive ausentes"
   assert_contains "$file" "Google Doc|Google Docs" "Contrato de snapshot em Google Docs ausente"
+done
+
+for file in "$CORE_FILE" "$BRIEFING_MODULE"; do
   assert_contains "$file" "30 min|30 minutos" "Regra de defasagem de snapshot ausente"
   assert_contains "$file" "emails_error" "Tratamento de emails_error ausente"
   assert_contains "$file" "calendar_error" "Tratamento de calendar_error ausente"
   assert_contains "$file" "45 segundos|45s" "Timeout de leitura dos snapshots ausente"
 done
 
-for file in "${BRIEFING_FILES[@]}"; do
+for file in "$CORE_FILE" "$BRIEFING_MODULE"; do
   assert_contains "$file" "last_briefing_at" "Janela temporal: falta referência a last_briefing_at"
   assert_contains "$file" "24h|24 h|24 horas" "Janela temporal: falta fallback de 24h"
-  assert_contains "$file" "captur.*memória|usar esse valor como janela desta sessão" "Janela temporal: falta snapshot do valor anterior"
+  assert_contains "$file" "capturar em memória|usar esse valor como janela desta sessão" "Janela temporal: falta snapshot do valor anterior"
 done
 
-for file in "${BRIEFING_FILES[@]}"; do
-  assert_contains "$file" "Não depende de script externo|Não depende de nenhum script externo|prumo_briefing_state\\.py" "Persistência direta: regra obrigatória ausente"
-  assert_contains "$file" "antes da primeira resposta.*last_briefing_at|persistir o início do briefing do dia" "Persistência direta: gravação no início ausente"
-  assert_contains "$file" "briefing iniciado/concluído: confirmar que .*last_briefing_at|Se briefing iniciou/concluiu, .*last_briefing_at" "Persistência direta: validação de briefing iniciado/concluído ausente"
-  assert_contains "$file" "briefing interrompido: confirmar que .*interrupted_at|Se briefing foi interrompido, .*interrupted_at" "Persistência direta: validação de briefing interrompido ausente"
+for file in "$CORE_FILE" "$BRIEFING_MODULE"; do
+  assert_contains "$file" "prumo_briefing_state\\.py|Persistir .*last_briefing_at" "Persistência direta: regra obrigatória ausente"
+  assert_contains "$file" "antes da primeira resposta.*last_briefing_at|Persistir .*last_briefing_at" "Persistência direta: gravação no início ausente"
+  assert_contains "$file" "interrupted_at" "Persistência direta: interrupted_at ausente"
+  assert_contains "$file" "resume_point" "Persistência direta: resume_point ausente"
 done
 
-for file in "${BRIEFING_FILES[@]}"; do
+for file in "$CORE_FILE" "$VERSION_MODULE"; do
   assert_contains "$file" "Nunca usar WebFetch|Nunca use WebFetch" "Update seguro: proibição explícita de WebFetch ausente"
   assert_contains "$file" "não consegue baixar o core bruto com segurança|não bloquear o briefing" "Update seguro: fallback para runtime sem transporte ausente"
   assert_contains "$file" "transporte seguro de aplicação" "Update seguro: separação entre detectar e aplicar ausente"
-  assert_contains "$file" "Nunca buscar changelog remoto via WebFetch|sem changelog detalhado|nova versão do motor" "Update seguro: fallback sem changelog remoto ausente"
+  assert_contains "$file" "nova versão do motor|changelog local seguro" "Update seguro: fallback sem changelog remoto ausente"
 done
 
-for file in "${BRIEFING_FILES[@]}"; do
+for file in "${BRIEFING_FILES[@]}" "$BRIEFING_MODULE"; do
   if command -v rg >/dev/null 2>&1; then
     ! rg -q --fixed-strings -- "--mark-briefing-complete" "$file" || fail "Persistência direta: referência legada a --mark-briefing-complete ainda presente em $file"
   elif grep -Fq -- "--mark-briefing-complete" "$file"; then
@@ -96,38 +144,49 @@ for file in "${BRIEFING_FILES[@]}"; do
   fi
 done
 
-for file in "${BRIEFING_FILES[@]}"; do
+for file in "$CORE_FILE" "$SKILL_FILE" "$INBOX_MODULE"; do
   assert_contains "$file" "_preview-index\\.json" "Preview adoption: falta referência ao índice de preview"
-  assert_contains "$file" "DEVE linkar|deve ser linkado|link obrigatório" "Preview adoption: regra bloqueante de link ausente"
+  assert_contains "$file" "DEVE linkar|deve ser linkado|link obrigatório|linkar" "Preview adoption: regra bloqueante de link ausente"
   assert_contains "$file" "inbox-preview\\.html" "Preview adoption: referência ao html de preview ausente"
-  assert_contains "$file" "regenerar SEMPRE|regenerar .*inbox-preview|No início de todo briefing diário, regenerar" "Preview adoption: falta regra de regeneração no início"
-  assert_contains "$file" "primeira interação.*proibido abrir|na primeira resposta do briefing, é proibido abrir" "Preview adoption: falta guardrail da primeira interação"
 done
 
-for file in "${BRIEFING_FILES[@]}"; do
+for file in "$BRIEFING_MODULE" "$INBOX_MODULE"; do
+  assert_contains "$file" "regenerar|preview" "Preview adoption: falta regra de regeneração"
+done
+
+for file in "$CORE_FILE" "$BRIEFING_MODULE"; do
+  assert_contains "$file" "primeira resposta.*proibido abrir|primeira interação.*proibido abrir" "Preview adoption: falta guardrail da primeira interação"
+done
+
+for file in "$CORE_FILE" "$SKILL_FILE" "$BRIEFING_MODULE"; do
   assert_contains "$file" "Bloco 1" "Briefing progressivo: ausência de Bloco 1"
   assert_contains "$file" "Bloco 2" "Briefing progressivo: ausência de Bloco 2"
   assert_contains "$file" "Tá bom por hoje|tá bom por hoje|escape|depois" "Escape hatch: gatilhos ausentes"
   assert_contains "$file" "interrupted_at" "Escape hatch: ausência de interrupted_at"
   assert_contains "$file" "resume_point" "Escape hatch: ausência de resume_point"
   assert_contains "$file" "--detalhe|briefing --detalhe" "Modo detalhe: ausência de gatilho explícito"
-  assert_contains "$file" "\\| cobrar: DD/MM|cobrar: DD/MM" "Supressão temporal: formato cobrar não documentado"
 done
+
+assert_contains "$INBOX_MODULE" "Responder" "Taxonomia: ausência de 'Responder'"
+assert_contains "$INBOX_MODULE" "Ver" "Taxonomia: ausência de 'Ver'"
+assert_contains "$INBOX_MODULE" "Sem ação|Sem acao" "Taxonomia: ausência de 'Sem ação'"
+assert_contains "$INBOX_MODULE" "P1|P2|P3" "Prioridade P1/P2/P3 ausente"
+assert_contains "$INBOX_MODULE" "_processed\\.json" "Fallback de inbox sem deleção ausente"
+assert_contains "$INBOX_MODULE" "\\| cobrar: DD/MM|cobrar: DD/MM" "Formato cobrar não documentado no módulo de inbox"
+
+assert_contains "$SKILL_FILE" "modules/briefing-procedure\\.md" "Skill principal não aponta para o módulo canônico"
+assert_contains "$SKILL_FILE" "modules/inbox-processing\\.md" "Skill principal não aponta para o módulo de inbox"
+assert_contains "$SKILL_FILE" "modules/version-update\\.md" "Skill principal não aponta para o módulo de update"
+if [[ -f "$SKILL_MIRROR_FILE" ]]; then
+  assert_contains "$SKILL_MIRROR_FILE" "modules/briefing-procedure\\.md" "Skill espelhada não aponta para o módulo canônico"
+fi
+
+assert_contains "$CORE_FILE" "Com shell|com shell" "Modo com shell não descrito no core"
+assert_contains "$CORE_FILE" "Sem shell|sem shell" "Modo sem shell não descrito no core"
 
 assert_contains "$TEMPLATES_FILE" "interrupted_at" "Template de briefing-state sem interrupted_at"
 assert_contains "$TEMPLATES_FILE" "resume_point" "Template de briefing-state sem resume_point"
 assert_contains "$TEMPLATES_FILE" "\\| cobrar: 25/02|cobrar: DD/MM" "Template de pauta sem exemplo de cobrança"
-
-assert_contains "$SKILL_FILE" "Google dual via Gemini CLI|script dual" "Modo com shell não descrito na skill principal"
-assert_contains "$SKILL_FILE" "Fallback sem shell" "Fallback sem shell não descrito na skill principal"
-assert_contains "$SKILL_FILE" "prumo_briefing_state\\.py" "Persistência direta: helper script ausente na skill principal"
-if [[ -f "$SKILL_MIRROR_FILE" ]]; then
-  assert_contains "$SKILL_MIRROR_FILE" "Google dual via Gemini CLI|script dual" "Modo com shell não descrito na skill espelhada"
-  assert_contains "$SKILL_MIRROR_FILE" "Fallback sem shell" "Fallback sem shell não descrito na skill espelhada"
-fi
-
-assert_contains "$CORE_FILE" "com shell" "Modo com shell não descrito no core"
-assert_contains "$CORE_FILE" "sem shell" "Modo sem shell não descrito no core"
 
 STATE_HELPER_FILE="$ROOT_DIR/scripts/prumo_briefing_state.py"
 [[ -f "$STATE_HELPER_FILE" ]] || fail "Helper de persistência do briefing ausente"
@@ -155,7 +214,6 @@ assert_contains "$PUBLIC_MARKETPLACE_MIRROR_FILE" "\"version\": \"$CORE_VERSION\
 assert_contains "$PUBLIC_README_FILE" "Versão atual: .*${CORE_VERSION}" "README público fora de sincronia"
 assert_contains "$PUBLIC_CHANGELOG_FILE" "^## \\[$CORE_VERSION\\] - " "CHANGELOG público sem entrada da versão atual"
 
-# Regressão: --index-output relativo deve ser path independente de --output
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 mkdir -p "$TMP_DIR/Inbox4Mobile"

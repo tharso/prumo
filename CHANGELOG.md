@@ -4,6 +4,15 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.3.0] - 2026-03-16
+
+### Changed
+- `PRUMO-CORE.md` foi refatorado para um core enxuto com regras estáveis, mapa de módulos e guardrails explícitos em `ASSERT:`.
+- Procedimentos detalhados passaram para módulos canônicos em `cowork-plugin/skills/prumo/references/modules/`.
+- `cowork-plugin/skills/briefing/SKILL.md` deixou de duplicar o briefing inteiro e passou a carregar o módulo canônico.
+- `cowork-plugin/skills/briefing/references/briefing-fast-path.md` e `load-policy.md` viraram ponteiros para os módulos canônicos, em vez de manter fonte paralela.
+- Smoke test atualizado para validar modularização, presença de `ASSERT:` e ausência de changelog inline no core.
+
 ## [4.2.5] - 2026-03-16
 
 ### Changed

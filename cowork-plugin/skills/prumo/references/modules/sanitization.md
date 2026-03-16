@@ -1,16 +1,12 @@
 # Sanitization
 
-> **module_version: 4.3.0**
+> **module_version: 4.3.1**
 >
 > Fonte canônica de sanitização manual e automática do estado operacional.
 
 ## Sanitização manual
 
-Quando houver shell, usar `prumo_sanitize_state.py` com fallback de paths:
-
-1. `scripts/`
-2. `Prumo/cowork-plugin/scripts/`
-3. `Prumo/scripts/`
+Quando houver shell, usar `prumo_sanitize_state.py` resolvendo os caminhos pela ordem definida em `runtime-paths.md`.
 
 O processo deve:
 

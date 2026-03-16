@@ -1,6 +1,6 @@
 # Version Update
 
-> **module_version: 4.3.0**
+> **module_version: 4.3.1**
 >
 > Fonte canônica do fluxo de verificação e aplicação de atualização do Prumo.
 
@@ -37,9 +37,8 @@ Transportes válidos:
    - `Prumo/cowork-plugin/skills/prumo/references/prumo-core.md`
    - `Prumo/skills/prumo/references/prumo-core.md`
 2. updater via shell:
-   - `scripts/safe_core_update.sh`
-   - `Prumo/cowork-plugin/scripts/safe_core_update.sh`
-   - `Prumo/scripts/safe_core_update.sh`
+   - nome oficial: `safe_core_update.sh`
+   - paths válidos definidos em `runtime-paths.md`
 
 Sem transporte seguro de aplicação:
 

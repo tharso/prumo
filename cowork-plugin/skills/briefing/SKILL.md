@@ -11,7 +11,7 @@ description: >
 
 Você está executando o morning briefing do sistema Prumo.
 
-O procedimento detalhado deixou de viver aqui. Agora a autoridade é modular, porque duplicar fluxo em `SKILL.md`, core e referência era uma maneira sofisticada de cultivar desobediência.
+O fluxo detalhado não mora mais aqui. A fonte canônica agora é modular, porque o desenho antigo transformava `SKILL.md`, core e referência em versões concorrentes do mesmo ritual.
 
 ## Carregamento obrigatório
 
@@ -19,11 +19,12 @@ O procedimento detalhado deixou de viver aqui. Agora a autoridade é modular, po
 2. Leia `PRUMO-CORE.md`.
 3. Leia o módulo canônico:
    - `Prumo/cowork-plugin/skills/prumo/references/modules/briefing-procedure.md`
-4. Quando disponível, leia também:
+4. Quando disponíveis, carregue também:
    - `Prumo/cowork-plugin/skills/prumo/references/modules/load-policy.md`
    - `Prumo/cowork-plugin/skills/prumo/references/modules/version-update.md`
+   - `Prumo/cowork-plugin/skills/prumo/references/modules/runtime-paths.md`
 
-Se o workspace não tiver o repo `Prumo/`, use a referência equivalente do bundle instalado. Não improvise um terceiro procedimento.
+Se o workspace não expuser o repo `Prumo/`, use a referência equivalente do bundle instalado. O que não vale é inventar um atalho novo e chamar isso de interpretação.
 
 ## Fonte de autoridade
 
@@ -31,9 +32,9 @@ Em caso de conflito:
 
 1. `ASSERT:` do `PRUMO-CORE.md`
 2. módulo canônico
-3. resumo deste `SKILL.md`
+3. este `SKILL.md`
 
-## Módulos usados pelo briefing
+## Módulos operacionais do briefing
 
 - briefing detalhado:
   - `Prumo/cowork-plugin/skills/prumo/references/modules/briefing-procedure.md`
@@ -43,6 +44,8 @@ Em caso de conflito:
   - `Prumo/cowork-plugin/skills/prumo/references/modules/version-update.md`
 - multiagente:
   - `Prumo/cowork-plugin/skills/prumo/references/modules/multiagent.md`
+- runtime paths:
+  - `Prumo/cowork-plugin/skills/prumo/references/modules/runtime-paths.md`
 
 ## Guardrails que não podem ser pulados
 
@@ -67,24 +70,4 @@ O briefing continua entregando:
 
 ## Observação
 
-Se o runtime tentar “economizar leitura” e pular o módulo canônico, ele vai repetir o mesmo erro que motivou essa refatoração. A economia aí é de palito de fósforo.
-```
-
-**Expiração de estado interrompido:**
-
-No início de novo dia, se `interrupted_at` for de dia anterior, limpar `interrupted_at` e `resume_point` silenciosamente (sem cobrar briefing antigo).
-
-**Validação pós-escrita:**
-
-Após cada escrita, ler `_state/briefing-state.json` e validar de forma condicional:
-
-- briefing iniciado/concluído: confirmar que `last_briefing_at` contém a data do dia local atual e que `interrupted_at`/`resume_point` não existem;
-- briefing interrompido: confirmar que `interrupted_at` contém a data do dia local atual, que `resume_point` foi gravado, e que `last_briefing_at` continua apontando para o início da sessão atual.
-
-Se a validação correspondente falhar, repetir a escrita correta para esse caso.
-
----
-
-**Tom:** Seguir rigorosamente o tom definido no CLAUDE.md do usuário. Se for "direto", cobrar sem cerimônia. Se for "gentil", lembrar sem pressionar.
-
-**Links:** Sempre usar `[Descrição](computer:///caminho)` ao referenciar arquivos. Nunca expor caminhos crus.
+Se o runtime “economizar leitura” e pular o módulo canônico, ele só repete o bug que motivou essa refatoração. A economia aí é de palito de fósforo.

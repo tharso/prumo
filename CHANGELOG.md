@@ -4,6 +4,15 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.3.1] - 2026-03-16
+
+### Fixed
+- `cowork-plugin/skills/briefing/SKILL.md` foi limpo de um bloco residual quebrado que ainda deixava texto renderizado como código.
+- Novo módulo `cowork-plugin/skills/prumo/references/modules/runtime-paths.md` centraliza `SCRIPT_PATHS` e a lista de scripts oficiais do runtime.
+- Módulos que dependem de shell agora apontam para `runtime-paths.md`, em vez de deixar a resolução de paths implícita ou espalhada.
+- Regra de feedback do produto voltou a aparecer explicitamente no core, com ponteiro para `feedback-loop.md`.
+- Smoke test reforçado para validar `runtime-paths`, regra de feedback e ausência de resíduo quebrado no briefing skill.
+
 ## [4.3.0] - 2026-03-16
 
 ### Changed

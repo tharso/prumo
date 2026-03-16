@@ -62,8 +62,9 @@ MULTIAGENT_MODULE="$MODULE_DIR/multiagent.md"
 WEEKLY_MODULE="$MODULE_DIR/weekly-review.md"
 SANITIZATION_MODULE="$MODULE_DIR/sanitization.md"
 LOAD_POLICY_MODULE="$MODULE_DIR/load-policy.md"
+RUNTIME_PATHS_MODULE="$MODULE_DIR/runtime-paths.md"
 
-for file in "$BRIEFING_MODULE" "$INBOX_MODULE" "$VERSION_MODULE" "$MULTIAGENT_MODULE" "$WEEKLY_MODULE" "$SANITIZATION_MODULE" "$LOAD_POLICY_MODULE"; do
+for file in "$BRIEFING_MODULE" "$INBOX_MODULE" "$VERSION_MODULE" "$MULTIAGENT_MODULE" "$WEEKLY_MODULE" "$SANITIZATION_MODULE" "$LOAD_POLICY_MODULE" "$RUNTIME_PATHS_MODULE"; do
   [[ -f "$file" ]] || fail "Módulo obrigatório ausente: $file"
 done
 
@@ -98,9 +99,11 @@ assert_contains "$CORE_FILE" "modules/inbox-processing\\.md" "Core não aponta p
 assert_contains "$CORE_FILE" "modules/version-update\\.md" "Core não aponta para o módulo de update"
 assert_contains "$CORE_FILE" "modules/multiagent\\.md" "Core não aponta para o módulo de multiagente"
 assert_contains "$CORE_FILE" "modules/weekly-review\\.md" "Core não aponta para o módulo de revisão semanal"
+assert_contains "$CORE_FILE" "modules/runtime-paths\\.md" "Core não aponta para o módulo de runtime paths"
+assert_contains "$CORE_FILE" "feedback-loop\\.md" "Core não aponta para o procedimento de feedback"
 assert_contains "$CORE_FILE" "CHANGELOG\\.md" "Core deveria apontar para o CHANGELOG público"
 
-for file in "$BRIEFING_MODULE" "$INBOX_MODULE" "$VERSION_MODULE" "$MULTIAGENT_MODULE" "$WEEKLY_MODULE" "$SANITIZATION_MODULE" "$LOAD_POLICY_MODULE"; do
+for file in "$BRIEFING_MODULE" "$INBOX_MODULE" "$VERSION_MODULE" "$MULTIAGENT_MODULE" "$WEEKLY_MODULE" "$SANITIZATION_MODULE" "$LOAD_POLICY_MODULE" "$RUNTIME_PATHS_MODULE"; do
   assert_contains "$file" "module_version: $CORE_VERSION" "Versão do módulo fora de sincronia"
 done
 
@@ -177,12 +180,17 @@ assert_contains "$INBOX_MODULE" "\\| cobrar: DD/MM|cobrar: DD/MM" "Formato cobra
 assert_contains "$SKILL_FILE" "modules/briefing-procedure\\.md" "Skill principal não aponta para o módulo canônico"
 assert_contains "$SKILL_FILE" "modules/inbox-processing\\.md" "Skill principal não aponta para o módulo de inbox"
 assert_contains "$SKILL_FILE" "modules/version-update\\.md" "Skill principal não aponta para o módulo de update"
+assert_contains "$SKILL_FILE" "modules/runtime-paths\\.md" "Skill principal não aponta para o módulo de runtime paths"
 if [[ -f "$SKILL_MIRROR_FILE" ]]; then
   assert_contains "$SKILL_MIRROR_FILE" "modules/briefing-procedure\\.md" "Skill espelhada não aponta para o módulo canônico"
 fi
 
 assert_contains "$CORE_FILE" "Com shell|com shell" "Modo com shell não descrito no core"
 assert_contains "$CORE_FILE" "Sem shell|sem shell" "Modo sem shell não descrito no core"
+assert_contains "$RUNTIME_PATHS_MODULE" "SCRIPT_PATHS" "Módulo de runtime paths sem constante central"
+assert_contains "$RUNTIME_PATHS_MODULE" "safe_core_update\\.sh" "Módulo de runtime paths sem scripts oficiais"
+assert_contains "$RUNTIME_PATHS_MODULE" "prumo_briefing_state\\.py" "Módulo de runtime paths sem helper de briefing"
+assert_contains "$CORE_FILE" "Feedback do produto" "Regra de feedback desapareceu do core"
 
 assert_contains "$TEMPLATES_FILE" "interrupted_at" "Template de briefing-state sem interrupted_at"
 assert_contains "$TEMPLATES_FILE" "resume_point" "Template de briefing-state sem resume_point"

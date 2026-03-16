@@ -1,6 +1,6 @@
 # Briefing Procedure
 
-> **module_version: 4.3.0**
+> **module_version: 4.3.1**
 >
 > Fonte canônica do procedimento de `/prumo:briefing`.
 > Se este módulo conflitar com um resumo em `SKILL.md`, este módulo vence.
@@ -14,6 +14,7 @@ Antes de executar o briefing:
 2. Ler `PRUMO-CORE.md`.
 3. Ler `Prumo/cowork-plugin/skills/prumo/references/modules/load-policy.md` quando o repo local estiver disponível.
 4. Ler `Prumo/cowork-plugin/skills/prumo/references/modules/version-update.md` se houver verificação de versão nesta sessão.
+5. Ler `Prumo/cowork-plugin/skills/prumo/references/modules/runtime-paths.md` quando houver shell.
 
 ## Passo 1: Configuração e data local
 
@@ -46,7 +47,7 @@ Antes de executar o briefing:
 
 ### 3.1 Autosanitização preventiva
 
-Quando houver shell, tentar manutenção preventiva via `prumo_auto_sanitize.py`. Se falhar, registrar em uma linha e seguir.
+Quando houver shell, tentar manutenção preventiva via `prumo_auto_sanitize.py`. Se falhar, registrar em uma linha e seguir. Os paths válidos do script são definidos em `runtime-paths.md`.
 
 ### 3.2 Inbox4Mobile
 
@@ -82,6 +83,8 @@ Se os snapshots estiverem ausentes, inválidos ou inacessíveis e houver shell:
 2. Usar a saída como fonte principal para agenda e triagem das contas `pessoal` e `trabalho`.
 3. Respeitar a janela temporal reportada pelo próprio script.
 4. Se uma conta falhar, manter a outra e avisar objetivamente.
+
+Os paths válidos do script são definidos em `runtime-paths.md`.
 
 ### 3.5 Fallback sem shell
 

@@ -1,6 +1,6 @@
 # Inbox Processing
 
-> **module_version: 4.3.0**
+> **module_version: 4.3.1**
 >
 > Fonte canônica da triagem e do commit de inbox do Prumo.
 
@@ -19,6 +19,7 @@ Vale para:
 1. Se houver shell, regenerar:
    - `Inbox4Mobile/inbox-preview.html`
    - `Inbox4Mobile/_preview-index.json`
+   - usando os paths válidos definidos em `runtime-paths.md`
 2. Se não houver shell, produzir fallback textual equivalente.
 3. Se `_preview-index.json` existir, o agente DEVE linkar `inbox-preview.html` antes de abrir qualquer arquivo bruto.
 4. Classificar cada item por:

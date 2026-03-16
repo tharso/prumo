@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 4.3.0**
+> **prumo_version: 4.3.1**
 >
 > Este arquivo é o núcleo estável do Prumo.
 > Ele define regras, guardrails e a localização dos módulos canônicos.
@@ -67,6 +67,8 @@ Quando um comando específico for executado, o agente deve ler o módulo corresp
 | Multiagente | `Prumo/cowork-plugin/skills/prumo/references/modules/multiagent.md` |
 | Sanitização | `Prumo/cowork-plugin/skills/prumo/references/modules/sanitization.md` |
 | Política de leitura | `Prumo/cowork-plugin/skills/prumo/references/modules/load-policy.md` |
+| Runtime paths | `Prumo/cowork-plugin/skills/prumo/references/modules/runtime-paths.md` |
+| Feedback do produto | `Prumo/cowork-plugin/skills/prumo/references/feedback-loop.md` |
 
 Se o runtime não expuser o repositório local `Prumo/`, ele deve usar a referência equivalente do bundle instalado. O que não pode é improvisar uma terceira versão do procedimento.
 
@@ -135,6 +137,10 @@ Update pode mexer em `PRUMO-CORE.md` e backup. O resto é área do usuário. Mã
 ### 12. Briefing é progressivo
 
 Primeiro panorama, depois proposta, detalhe só sob demanda.
+
+### 13. Feedback do produto é comportamento do sistema
+
+Se o usuário der feedback, bug ou sugestão sobre o Prumo em si, capturar isso e usar `Prumo/cowork-plugin/skills/prumo/references/feedback-loop.md` como procedimento canônico.
 
 ## Guardrails
 
@@ -223,6 +229,12 @@ Ler e seguir:
 
 - `Prumo/cowork-plugin/skills/prumo/references/modules/sanitization.md`
 
+### Runtime paths
+
+Ler e seguir:
+
+- `Prumo/cowork-plugin/skills/prumo/references/modules/runtime-paths.md`
+
 ## Durante o dia
 
 O usuário pode fazer dump, check-in, pedir cobrança futura, abrir handover ou rodar sanitização. A regra continua a mesma: ler o módulo certo, atualizar o estado certo e não fingir que lembrou tudo de cabeça.
@@ -239,8 +251,8 @@ Histórico completo de versão vive em `CHANGELOG.md`.
 
 Versão atual deste core:
 
-- `4.3.0`
+- `4.3.1`
 
 ---
 
-*Prumo Core v4.3.0 — https://github.com/tharso/prumo*
+*Prumo Core v4.3.1 — https://github.com/tharso/prumo*

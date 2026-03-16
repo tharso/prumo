@@ -156,16 +156,46 @@ Se a PAUTA estiver vazia: não fazer o briefing padrão. Pedir um brain dump.
 
 Atualizar PAUTA.md se algo mudou. Registrar itens processados no REGISTRO.md.
 Se houve validação de handover, atualizar status no `_state/HANDOVER.md`.
-Se o script dual foi usado e o briefing foi concluído:
-- atualizar estado via script com fallback de path: `if [ -f scripts/prumo_google_dual_snapshot.sh ]; then scripts/prumo_google_dual_snapshot.sh --mark-briefing-complete; elif [ -f Prumo/cowork-plugin/scripts/prumo_google_dual_snapshot.sh ]; then Prumo/cowork-plugin/scripts/prumo_google_dual_snapshot.sh --mark-briefing-complete; else Prumo/scripts/prumo_google_dual_snapshot.sh --mark-briefing-complete; fi`.
-- validar que `_state/briefing-state.json` ficou com `last_briefing_at` do dia local atual.
-- se a marcação via script falhar ou não atualizar o estado, aplicar fallback manual: escrever `_state/briefing-state.json` com `last_briefing_at` em ISO local e limpar `interrupted_at`/`resume_point`.
 Se existir `_state/HANDOVER.summary.md`, atualizar via sanitização quando houver grande volume de handovers fechados.
-Se o script dual NÃO foi usado (fallback sem shell), atualizar `_state/briefing-state.json` manualmente:
-- briefing concluído: atualizar `last_briefing_at` e limpar `interrupted_at`/`resume_point`.
-- briefing interrompido (escape): manter `last_briefing_at` como está e gravar `interrupted_at`/`resume_point`.
-- no início de novo dia, expirar silenciosamente estado interrompido antigo.
 Se houve fallback sem deleção física, manter `Inbox4Mobile/_processed.json` atualizado para evitar reapresentação de itens já processados.
+
+### Atualizar estado do briefing (obrigatório, sem exceção)
+
+Esta etapa é **bloqueante**: o briefing só está concluído quando `_state/briefing-state.json` refletir o estado correto. Não depende de nenhum script externo.
+
+**Se o briefing foi concluído normalmente:**
+
+Escrever `_state/briefing-state.json` com exatamente este conteúdo (substituindo o timestamp pelo horário local real no fuso do usuário):
+
+```json
+{
+  "last_briefing_at": "YYYY-MM-DDTHH:MM:SS-03:00"
+}
+```
+
+O arquivo não deve conter `interrupted_at` nem `resume_point` (limpar se existirem).
+
+Como obter o timestamp: executar `date +%Y-%m-%dT%H:%M:%S%:z` via shell, ou usar a hora do sistema no fuso configurado no `CLAUDE.md`.
+
+**Se o briefing foi interrompido (escape hatch):**
+
+Manter `last_briefing_at` como está e adicionar estado de retomada:
+
+```json
+{
+  "last_briefing_at": "[valor existente, não alterar]",
+  "interrupted_at": "YYYY-MM-DDTHH:MM:SS-03:00",
+  "resume_point": "[etapa onde parou, ex: bloco2_proposta]"
+}
+```
+
+**Expiração de estado interrompido:**
+
+No início de novo dia, se `interrupted_at` for de dia anterior, limpar `interrupted_at` e `resume_point` silenciosamente (sem cobrar briefing antigo).
+
+**Validação pós-escrita:**
+
+Após escrever o arquivo, ler `_state/briefing-state.json` e confirmar que `last_briefing_at` contém a data do dia local atual. Se não contiver, repetir a escrita.
 
 ---
 

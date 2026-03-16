@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 4.1.1**
+> **prumo_version: 4.2.0**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -125,10 +125,12 @@ Quando o usuário iniciar o briefing (via `/prumo:briefing`, alias legado `/brie
    - prioridade `P1/P2/P3` e motivo objetivo.
 10. Escape hatch:
    - se usuário disser "tá bom por hoje", "escape", "depois" ou equivalente, registrar `interrupted_at` + `resume_point` e encerrar sem cobrança.
-11. Fechamento:
-   - se briefing concluir, atualizar `last_briefing_at` e limpar `interrupted_at`/`resume_point`;
-   - quando houver script dual, marcar conclusão com fallback de path (`scripts/...`, `Prumo/cowork-plugin/scripts/...`, `Prumo/scripts/...`) e validar que `_state/briefing-state.json` foi atualizado no dia local; se falhar, fazer escrita manual do estado;
-   - se briefing for interrompido, manter estado de retomada.
+11. Fechamento (obrigatório, sem exceção):
+   - o agente DEVE escrever `_state/briefing-state.json` diretamente ao final de todo briefing. Não depende de script externo.
+   - se briefing concluir: escrever `{"last_briefing_at": "<ISO local>"}` (sem `interrupted_at`/`resume_point`). Obter timestamp via `date +%Y-%m-%dT%H:%M:%S%:z` ou hora do sistema no fuso do `CLAUDE.md`.
+   - se briefing for interrompido (escape): manter `last_briefing_at` existente e adicionar `interrupted_at` + `resume_point`.
+   - validação pós-escrita: ler o arquivo e confirmar que `last_briefing_at` contém a data do dia local. Se não, repetir.
+   - o briefing só está concluído quando o estado estiver persistido.
 12. Guardrail de primeira interação:
    - na primeira resposta do briefing, é proibido abrir arquivos brutos de `Inbox4Mobile/*`;
    - primeiro vem panorama + proposta; detalhe só depois de `c` ou `--detalhe`.
@@ -500,6 +502,13 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ## Changelog do Core
 
+### v4.2.0 (15/03/2026)
+- **Bugfix crítico:** fechamento do briefing não dependia mais de script externo (`prumo_google_dual_snapshot.sh`).
+- Estado do briefing (`_state/briefing-state.json`) agora é escrito diretamente pelo agente como etapa obrigatória e bloqueante do Passo 7.
+- Removida dependência de paths de script com fallback em cadeia (3 paths, nenhum correto).
+- Instrução de fallback manual (vaga) substituída por procedimento operacional explícito com formato JSON, comando de timestamp e validação pós-escrita.
+- Regra 11 (Fechamento) reescrita no core para refletir o novo fluxo.
+
 ### v4.1.1 (10/03/2026)
 - Fase 2 da migração do plugin: remoção da chave `skills` dos manifests (`plugin.json` e `.claude-plugin/plugin.json`) sem mudança estrutural de diretórios.
 - Versionamento sincronizado para `4.1.1` em manifests e arquivos de versão.
@@ -654,4 +663,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v4.1.1 — https://github.com/tharso/prumo*
+*Prumo Core v4.2.0 — https://github.com/tharso/prumo*

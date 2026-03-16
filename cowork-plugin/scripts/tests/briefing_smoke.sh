@@ -61,6 +61,7 @@ for file in "${BRIEFING_FILES[@]}"; do
   assert_contains "$file" "Sem ação|Sem acao" "Taxonomia: ausência de 'Sem ação'"
   assert_contains "$file" "P1/P2/P3|P1.*P2.*P3" "Prioridade P1/P2/P3 ausente"
   assert_contains "$file" "Google Drive|snapshot" "Snapshots via Google Drive ausentes"
+  assert_contains "$file" "Google Doc|Google Docs" "Contrato de snapshot em Google Docs ausente"
   assert_contains "$file" "30 min|30 minutos" "Regra de defasagem de snapshot ausente"
   assert_contains "$file" "emails_error" "Tratamento de emails_error ausente"
   assert_contains "$file" "calendar_error" "Tratamento de calendar_error ausente"

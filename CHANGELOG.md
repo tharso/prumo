@@ -4,6 +4,22 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.2.5] - 2026-03-16
+
+### Changed
+- Snapshots multi-conta deixam de ser gravados como `email-snapshot.json` bruto no Drive e passam a ser gravados como Google Docs com JSON texto em `Prumo/snapshots/email-snapshot`.
+- Ajuste motivado por limitação validada em runtime: o MCP de Google Drive do Cowork consegue ler Google Docs, mas não JSON bruto com confiabilidade suficiente para o briefing.
+- Briefing, setup e core atualizados para procurar o Google Doc, ler o texto e parsear o JSON antes de cair para fallbacks.
+- Templates dos Apps Scripts atualizados para criar/atualizar Google Docs em vez de arquivos texto puros.
+- Versionamento sincronizado para `4.2.5` em:
+  - `VERSION`
+  - `cowork-plugin/VERSION`
+  - `plugin.json`
+  - `.claude-plugin/plugin.json`
+  - `marketplace.json`
+  - `.claude-plugin/marketplace.json`
+- Smoke test de briefing reforçado para validar referência a Google Docs no contrato de snapshots.
+
 ## [4.2.4] - 2026-03-16
 
 ### Added

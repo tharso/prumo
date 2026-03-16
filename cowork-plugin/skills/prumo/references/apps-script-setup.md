@@ -16,21 +16,22 @@ Antes de colar no Apps Script, substitua:
 
 - Lê Gmail da conta onde está rodando e pega emails recebidos desde `since` (se não passar nada, usa 24h)
 - Lê eventos do Google Calendar de hoje e amanhã
-- Grava ou sobrescreve `Prumo/snapshots/email-snapshot.json` no Google Drive da mesma conta
+- Grava ou sobrescreve um Google Doc `Prumo/snapshots/email-snapshot` no Google Drive da mesma conta
 - Cria as pastas `Prumo/` e `Prumo/snapshots/` se não existirem
 - Grava JSON parcial se Gmail ou Calendar falharem, usando `emails_error` e `calendar_error`
 - Inclui `version: "1.0"` para migrações futuras
 - Tem helper para instalar trigger de 15 minutos sem web app público
+- Mantém o conteúdo como JSON texto dentro do Google Doc, para o MCP do Drive conseguir ler
 
 ## Como o briefing consome isso
 
 O contrato do briefing agora é este:
 
-- procurar primeiro por `Prumo/snapshots/email-snapshot.json` no Google Drive das contas conectadas;
-- usar o snapshot como fonte primária de email e agenda multi-conta;
+- procurar primeiro por um Google Doc `Prumo/snapshots/email-snapshot` no Google Drive das contas conectadas;
+- ler o texto do Doc e parsear o JSON contido ali como fonte primária de email e agenda multi-conta;
 - avisar se `generated_at` estiver com mais de 30 minutos;
 - respeitar `emails_error` e `calendar_error` como falha parcial, sem fingir que deu tudo certo;
-- se o snapshot faltar ou estiver inválido, cair para os fallbacks do runtime sem quebrar o briefing.
+- se o Doc faltar ou estiver inválido, cair para os fallbacks do runtime sem quebrar o briefing.
 
 ## Estrutura do snapshot
 
@@ -79,7 +80,7 @@ O contrato do briefing agora é este:
 7. Salve.
 8. Execute a função `runSnapshot` uma vez pelo editor.
 9. Aceite as permissões pedidas.
-10. Verifique no Drive dessa conta se o arquivo `Prumo/snapshots/email-snapshot.json` apareceu.
+10. Verifique no Drive dessa conta se o Google Doc `Prumo/snapshots/email-snapshot` apareceu.
 11. Execute a função `installOrRefreshTrigger` uma vez.
 12. Abra `Triggers` no menu lateral e confirme que existe um gatilho time-driven de 15 minutos para `runSnapshot`.
 
@@ -94,7 +95,7 @@ O contrato do briefing agora é este:
 7. Troque `WORK_ACCOUNT_EMAIL` pelo email real dessa conta.
 8. Salve.
 9. Execute `runSnapshot` uma vez e autorize os acessos.
-10. Verifique no Drive dessa conta se `Prumo/snapshots/email-snapshot.json` foi criado.
+10. Verifique no Drive dessa conta se `Prumo/snapshots/email-snapshot` foi criado como Google Doc.
 11. Execute `installOrRefreshTrigger`.
 12. Confirme em `Triggers` o agendamento de 15 minutos para `runSnapshot`.
 
@@ -112,7 +113,7 @@ Os acessos esperados são:
 
 - Gmail leitura (`GmailApp`)
 - Calendar leitura (`CalendarApp`)
-- Drive escrita/leitura do arquivo (`DriveApp`)
+- Drive escrita/leitura do documento (`DriveApp` + `DocumentApp`)
 - Gerenciamento de triggers (`ScriptApp`)
 - Identidade da conta para validação (`Session`)
 
@@ -127,12 +128,13 @@ Os acessos esperados são:
 
 - Se Gmail falhar, o script ainda grava o JSON com `emails: []` e `emails_error`
 - Se Calendar falhar, o script ainda grava o JSON com `calendar.today = []`, `calendar.tomorrow = []` e `calendar_error`
-- Se o Drive falhar, a execução falha de verdade
+- Se o Drive ou o Google Docs falharem, a execução falha de verdade
 
 ## Notas práticas
 
 - O snippet do email é truncado para 200 caracteres e normalizado para uma linha só
 - O script filtra mensagens enviadas pela própria conta para focar em emails recebidos
 - O campo `location` usa `event.getLocation()` e, se estiver vazio, tenta achar a primeira URL na descrição do evento
-- O arquivo é sobrescrito no mesmo path a cada execução
+- O Google Doc é sobrescrito no mesmo path a cada execução
+- Se você já criou `email-snapshot.json` na versão anterior, pode ignorar ou apagar depois. O briefing novo deve passar a usar o Doc
 - Para esse caso, você não precisa usar `Deploy > New deployment`

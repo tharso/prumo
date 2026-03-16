@@ -2,7 +2,7 @@ const CONFIG = {
   expectedAccount: 'WORK_ACCOUNT_EMAIL',
   rootFolderName: 'Prumo',
   snapshotsFolderName: 'snapshots',
-  snapshotFileName: 'email-snapshot.json',
+  snapshotDocumentName: 'email-snapshot',
   defaultLookbackHours: 24,
   searchBatchSize: 100,
   version: '1.0'
@@ -44,8 +44,8 @@ function runSnapshot(since) {
 
   return {
     ok: !snapshot.emails_error && !snapshot.calendar_error,
-    file_id: file.getId(),
-    file_name: file.getName(),
+    document_id: file.getId(),
+    document_name: file.getName(),
     account: snapshot.account,
     generated_at: snapshot.generated_at
   };
@@ -174,19 +174,27 @@ function saveSnapshotToDrive_(snapshot) {
   const prumoFolder = findOrCreateFolder_(rootFolder, CONFIG.rootFolderName);
   const snapshotsFolder = findOrCreateFolder_(prumoFolder, CONFIG.snapshotsFolderName);
   const content = JSON.stringify(snapshot, null, 2);
-  const existingFiles = snapshotsFolder.getFilesByName(CONFIG.snapshotFileName);
+  const existingFiles = snapshotsFolder.getFilesByName(CONFIG.snapshotDocumentName);
 
   if (existingFiles.hasNext()) {
     const file = existingFiles.next();
-    file.setContent(content);
+    updateSnapshotDocument_(file.getId(), content);
     return file;
   }
 
-  return snapshotsFolder.createFile(
-    CONFIG.snapshotFileName,
-    content,
-    MimeType.PLAIN_TEXT
-  );
+  const document = DocumentApp.create(CONFIG.snapshotDocumentName);
+  document.getBody().setText(content);
+  document.saveAndClose();
+
+  const file = DriveApp.getFileById(document.getId());
+  file.moveTo(snapshotsFolder);
+  return file;
+}
+
+function updateSnapshotDocument_(documentId, content) {
+  const document = DocumentApp.openById(documentId);
+  document.getBody().setText(content);
+  document.saveAndClose();
 }
 
 function findOrCreateFolder_(parentFolder, folderName) {

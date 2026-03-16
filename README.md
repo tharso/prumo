@@ -4,7 +4,7 @@
 
 Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
 
-Para email e agenda multi-conta, o fluxo preferencial agora usa snapshots privados no Google Drive gerados por Google Apps Script. Menos glamour, mais confiabilidade. Às vezes a gambiarra certa é só engenharia sem fantasia.
+Para email e agenda multi-conta, o fluxo preferencial agora usa snapshots privados no Google Drive gerados por Google Apps Script e gravados como Google Docs com JSON texto. Menos glamour, mais confiabilidade. Às vezes a gambiarra certa é só engenharia sem fantasia.
 
 Seus dados ficam em arquivos Markdown no seu computador. Sem cloud, sem conta, sem lock-in.
 
@@ -93,7 +93,7 @@ Se aparecer "comando desconhecido" após instalar/atualizar, consulte `README-DE
 
 ## Versão
 
-Versão atual: `4.2.4`
+Versão atual: `4.2.5`
 
 ## Licença
 

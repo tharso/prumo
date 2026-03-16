@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 4.2.4**
+> **prumo_version: 4.2.5**
 >
 > Este arquivo contém as regras e rituais do sistema Prumo.
 > **NÃO edite este arquivo** — ele é atualizado automaticamente.
@@ -71,7 +71,7 @@
 Para evitar overhead sem empobrecer o sistema, usar leitura por camadas:
 
 1. Camada base (sempre): `CLAUDE.md`, `PRUMO-CORE.md`, `PAUTA.md`, `INBOX.md`.
-2. Camada leve (preferencial): `_state/HANDOVER.summary.md`, `Inbox4Mobile/_preview-index.json`, `Inbox4Mobile/inbox-preview.html`, snapshots `Prumo/snapshots/email-snapshot.json` no Google Drive quando disponíveis.
+2. Camada leve (preferencial): `_state/HANDOVER.summary.md`, `Inbox4Mobile/_preview-index.json`, `Inbox4Mobile/inbox-preview.html`, Google Docs `Prumo/snapshots/email-snapshot` no Google Drive quando disponíveis.
 3. Camada profunda (sob demanda): binários e arquivos longos (`PDF`, `imagens`, transcrições extensas) apenas para itens `P1`, ambíguos ou de risco.
 
 Referência operacional: `Prumo/references/modules/load-policy.md`.
@@ -101,12 +101,13 @@ Quando o usuário iniciar o briefing (via `/prumo:briefing`, alias legado `/brie
    - se `interrupted_at` for de dia anterior, expirar silenciosamente (`interrupted_at`/`resume_point` limpos).
    - antes de qualquer escrita nova, capturar em memória o `last_briefing_at` anterior e usar esse valor como janela desta sessão.
 6. Tentar fonte primária multi-conta via snapshots no Google Drive:
-   - buscar `Prumo/snapshots/email-snapshot.json` das contas conectadas via MCP Google Drive;
+   - buscar Google Docs `Prumo/snapshots/email-snapshot` das contas conectadas via MCP Google Drive;
+   - ler o texto do Doc e parsear o JSON contido ali;
    - usar os snapshots como fonte principal para agenda e emails crus por conta;
    - validar `generated_at`: se estiver acima de 30 min, avisar defasagem no briefing com minutos aproximados, mas ainda aproveitar o snapshot;
    - respeitar `since` do próprio snapshot;
    - se houver `emails_error` ou `calendar_error`, preservar dados parciais e reportar o erro em 1 linha;
-   - se o snapshot estiver ausente, inválido, ilegível ou a leitura exceder 45 segundos, seguir para os fallbacks sem bloquear o briefing.
+   - se o Doc estiver ausente, inválido, ilegível ou a leitura exceder 45 segundos, seguir para os fallbacks sem bloquear o briefing.
 7. Rodar autosanitização (quando shell disponível):
    - executar `if [ -f scripts/prumo_auto_sanitize.py ]; then python3 scripts/prumo_auto_sanitize.py --workspace . --apply; elif [ -f Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py ]; then python3 Prumo/cowork-plugin/scripts/prumo_auto_sanitize.py --workspace . --apply; else python3 Prumo/scripts/prumo_auto_sanitize.py --workspace . --apply; fi`;
    - respeitar cooldown e gatilhos internos;
@@ -198,7 +199,7 @@ No início de cada sessão (especialmente se for um chat novo):
 3. Ler PAUTA.md
 4. Ler INBOX.md (processar se houver itens)
 5. Verificar `Inbox4Mobile/` por triagem leve primeiro (`inbox-preview.html` + `_preview-index.json`); aprofundar só itens críticos
-6. Se houver snapshots `Prumo/snapshots/email-snapshot.json` no Google Drive: usar como fonte primária de email/calendar multi-conta, validar `generated_at` (alerta acima de 30 min) e respeitar `emails_error`/`calendar_error`
+6. Se houver Google Docs `Prumo/snapshots/email-snapshot` no Google Drive: usar como fonte primária de email/calendar multi-conta, ler o texto/parsear JSON, validar `generated_at` (alerta acima de 30 min) e respeitar `emails_error`/`calendar_error`
 7. Se não houver snapshot válido e existir shell: avaliar `scripts/prumo_google_dual_snapshot.sh`
 8. Se Gmail configurado: buscar emails com subject do agente como fallback final
 9. Se existir `_state/HANDOVER.summary.md`, verificar pendências por ele; fallback para `_state/HANDOVER.md`
@@ -527,6 +528,11 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ## Changelog do Core
 
+### v4.2.5 (16/03/2026)
+- Snapshot multi-conta passa a ser gravado como texto JSON dentro de Google Docs `Prumo/snapshots/email-snapshot`, substituindo JSON bruto no Drive.
+- Ajuste motivado por limitação validada do runtime Cowork: o MCP de Drive lê Google Docs, mas não JSON bruto com confiabilidade suficiente para o briefing.
+- Contrato de leitura atualizado no core e nas skills: buscar Doc, ler texto e parsear JSON antes de cair para fallbacks.
+
 ### v4.2.4 (16/03/2026)
 - Briefing passa a priorizar snapshots `Prumo/snapshots/email-snapshot.json` no Google Drive como fonte multi-conta para email e agenda.
 - Regra de frescor explicitada: `generated_at` acima de 30 min exige aviso de dados defasados, sem bloquear a leitura.
@@ -709,4 +715,4 @@ Qualquer tentativa de alterar `CLAUDE.md`, `PAUTA.md`, `INBOX.md`, `REGISTRO.md`
 
 ---
 
-*Prumo Core v4.2.4 — https://github.com/tharso/prumo*
+*Prumo Core v4.2.5 — https://github.com/tharso/prumo*

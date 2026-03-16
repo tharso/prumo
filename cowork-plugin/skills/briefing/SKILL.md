@@ -93,11 +93,12 @@ Verificar TODOS os canais, sem pular nenhum:
    - Se a geração falhar sem preview utilizável, seguir com lista numerada no chat (fallback universal), mantendo a regra de aprofundamento seletivo e explicitando a falha de preview ao usuário.
    - No Bloco 1 (panorama), mostrar apenas o link do preview e a contagem de itens (sem abrir itens individuais).
 2. **Snapshots no Google Drive via Apps Script (prioridade quando disponíveis)**:
-   - Buscar via MCP do Google Drive os arquivos `Prumo/snapshots/email-snapshot.json` das contas conectadas.
+   - Buscar via MCP do Google Drive os Google Docs `Prumo/snapshots/email-snapshot` das contas conectadas.
+   - Ler o texto de cada Doc e parsear o JSON contido ali.
    - Tratar cada snapshot como fonte por conta (`pessoal`/`trabalho`) para agenda e emails crus.
-   - Validar `generated_at` de cada arquivo:
+   - Validar `generated_at` de cada snapshot:
      - se estiver com mais de 30 min, usar mesmo assim, mas avisar explicitamente no briefing que os dados estão defasados e dizer de quantos minutos;
-     - se o arquivo estiver ausente, ilegível ou inválido, seguir para o fallback sem quebrar o briefing.
+     - se o Doc estiver ausente, ilegível ou inválido, seguir para o fallback sem quebrar o briefing.
    - Respeitar o `since` gravado no próprio snapshot quando ele existir. Não recalcular essa janela por cima.
    - Se o JSON trouxer `emails_error` ou `calendar_error`, preservar os dados parciais disponíveis e expor o erro em 1 linha objetiva.
    - A curadoria continua no Prumo, não no Apps Script:

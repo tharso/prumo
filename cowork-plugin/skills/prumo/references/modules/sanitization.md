@@ -1,6 +1,6 @@
 # Sanitization
 
-> **module_version: 4.3.1**
+> **module_version: 4.4.0**
 >
 > Fonte canônica de sanitização manual e automática do estado operacional.
 
@@ -13,7 +13,10 @@ O processo deve:
 1. compactar handovers `CLOSED` antigos;
 2. mover histórico para `_state/archive/HANDOVER-ARCHIVE.md`;
 3. regenerar `_state/HANDOVER.summary.md`;
-4. nunca tocar arquivos pessoais.
+4. registrar movimentos no índice global:
+   - `_state/archive/ARCHIVE-INDEX.json`
+   - `_state/archive/ARCHIVE-INDEX.md`
+5. nunca tocar arquivos pessoais.
 
 ## Autosanitização
 
@@ -25,4 +28,9 @@ Regras:
 2. registrar estado em `_state/auto-sanitize-state.json`;
 3. usar `_state/auto-sanitize-history.json` para calibrar thresholds quando houver amostra;
 4. sem histórico suficiente, usar defaults seguros;
-5. nunca apagar histórico sem archive.
+5. arquivar frio só com política explícita;
+6. política inicial segura:
+   - compactação de handovers `CLOSED`;
+   - arquivos de `Inbox4Mobile/` marcados como processados em `_processed.json` e acima do threshold de idade;
+7. nunca apagar histórico sem archive;
+8. nunca mover sem registrar no `ARCHIVE-INDEX`.

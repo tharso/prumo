@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 4.3.1**
+> **prumo_version: 4.4.0**
 >
 > Este arquivo é o núcleo estável do Prumo.
 > Ele define regras, guardrails e a localização dos módulos canônicos.
@@ -36,6 +36,8 @@ Arquivos de estado esperados em `_state/`:
 - `agent-lock.json`
 - `auto-sanitize-state.json`
 - `auto-sanitize-history.json`
+- `archive/ARCHIVE-INDEX.json`
+- `archive/ARCHIVE-INDEX.md`
 
 ## Comandos disponíveis
 
@@ -161,6 +163,8 @@ Se o usuário der feedback, bug ou sugestão sobre o Prumo em si, capturar isso 
 `ASSERT: No update, a allowlist de escrita é apenas PRUMO-CORE.md e _backup/PRUMO-CORE.md.*`
 
 `ASSERT: Handover PENDING_VALIDATION ou REJECTED não pode ser ignorado no briefing.`
+
+`ASSERT: Arquivo frio só pode ser movido para archive se houver entrada correspondente em _state/archive/ARCHIVE-INDEX.*`
 
 ## Rituais e procedimentos
 

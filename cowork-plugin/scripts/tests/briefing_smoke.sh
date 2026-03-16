@@ -190,11 +190,19 @@ assert_contains "$CORE_FILE" "Sem shell|sem shell" "Modo sem shell não descrito
 assert_contains "$RUNTIME_PATHS_MODULE" "SCRIPT_PATHS" "Módulo de runtime paths sem constante central"
 assert_contains "$RUNTIME_PATHS_MODULE" "safe_core_update\\.sh" "Módulo de runtime paths sem scripts oficiais"
 assert_contains "$RUNTIME_PATHS_MODULE" "prumo_briefing_state\\.py" "Módulo de runtime paths sem helper de briefing"
+assert_contains "$RUNTIME_PATHS_MODULE" "prumo_archive_cold_files\\.py" "Módulo de runtime paths sem script de archive frio"
 assert_contains "$CORE_FILE" "Feedback do produto" "Regra de feedback desapareceu do core"
+assert_contains "$CORE_FILE" "ARCHIVE-INDEX" "Core não documenta o índice global de archive"
+assert_contains "$SANITIZATION_MODULE" "ARCHIVE-INDEX" "Módulo de sanitização não documenta o índice global de archive"
+assert_contains "$SANITIZATION_MODULE" "Inbox4Mobile.*processados|_processed\\.json" "Módulo de sanitização não documenta archive frio do inbox"
 
 assert_contains "$TEMPLATES_FILE" "interrupted_at" "Template de briefing-state sem interrupted_at"
 assert_contains "$TEMPLATES_FILE" "resume_point" "Template de briefing-state sem resume_point"
 assert_contains "$TEMPLATES_FILE" "\\| cobrar: 25/02|cobrar: DD/MM" "Template de pauta sem exemplo de cobrança"
+assert_contains "$TEMPLATES_FILE" "Inbox4Mobile/_processed\\.json" "Template de _processed.json ausente"
+
+ARCHIVE_SCRIPT_FILE="$ROOT_DIR/scripts/prumo_archive_cold_files.py"
+[[ -f "$ARCHIVE_SCRIPT_FILE" ]] || fail "Script de archive frio ausente"
 
 STATE_HELPER_FILE="$ROOT_DIR/scripts/prumo_briefing_state.py"
 [[ -f "$STATE_HELPER_FILE" ]] || fail "Helper de persistência do briefing ausente"

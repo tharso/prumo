@@ -22,6 +22,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from prumo_archive_cold_files import list_cold_inbox_candidates
+from prumo_archive_index import load_archive_index
+
 MEDIA_EXTENSIONS = {
     ".png",
     ".jpg",
@@ -53,6 +56,9 @@ THRESHOLD_KEYS = [
     "handover_keep_closed",
     "inbox_min_total",
     "inbox_min_media",
+    "cold_inbox_min_candidates",
+    "cold_inbox_min_bytes",
+    "cold_inbox_min_age_days",
 ]
 
 BASE_THRESHOLDS = {
@@ -61,6 +67,9 @@ BASE_THRESHOLDS = {
     "handover_keep_closed": 8,
     "inbox_min_total": 8,
     "inbox_min_media": 4,
+    "cold_inbox_min_candidates": 2,
+    "cold_inbox_min_bytes": 262_144,
+    "cold_inbox_min_age_days": 14,
 }
 
 
@@ -81,6 +90,9 @@ def parse_args() -> argparse.Namespace:
 
     p.add_argument("--inbox-min-total", type=int, default=None)
     p.add_argument("--inbox-min-media", type=int, default=None)
+    p.add_argument("--cold-inbox-min-candidates", type=int, default=None)
+    p.add_argument("--cold-inbox-min-bytes", type=int, default=None)
+    p.add_argument("--cold-inbox-min-age-days", type=int, default=None)
     return p.parse_args()
 
 
@@ -89,6 +101,12 @@ def now_iso() -> str:
 
 
 def find_script(ws: Path, candidates: list[str]) -> Path | None:
+    local_dir = Path(__file__).resolve().parent
+    for rel in candidates:
+        local_path = (local_dir / Path(rel).name).resolve()
+        if local_path.exists() and local_path.is_file():
+            return local_path
+
     for rel in candidates:
         path = (ws / rel).resolve()
         if path.exists() and path.is_file():
@@ -312,6 +330,7 @@ def main() -> int:
     inbox_dir = ws / "Inbox4Mobile"
     preview_path = inbox_dir / "inbox-preview.html"
     index_path = inbox_dir / "_preview-index.json"
+    archive_index_path = state_dir / "archive" / "ARCHIVE-INDEX.json"
 
     state = load_json(state_path, default={})
     history = load_json(history_path, default=[])
@@ -372,11 +391,29 @@ def main() -> int:
         or preview_stale
     )
 
+    cold_probe = list_cold_inbox_candidates(
+        ws,
+        min_age_days=effective_thresholds["cold_inbox_min_age_days"],
+    )
+    cold_registry_status = str(cold_probe["registry_status"])
+    cold_candidates = list(cold_probe["candidates"])
+    cold_candidate_total = len(cold_candidates)
+    cold_candidate_bytes = sum(int(item["size_bytes"]) for item in cold_candidates)
+    cold_inbox_trigger = cold_registry_status == "ok" and (
+        cold_candidate_total >= effective_thresholds["cold_inbox_min_candidates"]
+        or cold_candidate_bytes >= effective_thresholds["cold_inbox_min_bytes"]
+    )
+
+    archive_index_payload = load_archive_index(archive_index_path)
+    archive_index_entries = len(archive_index_payload.get("entries", []))
+
     triggers: list[str] = []
     if handover_trigger:
         triggers.append("handover")
     if inbox_trigger:
         triggers.append("inbox")
+    if cold_inbox_trigger:
+        triggers.append("cold_inbox")
 
     should_apply = args.apply and cooldown_ok and bool(triggers)
 
@@ -446,6 +483,50 @@ def main() -> int:
                     }
                 )
 
+        if cold_inbox_trigger:
+            archive_script = find_script(
+                ws,
+                [
+                    "scripts/prumo_archive_cold_files.py",
+                    "Prumo/cowork-plugin/scripts/prumo_archive_cold_files.py",
+                    "Prumo/scripts/prumo_archive_cold_files.py",
+                ],
+            )
+            if archive_script is None:
+                actions.append({"name": "archive_cold_files", "ok": False, "reason": "script_not_found"})
+            else:
+                cmd = [
+                    sys.executable,
+                    str(archive_script),
+                    "--workspace",
+                    str(ws),
+                    "--min-age-days",
+                    str(effective_thresholds["cold_inbox_min_age_days"]),
+                    "--min-candidates",
+                    str(effective_thresholds["cold_inbox_min_candidates"]),
+                    "--min-bytes",
+                    str(effective_thresholds["cold_inbox_min_bytes"]),
+                    "--apply",
+                ]
+                code, out, err = run_cmd(cmd)
+                actions.append(
+                    {
+                        "name": "archive_cold_files",
+                        "ok": code == 0,
+                        "exit_code": code,
+                        "stdout": out,
+                        "stderr": err,
+                    }
+                )
+
+    archive_index_payload = load_archive_index(archive_index_path)
+    archive_index_entries = len(archive_index_payload.get("entries", []))
+    archive_actions_ok = sum(
+        1
+        for action in actions
+        if action.get("name") in {"archive_cold_files", "sanitize_handover"} and action.get("ok") is True
+    )
+
     metrics = {
         "handover_exists": handover_exists,
         "handover_size_bytes": handover_size,
@@ -457,6 +538,11 @@ def main() -> int:
         "preview_exists": preview_exists,
         "index_exists": index_exists,
         "preview_stale": preview_stale,
+        "cold_inbox_registry_status": cold_registry_status,
+        "cold_inbox_candidates": cold_candidate_total,
+        "cold_inbox_candidate_bytes": cold_candidate_bytes,
+        "archive_index_entries": archive_index_entries,
+        "archive_actions_ok": archive_actions_ok,
     }
 
     decision = {
@@ -518,6 +604,10 @@ def main() -> int:
     print(f"cooldown_ok: {cooldown_ok}")
     print(f"apply_requested: {args.apply}")
     print(f"applied: {should_apply}")
+    print(f"cold_inbox_registry_status: {cold_registry_status}")
+    print(f"cold_inbox_candidates: {cold_candidate_total}")
+    print(f"cold_inbox_candidate_bytes: {cold_candidate_bytes}")
+    print(f"archive_index_entries: {archive_index_entries}")
 
     for action in actions:
         name = action.get("name", "unknown")

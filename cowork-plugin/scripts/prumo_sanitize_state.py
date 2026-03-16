@@ -14,6 +14,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from prumo_archive_index import append_archive_entries, text_fingerprint
+
 ID_RE = re.compile(r"^###\s+ID:\s*(.+)$", re.MULTILINE)
 STATUS_RE = re.compile(r"^-\s+Status:\s*([A-Z_]+)", re.MULTILINE)
 DATE_RE = re.compile(r"^-\s+Data:\s*(.+)$", re.MULTILINE)
@@ -201,6 +203,24 @@ def main() -> int:
 
         if moved:
             append_archive(archive_dir / "HANDOVER-ARCHIVE.md", moved, handover_path)
+            archive_entries = [
+                {
+                    "policy": "handover_closed_compaction",
+                    "source_path": f"{handover_path}#{section.ident}",
+                    "destination_path": f"{archive_dir / 'HANDOVER-ARCHIVE.md'}#{section.ident}",
+                    "reason": "status=CLOSED excedeu limite do arquivo ativo",
+                    "size_bytes": len(section.raw.encode("utf-8")),
+                    "mtime_iso": "",
+                    "fingerprint": text_fingerprint(section.raw),
+                }
+                for section in moved
+            ]
+            archive_index_result = append_archive_entries(
+                archive_dir / "ARCHIVE-INDEX.json",
+                archive_dir / "ARCHIVE-INDEX.md",
+                archive_entries,
+            )
+            print(f"apply: archive_index_additions={archive_index_result['added']}")
 
         new_content = join_sections(prefix, active_sections)
         handover_path.write_text(new_content, encoding="utf-8")

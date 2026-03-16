@@ -40,6 +40,7 @@ Ao final da geração de arquivos, mostrar resumo claro:
 | scripts/prumo_google_dual_snapshot.sh | prumo-google-dual-snapshot.sh | Script opcional para briefing Google dual. |
 | scripts/prumo_sanitize_state.py | Gerar arquivo | Sanitização de estado operacional (`HANDOVER`). |
 | scripts/prumo_auto_sanitize.py | Gerar arquivo | Autosanitização por gatilhos com cooldown e calibração. |
+| scripts/prumo_archive_cold_files.py | Gerar arquivo | Archive conservador de arquivos frios com índice global. |
 | Inbox4Mobile/ | Criar pasta vazia | Para notas/arquivos do celular. |
 | Referencias/ | Criar pasta vazia | Para material de referência. |
 | Referencias/INDICE.md | file-templates.md | Índice de material de referência. |

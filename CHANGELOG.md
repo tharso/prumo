@@ -4,6 +4,31 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.4.0] - 2026-03-16
+
+### Added
+- Novo script `cowork-plugin/scripts/prumo_archive_cold_files.py` para archive conservador de arquivos frios em `Inbox4Mobile/`, com suporte a dry-run, thresholds configuráveis e refresh do preview após movimentação.
+- Novo helper `cowork-plugin/scripts/prumo_archive_index.py` para manter o índice global de archive em:
+  - `_state/archive/ARCHIVE-INDEX.json`
+  - `_state/archive/ARCHIVE-INDEX.md`
+- Template explícito para `Inbox4Mobile/_processed.json` e documentação do contrato mínimo usado pela autolimpeza.
+- Nova issue pública para a feature: [#32](https://github.com/tharso/prumo/issues/32).
+
+### Changed
+- `prumo_sanitize_state.py` agora registra compactação de handovers no índice global de archive, em vez de só mover texto para `HANDOVER-ARCHIVE.md`.
+- `prumo_auto_sanitize.py` ganhou terceiro eixo de manutenção: detecção e archive de arquivos processados e frios do inbox, com telemetria de candidatos e bytes acumulados.
+- Core, módulo de sanitização, módulo de inbox e runtime paths atualizados para explicitar guardrails de archive e a nova política conservadora.
+- Versionamento sincronizado para `4.4.0` em:
+  - `VERSION`
+  - `cowork-plugin/VERSION`
+  - `plugin.json`
+  - `.claude-plugin/plugin.json`
+  - `marketplace.json`
+  - `.claude-plugin/marketplace.json`
+
+### Fixed
+- Sanitização deixa de ser um mecanismo parcial sem índice global; agora todo movimento suportado precisa deixar rastro consultável.
+
 ## [4.3.1] - 2026-03-16
 
 ### Fixed

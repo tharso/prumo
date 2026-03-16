@@ -155,6 +155,19 @@ _Última atualização: {{DATA_SETUP}}_
 
 ---
 
+## Inbox4Mobile/_processed.json
+
+--- INÍCIO ---
+
+{
+  "version": "1.0",
+  "items": []
+}
+
+--- FIM ---
+
+---
+
 ## [Area]/README.md (template genérico por área)
 
 --- INÍCIO ---

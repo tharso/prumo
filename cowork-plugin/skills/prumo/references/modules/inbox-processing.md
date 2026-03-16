@@ -1,6 +1,6 @@
 # Inbox Processing
 
-> **module_version: 4.3.1**
+> **module_version: 4.4.0**
 >
 > Fonte canônica da triagem e do commit de inbox do Prumo.
 
@@ -71,6 +71,31 @@ Depois da triagem:
    - registrar `DELECAO_FALHOU` no `REGISTRO.md`;
    - marcar o item em `Inbox4Mobile/_processed.json`.
 4. No próximo briefing, usar `_processed.json` para não reapresentar como novo o que já foi processado.
+
+## Contrato mínimo do `_processed.json`
+
+Formato recomendado:
+
+```json
+{
+  "version": "1.0",
+  "items": [
+    {
+      "filename": "captura-exemplo.txt",
+      "processed_at": "2026-03-16T19:00:00-03:00",
+      "status": "processed",
+      "reason": "fallback sem deleção física"
+    }
+  ]
+}
+```
+
+Regras:
+
+1. O nome do arquivo deve ser preservado em `filename`.
+2. `processed_at` deve registrar o timestamp ISO da decisão.
+3. `status` recomendado: `processed`.
+4. A autolimpeza fria só pode arquivar item que esteja marcado aqui e já esteja frio pelo threshold configurado.
 
 ## Material de referência
 

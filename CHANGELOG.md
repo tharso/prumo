@@ -19,6 +19,11 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 - Documentação e comandos agora refletem o comportamento real do Cowork: os slash commands do Prumo aparecem sem prefixo de plugin (`/setup`, `/briefing`, `/handover`, `/sanitize`, `/higiene`, `/start`).
 - O produto deixou de sugerir `/prumo:*` como caminho canônico no Cowork, porque promessa falsa com cara de alias é só bug usando gravata.
 
+## [4.5.3] - 2026-03-18
+
+### Fixed
+- `plugin.json` e `.claude-plugin/plugin.json` voltaram a declarar explicitamente as skills do Prumo. Sem isso, o Cowork recebia metadado de plugin mas não tinha o que carregar, que é uma forma bem elaborada de instalar nada.
+
 ## [4.5.0] - 2026-03-16
 
 ### Added

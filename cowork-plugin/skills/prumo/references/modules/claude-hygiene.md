@@ -52,9 +52,17 @@ Destino padrão:
 
 Apresentar ao usuário:
 
-1. categorias dos achados;
-2. impacto esperado;
-3. se a proposta altera ou não o arquivo.
+1. `Mudanças seguras`;
+2. `Itens que pedem confirmação factual`;
+3. `Decisões de governança/arquitetura`;
+4. impacto esperado;
+5. se a proposta altera ou não o arquivo.
+
+Esses blocos não podem ser misturados. O produto precisa deixar claro o que é:
+
+1. limpeza estrutural segura;
+2. verdade factual pendente;
+3. decisão de arquitetura do arquivo.
 
 Nunca aplicar direto.
 

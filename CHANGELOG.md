@@ -4,6 +4,15 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.6.2] - 2026-03-18
+
+### Changed
+- O relatório e a skill de `/higiene` agora separam explicitamente a proposta em 3 blocos fixos:
+  - `Mudanças seguras`
+  - `Itens que pedem confirmação factual`
+  - `Decisões de governança/arquitetura`
+- O produto deixa de depender de prompt manual do usuário para distinguir limpeza estrutural, verdade factual pendente e decisão de arquitetura do arquivo.
+
 ## [4.6.0] - 2026-03-18
 
 ### Added

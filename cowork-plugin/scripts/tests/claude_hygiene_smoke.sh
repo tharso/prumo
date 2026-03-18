@@ -88,12 +88,18 @@ python3 "$ROOT_DIR/scripts/prumo_claude_hygiene.py" --workspace "$TMP_DIR" >/dev
 [[ -f "$TMP_DIR/_state/claude-hygiene/CLAUDE.proposed.md" ]] || fail "CLAUDE proposto ausente"
 assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "Duplicado" "Relatorio nao apontou duplicacao"
 assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "Potencial conflito" "Relatorio nao apontou conflito"
+assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "## Mudanças seguras" "Relatorio nao criou bloco de mudancas seguras"
+assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "## Itens que pedem confirmação factual" "Relatorio nao criou bloco de confirmacao factual"
+assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "## Decisões de governança/arquitetura" "Relatorio nao criou bloco de governanca"
 assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "Lembrete vencido no arquivo vivo" "Relatorio nao apontou lembrete vencido"
 assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "Histórico no arquivo vivo" "Relatorio nao apontou historico deslocado"
 assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "Status transitório envelhecido" "Relatorio nao apontou status transitorio envelhecido"
 assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "PAUTA.md / REGISTRO.md" "Relatorio nao sugeriu destino para lembrete vencido"
 assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "REGISTRO.md / CHANGELOG" "Relatorio nao sugeriu destino para historico"
 assert_not_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.md" "Conheci Mari em 01/01/2016" "Relatorio gerou falso positivo no caso negativo"
+assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.json" "\"safe_cleanup_count\": 3" "JSON nao resumiu bloco seguro"
+assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.json" "\"needs_factual_confirmation_count\": 2" "JSON nao resumiu bloco factual"
+assert_contains "$TMP_DIR/_state/claude-hygiene/claude-hygiene-report.json" "\"governance_decision_count\": 3" "JSON nao resumiu bloco de governanca"
 assert_contains "$TMP_DIR/CLAUDE.md" "Evite emojis." "Dry-run alterou CLAUDE.md"
 
 python3 "$ROOT_DIR/scripts/prumo_claude_hygiene.py" --workspace "$TMP_DIR" --apply >/dev/null

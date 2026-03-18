@@ -66,6 +66,12 @@ HISTORY_HINTS = {
     "evolução",
 }
 
+GROUP_LABELS = {
+    "safe_cleanup": "Mudanças seguras",
+    "needs_factual_confirmation": "Itens que pedem confirmação factual",
+    "governance_decision": "Decisões de governança/arquitetura",
+}
+
 
 @dataclass
 class Block:
@@ -422,7 +428,41 @@ def build_proposed_content(content: str, duplicate_indexes: set[int]) -> str:
     return proposed
 
 
+def classify_group(item: dict[str, Any]) -> str:
+    item_type = item.get("type")
+    if item_type in {"duplicate_line", "duplicate_block", "near_duplicate_block"}:
+        return "safe_cleanup"
+    if item_type in {"stale_reminder", "transient_status"}:
+        return "needs_factual_confirmation"
+    return "governance_decision"
+
+
+def bucket_findings(findings: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    buckets = {key: [] for key in GROUP_LABELS}
+    for item in findings:
+        group = item.get("group") or classify_group(item)
+        buckets.setdefault(group, []).append(item)
+    return buckets
+
+
+def render_finding_md(item: dict[str, Any]) -> list[str]:
+    line_info = ", ".join(str(x) for x in item.get("lines", []))
+    return [
+        "",
+        f"### {item['label']}",
+        "",
+        f"- Linhas: {line_info or 'n/d'}",
+        f"- Risco: {item['risk']}",
+        f"- Trecho/tema: `{item['snippet']}`",
+        f"- Razão: {item.get('reason', 'n/d')}",
+        f"- Destino sugerido: {item.get('destination', 'CLAUDE.md')}",
+        f"- Requer confirmação factual: {'sim' if item.get('requires_confirmation') else 'não'}",
+        f"- Sugestão: {item['suggestion']}",
+    ]
+
+
 def render_report_md(payload: dict[str, Any]) -> str:
+    grouped = payload.get("grouped_findings", {})
     lines = [
         "# CLAUDE Hygiene Report",
         "",
@@ -436,31 +476,22 @@ def render_report_md(payload: dict[str, Any]) -> str:
         f"- Conflitos potenciais: {payload['summary']['conflict_count']}",
         f"- Drift de governança: {payload['summary']['policy_drift_count']}",
         f"- Itens que pedem confirmação factual: {payload['summary']['manual_review_count']}",
+        f"- Bloco 1 (`Mudanças seguras`): {payload['summary']['safe_cleanup_count']}",
+        f"- Bloco 2 (`Confirmação factual`): {payload['summary']['needs_factual_confirmation_count']}",
+        f"- Bloco 3 (`Governança/arquitetura`): {payload['summary']['governance_decision_count']}",
         f"- Proposta altera arquivo: {'sim' if payload['summary']['proposal_changes'] else 'não'}",
         "",
-        "## Achados",
+        "## Proposta por bloco",
     ]
 
-    findings = payload.get("findings", [])
-    if not findings:
-        lines.extend(["", "- Nenhum achado relevante."])
-    else:
+    for group_key, heading in GROUP_LABELS.items():
+        lines.extend(["", f"## {heading}", ""])
+        findings = grouped.get(group_key, [])
+        if not findings:
+            lines.append("- Nenhum item neste bloco.")
+            continue
         for item in findings:
-            line_info = ", ".join(str(x) for x in item.get("lines", []))
-            lines.extend(
-                [
-                    "",
-                    f"### {item['label']}",
-                    "",
-                    f"- Linhas: {line_info or 'n/d'}",
-                    f"- Risco: {item['risk']}",
-                    f"- Trecho/tema: `{item['snippet']}`",
-                    f"- Razão: {item.get('reason', 'n/d')}",
-                    f"- Destino sugerido: {item.get('destination', 'CLAUDE.md')}",
-                    f"- Requer confirmação factual: {'sim' if item.get('requires_confirmation') else 'não'}",
-                    f"- Sugestão: {item['suggestion']}",
-                ]
-            )
+            lines.extend(render_finding_md(item))
 
     lines.extend(
         [
@@ -468,6 +499,7 @@ def render_report_md(payload: dict[str, Any]) -> str:
             "## Aplicação",
             "",
             "Este relatório não altera `CLAUDE.md` sozinho.",
+            "Os blocos são deliberadamente separados para impedir que mudança segura, verdade factual e decisão de governança saiam emboladas no mesmo pacote.",
             "Para aplicar a proposta, é preciso confirmação explícita do usuário e execução com `--apply`.",
             "",
         ]
@@ -483,6 +515,17 @@ def build_report(content: str, claude_path: Path, threshold: float) -> tuple[dic
     conflict_findings = detect_conflicts(content.splitlines())
     lifecycle_findings = detect_lifecycle_findings(blocks, today=dt.datetime.now().astimezone().date())
 
+    all_findings = (
+        duplicate_line_findings
+        + duplicate_block_findings
+        + near_duplicate_findings
+        + conflict_findings
+        + lifecycle_findings
+    )
+    for item in all_findings:
+        item["group"] = classify_group(item)
+
+    grouped_findings = bucket_findings(all_findings)
     proposed = build_proposed_content(content, duplicate_indexes)
     summary = {
         "duplicate_count": len(duplicate_line_findings) + len(duplicate_block_findings),
@@ -492,6 +535,9 @@ def build_report(content: str, claude_path: Path, threshold: float) -> tuple[dic
         "manual_review_count": sum(
             1 for item in conflict_findings + lifecycle_findings if item.get("requires_confirmation") is True
         ),
+        "safe_cleanup_count": len(grouped_findings["safe_cleanup"]),
+        "needs_factual_confirmation_count": len(grouped_findings["needs_factual_confirmation"]),
+        "governance_decision_count": len(grouped_findings["governance_decision"]),
         "proposal_changes": proposed != content,
     }
 
@@ -499,11 +545,8 @@ def build_report(content: str, claude_path: Path, threshold: float) -> tuple[dic
         "generated_at": now_iso(),
         "claude_path": str(claude_path),
         "summary": summary,
-        "findings": duplicate_line_findings
-        + duplicate_block_findings
-        + near_duplicate_findings
-        + conflict_findings
-        + lifecycle_findings,
+        "findings": all_findings,
+        "grouped_findings": grouped_findings,
         "proposal": {
             "changed": proposed != content,
             "fingerprint_before": fingerprint(content),
@@ -610,6 +653,9 @@ def main() -> int:
     print(f"conflicts: {report_payload['summary']['conflict_count']}")
     print(f"policy_drift: {report_payload['summary']['policy_drift_count']}")
     print(f"manual_review: {report_payload['summary']['manual_review_count']}")
+    print(f"safe_cleanup: {report_payload['summary']['safe_cleanup_count']}")
+    print(f"needs_factual_confirmation: {report_payload['summary']['needs_factual_confirmation_count']}")
+    print(f"governance_decision: {report_payload['summary']['governance_decision_count']}")
     print(f"proposal_changes: {report_payload['summary']['proposal_changes']}")
     print(f"apply_requested: {args.apply}")
     print(f"applied: {applied}")

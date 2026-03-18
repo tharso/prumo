@@ -26,7 +26,10 @@ Também é checagem de governança do que pertence a cada arquivo vivo do Prumo.
 ## Fluxo
 
 1. Rodar diagnóstico do `CLAUDE.md`.
-2. Mostrar duplicações, redundâncias, conflitos e conteúdo no arquivo errado.
+2. Mostrar o resultado em 3 blocos fixos, nesta ordem:
+   - `Mudanças seguras`
+   - `Itens que pedem confirmação factual`
+   - `Decisões de governança/arquitetura`
 3. Apontar onde está o patch proposto.
 4. Perguntar se o usuário quer aplicar.
 5. Só com confirmação explícita:
@@ -40,4 +43,5 @@ Também é checagem de governança do que pertence a cada arquivo vivo do Prumo.
 - Nunca aplicar sem confirmação explícita.
 - Nunca reescrever preferências subjetivas por conta própria.
 - Nunca mover item entre arquivos sem confirmação factual do usuário.
+- Nunca misturar no mesmo bloco limpeza segura, confirmação factual e decisão de governança.
 - Se o conflito for interpretativo demais, reportar e deixar a decisão para o usuário.

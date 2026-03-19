@@ -106,6 +106,7 @@ Reverter movimento de diretórios, restaurar paths antigos, lançar patch de cor
    - `/setup`
    - `/prumo`
    - `/briefing`
+   - `/doctor`
    - `/handover`
    - `/sanitize`
    - `/higiene`

@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 4.6.0**
+> **prumo_version: 4.7.0**
 >
 > Este arquivo é o núcleo estável do Prumo.
 > Ele define regras, guardrails e a localização dos módulos canônicos.
@@ -43,19 +43,17 @@ Arquivos de estado esperados em `_state/`:
 
 | Comando | Função |
 |---|---|
-| `/prumo:setup` | Configuração inicial e reconfiguração |
-| `/prumo:briefing` | Briefing diário em blocos progressivos |
-| `/prumo:inbox` | Processar inbox sob demanda |
-| `/prumo:dump` | Captura rápida |
-| `/prumo:revisao` | Revisão semanal |
-| `/prumo:status` | Panorama rápido |
-| `/prumo:handover` | Operar handovers |
-| `/prumo:sanitize` | Sanitizar estado operacional |
-| `/prumo:higiene` | Higiene assistida do `CLAUDE.md` |
-| `/prumo:menu` | Listar comandos |
+| `/setup` | Configuração inicial e reconfiguração |
+| `/briefing` | Briefing diário em blocos progressivos |
+| `/doctor` | Diagnóstico do runtime do Prumo no Cowork |
+| `/handover` | Operar handovers |
+| `/sanitize` | Sanitizar estado operacional |
+| `/higiene` | Higiene assistida do `CLAUDE.md` |
+| `/start` | Captura inicial e onboarding rápido |
+| `/prumo` | Alias legado de setup |
 
-Canônico de briefing: `/prumo:briefing`
-Alias legado aceito: `/briefing`
+No Cowork, os comandos canônicos aparecem sem prefixo do plugin.
+Alias legado ainda pode existir por compatibilidade, mas documentação nova deve usar o formato curto.
 
 ## Módulos canônicos
 
@@ -70,6 +68,7 @@ Quando um comando específico for executado, o agente deve ler o módulo corresp
 | Multiagente | `Prumo/cowork-plugin/skills/prumo/references/modules/multiagent.md` |
 | Sanitização | `Prumo/cowork-plugin/skills/prumo/references/modules/sanitization.md` |
 | Higiene do CLAUDE | `Prumo/cowork-plugin/skills/prumo/references/modules/claude-hygiene.md` |
+| Runtime do Cowork | `Prumo/cowork-plugin/skills/prumo/references/modules/cowork-runtime-maintenance.md` |
 | Governança de arquivos | `Prumo/cowork-plugin/skills/prumo/references/modules/runtime-file-governance.md` |
 | Política de leitura | `Prumo/cowork-plugin/skills/prumo/references/modules/load-policy.md` |
 | Runtime paths | `Prumo/cowork-plugin/skills/prumo/references/modules/runtime-paths.md` |

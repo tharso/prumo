@@ -15,6 +15,7 @@ Se você só ler uma parte, leia esta.
 5. Se o pacote distribuído tiver dois `plugin.json` com o mesmo `name`, o discovery de slash command pode ficar inconsistente no app.
 6. O erro visual no app costuma ser genérico. A causa real aparece nos logs do desktop.
 7. Se a sessão/chat foi aberta antes da instalação do plugin, o slash command pode continuar "desconhecido" nessa sessão mesmo após instalar.
+8. O botão `Atualizar` pode ficar apagado porque o checkout local do marketplace congelou. Nesse caso, a UI não está “em paz”. Está desinformada.
 
 ## 2) Causas raiz encontradas neste caso
 
@@ -105,6 +106,7 @@ Exemplo:
 ### Faça
 
 - Use `source` remoto por objeto (`url` git + `ref`) no marketplace.
+- Para Cowork UI, prefira adicionar o marketplace pelo repositório Git. `raw marketplace.json` é compatibilidade, não caminho nobre.
 - Use `marketplace.name` diferente de `plugin.name`.
 - Use `strict: true` no marketplace entry se componentes estão no `plugin.json`.
 - Versione de forma consistente:
@@ -153,6 +155,23 @@ Padrões úteis:
 - `ENAMETOOLONG`
 - `conflicting manifests`
 
+### Quando o botão `Atualizar` continua cinza
+
+Não trate isso como mistério cósmico. Primeiro verifique o store real do Cowork.
+
+Scripts canônicos do Prumo:
+
+- `scripts/prumo_cowork_doctor.sh`
+- `scripts/prumo_cowork_update.sh`
+
+O padrão observado no caso real foi:
+
+1. plugin instalado em versão nova;
+2. checkout do marketplace parado num commit velho;
+3. UI assumindo que não havia update porque o catálogo local não conhecia a release.
+
+Ou seja: botão cinza não é prova de “tudo sincronizado”. Às vezes é só um porteiro lendo lista antiga.
+
 ### Quando o problema é só daquela sessão
 
 Olhe o `audit.jsonl` da sessão:
@@ -196,13 +215,15 @@ Depois de estabilizar:
 
 ## 9) Contingência operacional (se produção ainda falhar)
 
-1. Fixar URL por commit do `marketplace.json` para eliminar cache velho.
-2. Pedir retry no app após remover marketplace antigo e adicionar de novo.
-3. Capturar erro exato + trecho do `main.log`.
-4. Se necessário, usar o caminho canônico por CLI:
+1. Rodar `scripts/prumo_cowork_doctor.sh`.
+2. Se houver checkout congelado, rodar `scripts/prumo_cowork_update.sh`.
+3. Reiniciar o app.
+4. Se o plugin ainda não acompanhar o catálogo, remover só o plugin e reinstalar pelo marketplace.
+5. Capturar erro exato + trecho do `main.log`.
+6. Se necessário, usar o caminho canônico por CLI:
    - `claude plugin marketplace add <url-do-marketplace>`
    - `claude plugin install prumo@prumo-marketplace`
-5. Se necessário, manter `.zip` como fallback temporário com prazo de remoção.
+7. Se necessário, manter `.zip` como fallback temporário com prazo de remoção.
 
 ## 10) Nota prática sobre testes de comando
 

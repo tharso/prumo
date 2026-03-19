@@ -4,6 +4,23 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.7.0] - 2026-03-18
+
+### Added
+- Novo `scripts/prumo_cowork_doctor.sh` para diagnosticar o store real do Cowork, checkout do marketplace, versão instalada, drift de catálogo e o caso clássico do botão `Atualizar` morrer enquanto o checkout local continua preso no passado.
+- Novo `scripts/prumo_cowork_update.sh` para atualizar os checkouts do marketplace do Prumo usados pelo Cowork e renovar o timestamp de sync sem sair remendando o cache do plugin na marra.
+- Novo comando `/doctor` e skill dedicada para expor esse diagnóstico no próprio produto.
+- Novo módulo canônico [cowork-runtime-maintenance.md](cowork-plugin/skills/prumo/references/modules/cowork-runtime-maintenance.md) consolidando a política de instalação e update no Cowork.
+- Novo smoke [cowork_runtime_smoke.sh](cowork-plugin/scripts/tests/cowork_runtime_smoke.sh) para validar o caso de catálogo congelado em store fake.
+
+### Changed
+- O caminho recomendado para instalar o Prumo no Cowork agora é o repositório Git `https://github.com/tharso/prumo.git`, não a URL `raw` do marketplace.
+- `prumo_plugin_install.sh` deixou de fingir que resolve sozinho o store local do Cowork e passou a apontar explicitamente para os scripts de `doctor` e `update` quando a UI congelar.
+- README, playbook e comando `doctor` agora tratam o botão `Atualizar` como sinal fraco. A verdade mora no store local, não no teatro do painel.
+
+### Fixed
+- O produto ganhou um trilho canônico para diagnosticar e corrigir catálogo congelado no Cowork. Usuário não deveria precisar virar arqueólogo de cache para instalar release nova.
+
 ## [4.6.3] - 2026-03-18
 
 ### Changed

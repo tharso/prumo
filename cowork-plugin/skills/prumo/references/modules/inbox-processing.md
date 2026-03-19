@@ -1,6 +1,6 @@
 # Inbox Processing
 
-> **module_version: 4.5.0**
+> **module_version: 4.7.0**
 >
 > Fonte canônica da triagem e do commit de inbox do Prumo.
 

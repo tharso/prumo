@@ -4,23 +4,30 @@ set -euo pipefail
 
 MARKETPLACE_NAME="prumo-marketplace"
 PLUGIN_NAME="prumo@prumo-marketplace"
-MARKETPLACE_URL="https://raw.githubusercontent.com/tharso/prumo/main/marketplace.json"
+MARKETPLACE_SOURCE="https://github.com/tharso/prumo.git"
 SCOPE="user"
 FORCE_READD="0"
 
 usage() {
   cat <<'EOF'
 Uso:
-  scripts/prumo_plugin_install.sh [--scope user|project|local] [--marketplace-url URL] [--force-readd]
+  scripts/prumo_plugin_install.sh [--scope user|project|local] [--marketplace-source SOURCE] [--marketplace-url SOURCE] [--force-readd]
 
 O que faz:
-  1. Garante que o marketplace do Prumo existe no backend do Claude/Cowork
+  1. Garante que o marketplace do Prumo existe no backend do Claude
   2. Atualiza ou adiciona o marketplace pelo CLI
-  3. Instala ou atualiza o plugin prumo
+  3. Instala ou atualiza o plugin prumo nesse backend
+
+Observação importante:
+  Este script não corrige sozinho o store local do Cowork quando a UI congela o catálogo.
+  Para isso, use:
+    - scripts/prumo_cowork_doctor.sh
+    - scripts/prumo_cowork_update.sh
 
 Exemplos:
   scripts/prumo_plugin_install.sh
   scripts/prumo_plugin_install.sh --scope user
+  scripts/prumo_plugin_install.sh --marketplace-source https://github.com/tharso/prumo.git --force-readd
   scripts/prumo_plugin_install.sh --marketplace-url https://raw.githubusercontent.com/tharso/prumo/<commit>/marketplace.json --force-readd
 EOF
 }
@@ -31,8 +38,8 @@ while [ "$#" -gt 0 ]; do
       SCOPE="${2:-}"
       shift 2
       ;;
-    --marketplace-url)
-      MARKETPLACE_URL="${2:-}"
+    --marketplace-source|--marketplace-url)
+      MARKETPLACE_SOURCE="${2:-}"
       shift 2
       ;;
     --force-readd)
@@ -73,6 +80,7 @@ echo "==> Prumo plugin installer"
 echo "Marketplace: $MARKETPLACE_NAME"
 echo "Plugin: $PLUGIN_NAME"
 echo "Scope: $SCOPE"
+echo "Source: $MARKETPLACE_SOURCE"
 
 if [ "$FORCE_READD" = "1" ] && [ "$(has_marketplace)" = "yes" ]; then
   echo "==> Removendo marketplace antigo para forçar recadastro"
@@ -84,7 +92,7 @@ if [ "$(has_marketplace)" = "yes" ]; then
   claude plugin marketplace update "$MARKETPLACE_NAME"
 else
   echo "==> Adicionando marketplace"
-  claude plugin marketplace add "$MARKETPLACE_URL"
+  claude plugin marketplace add "$MARKETPLACE_SOURCE"
 fi
 
 if [ "$(has_plugin)" = "yes" ]; then
@@ -101,4 +109,8 @@ echo "Próximos passos:"
 echo "1. Feche totalmente o Cowork/Claude Desktop."
 echo "2. Abra o app de novo."
 echo "3. Abra uma conversa nova."
-echo "4. Teste /prumo:setup ou /prumo:higiene."
+echo "4. Teste /setup, /briefing, /doctor ou /higiene."
+echo
+echo "Se o Cowork continuar preso em catálogo velho com botão apagado, não negocie com a UI:"
+echo "  - scripts/prumo_cowork_doctor.sh"
+echo "  - scripts/prumo_cowork_update.sh"

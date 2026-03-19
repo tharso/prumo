@@ -1,6 +1,6 @@
 # Weekly Review
 
-> **module_version: 4.5.0**
+> **module_version: 4.7.0**
 >
 > Fonte canônica da revisão semanal do Prumo.
 

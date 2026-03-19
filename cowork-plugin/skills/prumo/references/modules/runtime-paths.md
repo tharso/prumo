@@ -1,6 +1,6 @@
 # Runtime Paths
 
-> **module_version: 4.5.0**
+> **module_version: 4.7.0**
 >
 > Fonte canônica dos paths válidos de scripts no runtime do Prumo.
 
@@ -17,6 +17,8 @@ Resolver scripts nesta ordem:
 - `prumo_auto_sanitize.py`
 - `prumo_archive_cold_files.py`
 - `prumo_claude_hygiene.py`
+- `prumo_cowork_doctor.sh`
+- `prumo_cowork_update.sh`
 - `prumo_sanitize_state.py`
 - `prumo_briefing_state.py`
 - `safe_core_update.sh`

@@ -139,6 +139,12 @@ for file in "$CORE_FILE" "$VERSION_MODULE"; do
   assert_contains "$file" "nova versão do motor|changelog local seguro" "Update seguro: fallback sem changelog remoto ausente"
 done
 
+for file in "$CORE_FILE" "$BRIEFING_MODULE" "$VERSION_MODULE" "$SKILL_FILE"; do
+  assert_contains "$file" "core defasado|motor do workspace defasado" "Preflight de versão: falta tratamento explícito de core defasado"
+done
+
+assert_contains "$VERSION_MODULE" "não como release corrompida|não como release" "Preflight de versão: módulo ainda confunde drift com falha de release"
+
 for file in "$SKILL_FILE" "$BRIEFING_MODULE" "$VERSION_MODULE"; do
   assert_contains "$file" "atualizar agora" "Preflight de versão: falta opção de atualizar agora"
   assert_contains "$file" "seguir mesmo assim" "Preflight de versão: falta opção de seguir mesmo assim"

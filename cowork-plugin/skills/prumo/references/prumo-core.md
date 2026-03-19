@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 4.7.2**
+> **prumo_version: 4.7.3**
 >
 > Este arquivo é o núcleo estável do Prumo.
 > Ele define regras, guardrails e a localização dos módulos canônicos.
@@ -175,6 +175,8 @@ Sempre que houver mais de um caminho razoável, oferecer alternativas curtas e r
 
 `ASSERT: Antes do panorama do briefing, o sistema deve tentar preflight de versão e avisar quando detectar versão nova.`
 
+`ASSERT: Se Prumo/VERSION local for maior que prumo_version do workspace, o briefing deve acusar core defasado antes de seguir.`
+
 `ASSERT: Handover PENDING_VALIDATION ou REJECTED não pode ser ignorado no briefing.`
 
 `ASSERT: Arquivo frio só pode ser movido para archive se houver entrada correspondente em _state/archive/ARCHIVE-INDEX.*`
@@ -278,8 +280,8 @@ Histórico completo de versão vive em `CHANGELOG.md`.
 
 Versão atual deste core:
 
-- `4.7.2`
+- `4.7.3`
 
 ---
 
-*Prumo Core v4.7.2 — https://github.com/tharso/prumo*
+*Prumo Core v4.7.3 — https://github.com/tharso/prumo*

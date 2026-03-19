@@ -1,6 +1,6 @@
 # Version Update
 
-> **module_version: 4.7.2**
+> **module_version: 4.7.3**
 >
 > Fonte canônica do fluxo de verificação e aplicação de atualização do Prumo.
 
@@ -19,7 +19,9 @@ Ela deve acontecer como preflight antes do panorama principal.
 
 1. Ler `prumo_version` no topo do `PRUMO-CORE.md`.
 2. Ler `VERSION` do repositório quando existir no runtime.
-3. Se `VERSION` e `prumo_version` divergirem, tratar como falha de release.
+3. Se `VERSION` do repo local for maior que `prumo_version` do workspace, tratar como motor do workspace defasado.
+4. Se `prumo_version` do workspace for maior que `VERSION` do repo local, tratar como inconsistência de ambiente e avisar isso explicitamente.
+5. Só tratar como falha de release quando houver conflito impossível de explicar por drift normal de workspace.
 
 ## Passo 2: comparar com a versão remota
 
@@ -70,6 +72,13 @@ Se houver versão nova, mas não houver transporte seguro:
 1. avisar isso explicitamente;
 2. oferecer `b)` e `c)` do mesmo jeito;
 3. não sequestrar o briefing por causa do updater.
+
+Se o caso for `workspace core defasado`:
+
+1. dizer isso com nome e sobrenome;
+2. mencionar a diferença entre `PRUMO-CORE.md` do workspace e `Prumo/VERSION` local;
+3. tratar isso como condição operacional esperável, não como release corrompida;
+4. no briefing, parar antes do panorama e pedir decisão do usuário.
 
 ## Passo 5: aplicação segura
 

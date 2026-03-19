@@ -4,7 +4,7 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
-## [4.7.1] - 2026-03-19
+## [4.7.3] - 2026-03-19
 
 ### Fixed
 - O briefing voltou a tratar update como preflight de verdade, não como leitura opcional de módulo esquecida no canto.
@@ -12,6 +12,13 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 - Regressão pública rastreada em [#38](https://github.com/tharso/prumo/issues/38).
 
 ## [4.7.2] - 2026-03-19
+
+### Fixed
+- O briefing agora distingue `motor do workspace defasado` de `release inconsistente`. No caso real do `DailyLife`, `PRUMO-CORE.md` velho ao lado de `Prumo/VERSION` novo passa a ser tratado como drift operacional explícito.
+- O preflight do briefing deve acusar esse drift antes do panorama, em vez de fingir normalidade e depois tropeçar em regra antiga.
+- Regressão pública rastreada em [#39](https://github.com/tharso/prumo/issues/39).
+
+## [4.7.1] - 2026-03-19
 
 ### Added
 - Novo módulo canônico [interaction-format.md](cowork-plugin/skills/prumo/references/modules/interaction-format.md) definindo o contrato de interface do Prumo no chat: numeração contínua durante o mesmo fluxo e alternativas curtas quando houver mais de um caminho razoável.

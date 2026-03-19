@@ -58,6 +58,7 @@ Em caso de conflito:
 - `interrupted_at` e `resume_point` só existem se o usuário acionou escape hatch.
 - Update sem transporte seguro de aplicação não bloqueia briefing.
 - Se houver versão nova detectável, o briefing deve avisar antes do panorama e oferecer alternativas curtas.
+- Se o `PRUMO-CORE.md` do workspace estiver atrás do `Prumo/VERSION` local, isso deve ser tratado como core defasado do workspace, não como detalhe invisível.
 - Quando isso acontecer, preferir:
   - `a) atualizar agora`
   - `b) seguir mesmo assim`

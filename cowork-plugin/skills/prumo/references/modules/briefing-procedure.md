@@ -1,6 +1,6 @@
 # Briefing Procedure
 
-> **module_version: 4.7.2**
+> **module_version: 4.7.3**
 >
 > Fonte canônica do procedimento de `/prumo:briefing`.
 > Se este módulo conflitar com um resumo em `SKILL.md`, este módulo vence.
@@ -44,7 +44,11 @@ Antes do panorama, o briefing deve tentar checar atualização do Prumo.
    - avisar a limitação;
    - não bloquear o briefing;
    - permitir seguir com `b)`.
-5. Se a checagem falhar, registrar em uma linha e seguir. O briefing não pode virar refém de updater manco.
+5. Se `Prumo/VERSION` local for maior que o `prumo_version` do `PRUMO-CORE.md` do workspace:
+   - tratar isso como motor do workspace defasado;
+   - avisar explicitamente antes do panorama;
+   - não fingir briefing normal em cima de core velho.
+6. Se a checagem falhar, registrar em uma linha e seguir. O briefing não pode virar refém de updater manco.
 
 ## Passo 3: Estado operacional
 

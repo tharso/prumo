@@ -7,6 +7,8 @@ from prumo_runtime.workspace import workspace_overview
 
 
 def render_markdown(payload: dict) -> str:
+    google = payload["google_integration"]
+    connected = ", ".join(google["connected_profiles"]) or "nenhum"
     lines = [
         "# Prumo context-dump",
         "",
@@ -17,6 +19,9 @@ def render_markdown(payload: dict) -> str:
         f"- Core do workspace: `{payload['core_version'] or 'ausente'}`",
         f"- Schema: `{payload['schema_version']}`",
         f"- Core defasado: `{'sim' if payload['core_outdated'] else 'nao'}`",
+        f"- Google: `{google['status']}`",
+        f"- Perfil Google ativo: `{google['active_profile']}`",
+        f"- Perfis Google conectados: `{connected}`",
         "",
         "## Missing",
         "",

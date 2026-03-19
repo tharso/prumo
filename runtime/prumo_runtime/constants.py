@@ -35,6 +35,7 @@ AUTHORIAL_FILES = (
 DERIVED_FILES = (
     "_state/workspace-schema.json",
     "_state/briefing-state.json",
+    "_state/google-integration.json",
     "Inbox4Mobile/_processed.json",
 )
 

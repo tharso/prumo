@@ -4,6 +4,7 @@ import argparse
 
 from prumo_runtime import __version__
 from prumo_runtime.commands import (
+    run_auth_google,
     run_briefing,
     run_context_dump,
     run_migrate,
@@ -26,6 +27,37 @@ def build_parser() -> argparse.ArgumentParser:
     setup.add_argument("--timezone", default="America/Sao_Paulo", help="Fuso IANA")
     setup.add_argument("--briefing-time", default="09:00", help="Horario preferido do briefing")
     setup.set_defaults(handler=run_setup)
+
+    auth = subparsers.add_parser("auth", help="Conectar integracoes externas ao runtime")
+    auth_subparsers = auth.add_subparsers(dest="auth_provider", required=True)
+
+    auth_google = auth_subparsers.add_parser("google", help="Conectar Google via browser OAuth")
+    auth_google.add_argument("--workspace", required=True, help="Caminho do workspace")
+    auth_google.add_argument(
+        "--client-secrets",
+        required=True,
+        help="JSON OAuth do Google Desktop App (nao comita isso, por favor)",
+    )
+    auth_google.add_argument(
+        "--profile",
+        default="pessoal",
+        choices=["pessoal", "trabalho"],
+        help="Perfil logico da conta no workspace",
+    )
+    auth_google.add_argument(
+        "--timeout",
+        type=int,
+        default=180,
+        help="Segundos esperando o callback do navegador",
+    )
+    auth_google.add_argument(
+        "--no-open",
+        action="store_true",
+        help="Nao abre o navegador automaticamente; so imprime a URL",
+    )
+    auth_google.add_argument("--auth-uri", help=argparse.SUPPRESS)
+    auth_google.add_argument("--token-uri", help=argparse.SUPPRESS)
+    auth_google.set_defaults(handler=run_auth_google)
 
     migrate = subparsers.add_parser("migrate", help="Adotar um workspace legado no trilho novo")
     migrate.add_argument("--workspace", required=True, help="Caminho do workspace")

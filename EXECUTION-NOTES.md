@@ -25,6 +25,27 @@ Fase 1 passa a ser validada sem depender do plugin. O plugin vira adapter futuro
 
 Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
 
+## 2026-03-19 — Browser auth direto entrou como fundacao da integracao Google
+
+### Descoberta
+
+Se a direcao arquitetural e Google API direta, fazia pouco sentido continuar sem uma porta de entrada oficial para consentimento do usuario. Estavamos com o canteiro de obra pronto e sem portao.
+
+### Por que importa
+
+Sem `auth` explicito, o runtime continuaria dependendo de atalhos e improvisos para qualquer integracao real com Calendar ou Gmail. Isso e arquitetura de palco: parece pronta de frente, mas atras so tem madeira e prego torto.
+
+### Decisao
+
+Entrou `prumo auth google`:
+
+1. abre o navegador para OAuth direto com Google;
+2. grava apenas estado/metadado em `_state/google-integration.json`;
+3. envia token sensivel para o Keychain no macOS;
+4. assume `pessoal` como perfil padrao nesta fase.
+
+Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
+
 ## 2026-03-19 — O briefing local funciona; o gargalo era a coleta dual
 
 ### Descoberta

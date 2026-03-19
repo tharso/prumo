@@ -20,6 +20,7 @@ from prumo_runtime.constants import (
     repo_root_from,
 )
 from prumo_runtime import templates
+from prumo_runtime.google_integration import google_integration_summary, render_google_integration_json
 
 
 def now_iso(timezone_name: str) -> str:
@@ -102,6 +103,7 @@ def render_files(config: WorkspaceConfig) -> dict[str, str]:
         "IDEIAS.md": templates.render_ideias_md(),
         "Referencias/INDICE.md": templates.render_referencias_md(setup_date),
         "_state/briefing-state.json": templates.render_briefing_state_json(),
+        "_state/google-integration.json": render_google_integration_json(config.workspace),
         "Inbox4Mobile/_processed.json": templates.render_inbox_processed_json(),
     }
 
@@ -418,6 +420,7 @@ def workspace_overview(workspace: Path) -> dict:
         "workspace_created_at": schema.get("created_at", ""),
         "core_version": core_version or "",
         "core_outdated": bool(core_version and core_key < runtime_key),
+        "google_integration": google_integration_summary(workspace),
         "missing": missing,
         "pauta_exists": (workspace / "PAUTA.md").exists(),
         "inbox_exists": (workspace / "INBOX.md").exists(),

@@ -28,13 +28,14 @@ A Fase 1 inclui apenas:
 1. `prumo setup`
 2. `prumo migrate`
 3. `prumo snapshot-refresh`
-4. `prumo briefing`
-5. `prumo context-dump`
-6. `prumo repair`
-7. adapter experimental do Cowork
-8. fluxo de update do runtime local
-9. trilha minima de migracao do workspace
-10. trilha minima de documentacao de execucao
+4. `prumo auth google`
+5. `prumo briefing`
+6. `prumo context-dump`
+7. `prumo repair`
+8. adapter experimental do Cowork
+9. fluxo de update do runtime local
+10. trilha minima de migracao do workspace
+11. trilha minima de documentacao de execucao
 
 Fora da Fase 1:
 
@@ -217,6 +218,23 @@ Responsabilidade:
 2. desacoplar coleta externa da resposta do briefing;
 3. permitir automação futura sem obrigar o usuário a esperar integração ao vivo toda manhã;
 4. registrar com honestidade quando a fonte viva falhar e quando o runtime estiver só reaproveitando memória local.
+
+### 5.5. `prumo auth google`
+
+Responsabilidade:
+
+1. abrir autenticacao Google no navegador;
+2. conectar a conta principal do workspace sem depender de host externo;
+3. guardar metadado de integracao no workspace;
+4. guardar token sensivel fora do workspace, em storage seguro local;
+5. deixar explicito qual conta e quais escopos foram conectados.
+
+Diretriz:
+
+1. na Fase 1, a conta principal padrao continua sendo `pessoal`;
+2. o workspace guarda estado e metadado, nao credencial em texto puro;
+3. no macOS, o storage sensivel vai para o Keychain;
+4. multi-conta continua backlog, nao pretexto para atrasar o primeiro cano que precisa funcionar.
 
 ### 5.5. `prumo context-dump`
 

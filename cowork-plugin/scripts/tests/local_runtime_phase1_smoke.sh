@@ -24,6 +24,8 @@ assert_contains() {
 
 mkdir -p "$WORKSPACE"
 
+PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime auth google --help >/dev/null
+
 PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime setup \
   --workspace "$WORKSPACE" \
   --user-name "Tharso" \
@@ -37,6 +39,7 @@ PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime setup \
 [[ -f "$WORKSPACE/PRUMO-CORE.md" ]] || fail "PRUMO-CORE.md nao foi criado"
 [[ -f "$WORKSPACE/Agente/INDEX.md" ]] || fail "Agente/INDEX.md nao foi criado"
 [[ -f "$WORKSPACE/_state/workspace-schema.json" ]] || fail "workspace-schema.json nao foi criado"
+[[ -f "$WORKSPACE/_state/google-integration.json" ]] || fail "google-integration.json nao foi criado"
 
 PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime context-dump \
   --workspace "$WORKSPACE" \
@@ -44,15 +47,19 @@ PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime context-dump \
 
 assert_contains "$TMP_DIR/context.json" "\"user_name\": \"Tharso\"" "context-dump nao expôs user_name"
 assert_contains "$TMP_DIR/context.json" "\"core_outdated\": false" "context-dump marcou core outdated sem motivo"
+assert_contains "$TMP_DIR/context.json" "\"google_integration\"" "context-dump nao expôs o bloco de integracao Google"
+assert_contains "$TMP_DIR/context.json" "\"status\": \"disconnected\"" "integracao Google deveria nascer desconectada"
 
 rm "$WORKSPACE/CLAUDE.md"
 rm "$WORKSPACE/_state/briefing-state.json"
+rm "$WORKSPACE/_state/google-integration.json"
 
 PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime repair \
   --workspace "$WORKSPACE" >"$TMP_DIR/repair.out"
 
 [[ -f "$WORKSPACE/CLAUDE.md" ]] || fail "repair nao recriou CLAUDE.md"
 [[ -f "$WORKSPACE/_state/briefing-state.json" ]] || fail "repair nao recriou briefing-state.json"
+[[ -f "$WORKSPACE/_state/google-integration.json" ]] || fail "repair nao recriou google-integration.json"
 
 cat >"$WORKSPACE/PAUTA.md" <<'EOF'
 # Pauta

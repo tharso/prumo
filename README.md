@@ -2,7 +2,7 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.9.5**
+Versão atual: **4.10.0**
 
 Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
 
@@ -78,6 +78,7 @@ Depois:
 ```bash
 prumo setup --workspace /caminho/do/workspace
 prumo migrate --workspace /caminho/do/workspace
+prumo auth google --workspace /caminho/do/workspace --client-secrets /caminho/do/client_secret.json
 prumo snapshot-refresh --workspace /caminho/do/workspace
 prumo snapshot-refresh --workspace /caminho/do/workspace --profile pessoal
 prumo context-dump --workspace /caminho/do/workspace --format json
@@ -90,6 +91,12 @@ Esse trilho cria:
 1. `AGENT.md` como índice canônico do workspace;
 2. `CLAUDE.md` e `AGENTS.md` como wrappers regeneráveis;
 3. `Agente/` como diretório modular do contexto do usuário.
+
+E agora também deixa uma fundação decente para integrações:
+
+1. `_state/google-integration.json` guarda estado e metadado da conexão;
+2. token sensível fica fora do workspace, em storage seguro local;
+3. no macOS, o runtime usa o Keychain em vez de largar refresh token no chão.
 
 E deixa uma coisa explícita, porque software adora esconder isso em rodapé: se você desinstalar o Prumo, seus arquivos continuam seus, legíveis e no mesmo lugar.
 
@@ -114,6 +121,14 @@ prumo snapshot-refresh --workspace /caminho/do/workspace
 Esse comando tenta atualizar o cache local de snapshot dual. O briefing passa a preferir esse cache por padrão, em vez de bancar o herói toda vez que a integração externa decide atrasar.
 
 Na Fase 1, o runtime assume um perfil Google principal (`pessoal`) por padrão. Multi-conta ficou para depois. Antes de querer dois fogões, convém fazer um acender sem drama.
+
+Para conectar Google direto no runtime:
+
+```bash
+prumo auth google --workspace /caminho/do/workspace --client-secrets /caminho/do/client_secret.json
+```
+
+Esse fluxo abre o navegador, pede consentimento e grava só metadado no workspace. Credencial sensível vai para o Keychain. Não porque o Prumo seja dono do segredo, mas porque guardar refresh token em Markdown seria a forma mais criativa de chamar imprudência de transparência.
 
 Descobertas tecnicas que mudam direcao agora ficam registradas em `EXECUTION-NOTES.md`. O objetivo e simples: nao repetir a mesma escavacao toda vez que um host resolver brincar de labirinto.
 
@@ -209,7 +224,7 @@ Se o painel do app disser que atualizou, mas o plugin continuar em versão velha
 
 ## Versão
 
-Versão atual: `4.9.5`
+Versão atual: `4.10.0`
 
 ## Licença
 

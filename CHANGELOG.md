@@ -4,6 +4,17 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.10.0] - 2026-03-19
+
+### Added
+- Novo comando `prumo auth google` para conectar a conta Google via navegador, sem depender de host externo como atravessador.
+- Novo arquivo derivado `_state/google-integration.json` para guardar estado e metadado da integração Google dentro do workspace.
+
+### Changed
+- `prumo context-dump` agora expõe o estado da integração Google, o perfil ativo e os perfis conectados, em vez de tratar isso como segredo de porão.
+- `setup`, `migrate` e `repair` passam a materializar e reconstruir `_state/google-integration.json` quando necessário.
+- O runtime, no macOS, passa a guardar token sensível no Keychain em vez de largar credencial em texto puro no workspace.
+
 ## [4.9.5] - 2026-03-19
 
 ### Added

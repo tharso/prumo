@@ -11,7 +11,7 @@ GEMINI_TIMEOUT_SEC="${GEMINI_TIMEOUT_SEC:-15}"
 if [[ -n "${PRUMO_GEMINI_PROFILES:-}" ]]; then
   IFS=',' read -r -a PROFILES <<<"${PRUMO_GEMINI_PROFILES}"
 else
-  PROFILES=("pessoal" "trabalho")
+  PROFILES=("pessoal")
 fi
 MCP_NAME="google-workspace"
 MODE="${1:-snapshot}"

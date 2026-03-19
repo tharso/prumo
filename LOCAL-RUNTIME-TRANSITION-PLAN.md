@@ -7,6 +7,7 @@ Relacionado:
 - Issue pública: [#40](https://github.com/tharso/prumo/issues/40)
 - Contexto atual: [PLUGIN-MIGRATION-PHASES.md](/Users/tharsovieira/Documents/DailyLife/Prumo/PLUGIN-MIGRATION-PHASES.md)
 - Operação atual do Cowork: [COWORK-MARKETPLACE-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/COWORK-MARKETPLACE-PLAYBOOK.md)
+- Decisão de integração Google: [ADR-001-GOOGLE-INTEGRATION.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ADR-001-GOOGLE-INTEGRATION.md)
 
 ## 1. Problema que estamos realmente tentando resolver
 

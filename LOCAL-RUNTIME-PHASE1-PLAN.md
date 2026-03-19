@@ -6,6 +6,7 @@ Relacionado:
 
 1. [LOCAL-RUNTIME-TRANSITION-PLAN.md](/Users/tharsovieira/Documents/DailyLife/Prumo/LOCAL-RUNTIME-TRANSITION-PLAN.md)
 2. Issue publica base: [#40](https://github.com/tharso/prumo/issues/40)
+3. [ADR-001-GOOGLE-INTEGRATION.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ADR-001-GOOGLE-INTEGRATION.md)
 
 ## 1. Objetivo da Fase 1
 

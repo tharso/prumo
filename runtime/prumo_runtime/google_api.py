@@ -26,6 +26,14 @@ LOW_SIGNAL_SENDER_RE = re.compile(
     r"(no-?reply|newsletter|notifications?|google alerts|medium daily digest|substack|beehiiv|mailchimp|noreply)",
     re.IGNORECASE,
 )
+LOW_SIGNAL_SUBJECT_RE = re.compile(
+    r"(upgraded to a paid google cloud account|terms of service|receipt|invoice|newsletter|daily digest|billing profile|faturamento recebido|welcome to google cloud)",
+    re.IGNORECASE,
+)
+ACTIONABLE_SUBJECT_RE = re.compile(
+    r"(urgente|cancelad|cancelamento|erro|problema|faltando|verifica|verification|codigo|c[oó]digo|recovery|recupera|ajuste|confirm|deadline|prazo|falhou|failed|rejeitad|suspens|compra)",
+    re.IGNORECASE,
+)
 
 
 def connected_google_profile(workspace: Path, preferred_profile: str | None = None) -> str | None:
@@ -217,7 +225,12 @@ def compact_message_time(detail: dict, timezone_name: str) -> str:
 
 def is_low_signal_sender(sender: str, subject: str, headers: dict[str, str]) -> bool:
     haystack = " ".join([sender, subject, headers.get("list-id", ""), headers.get("precedence", "")])
-    return bool(LOW_SIGNAL_SENDER_RE.search(haystack))
+    return bool(LOW_SIGNAL_SENDER_RE.search(haystack) or LOW_SIGNAL_SUBJECT_RE.search(subject))
+
+
+def is_actionable_subject(subject: str, snippet: str = "") -> bool:
+    haystack = f"{subject} {snippet}".strip()
+    return bool(ACTIONABLE_SUBJECT_RE.search(haystack))
 
 
 def compact_sender(sender: str) -> str:
@@ -250,7 +263,8 @@ def fetch_gmail_triage(access_token: str, workspace: Path, timezone_name: str) -
         snippet = str(detail.get("snippet") or "").replace("\n", " ").strip()
         if len(snippet) > 60:
             snippet = snippet[:57] + "..."
-        rendered = f"P2 | {compact_message_time(detail, timezone_name)} | {sender} | {subject} | {snippet or 'sem preview'}"
+        priority = "P1" if is_actionable_subject(subject, snippet) else "P2"
+        rendered = f"{priority} | {compact_message_time(detail, timezone_name)} | {sender} | {subject} | {snippet or 'sem preview'}"
         if is_low_signal_sender(headers.get("from", ""), subject, headers):
             no_action_items.append(rendered)
         else:

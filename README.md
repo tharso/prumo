@@ -2,7 +2,7 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.11.0**
+Versão atual: **4.11.1**
 
 Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
 
@@ -79,6 +79,7 @@ Depois:
 prumo setup --workspace /caminho/do/workspace
 prumo migrate --workspace /caminho/do/workspace
 prumo auth google --workspace /caminho/do/workspace --client-secrets /caminho/do/client_secret.json
+prumo auth google --workspace /caminho/do/workspace --client-id SEU_CLIENT_ID --client-secret SEU_CLIENT_SECRET
 prumo snapshot-refresh --workspace /caminho/do/workspace
 prumo snapshot-refresh --workspace /caminho/do/workspace --profile pessoal
 prumo context-dump --workspace /caminho/do/workspace --format json
@@ -128,9 +129,12 @@ Para conectar Google direto no runtime:
 
 ```bash
 prumo auth google --workspace /caminho/do/workspace --client-secrets /caminho/do/client_secret.json
+prumo auth google --workspace /caminho/do/workspace --client-id SEU_CLIENT_ID --client-secret SEU_CLIENT_SECRET
 ```
 
 Esse fluxo abre o navegador, pede consentimento e grava só metadado no workspace. Credencial sensível vai para o Keychain. Não porque o Prumo seja dono do segredo, mas porque guardar refresh token em Markdown seria a forma mais criativa de chamar imprudência de transparência.
+
+Se o Google Console resolver esconder o download do JSON como se fosse herança de família, o runtime também aceita `--client-id` e `--client-secret` diretamente. Produto bom não devia depender do humor de uma UI barroca.
 
 Descobertas tecnicas que mudam direcao agora ficam registradas em `EXECUTION-NOTES.md`. O objetivo e simples: nao repetir a mesma escavacao toda vez que um host resolver brincar de labirinto.
 
@@ -226,7 +230,7 @@ Se o painel do app disser que atualizou, mas o plugin continuar em versão velha
 
 ## Versão
 
-Versão atual: `4.11.0`
+Versão atual: `4.11.1`
 
 ## Licença
 

@@ -4,6 +4,10 @@ imgs/
 dist/
 docs/TESTE_*.md
 docs/TESTE_*.csv
+_secrets/
+client_secret*.json
+credentials*.json
+google-oauth-client.json
 
 # Materiais internos (não publicar no repositório de produto)
 Prumo-Ideias-e-Possibilidades.pdf

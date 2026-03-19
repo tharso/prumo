@@ -6,6 +6,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from prumo_runtime.commands.briefing import (
+    choose_proposal,
+    is_actionworthy_triage_item,
     load_snapshot_cache,
     resolve_snapshot_data,
     summarize_emails,
@@ -123,6 +125,32 @@ class BriefingSnapshotTests(unittest.TestCase):
             }
         )
         self.assertEqual(rendered, "email direto ainda nao entrou")
+
+    def test_choose_proposal_ignores_low_signal_email_before_andamento(self) -> None:
+        proposal = choose_proposal(
+            [],
+            [],
+            ["Decidir abertura de empresa"],
+            {
+                "profiles": {
+                    "pessoal": {
+                        "triage_reply": [],
+                        "triage_view": [
+                            "P2 | 19:23 | Google Cloud | You have upgraded to a paid Google Cloud account | Explore full access"
+                        ],
+                    }
+                }
+            },
+        )
+        self.assertEqual(proposal, "Decidir abertura de empresa")
+
+    def test_actionworthy_triage_item_accepts_p1_and_rejects_billing_noise(self) -> None:
+        self.assertTrue(is_actionworthy_triage_item("P1 | 09:00 | Danilo | Ajuste urgente no site | revisar"))
+        self.assertFalse(
+            is_actionworthy_triage_item(
+                "P2 | 19:23 | Google Cloud | You have upgraded to a paid Google Cloud account | Explore full access"
+            )
+        )
 
 
 if __name__ == "__main__":

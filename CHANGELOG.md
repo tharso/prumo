@@ -4,6 +4,17 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.11.1] - 2026-03-19
+
+### Added
+- `prumo auth google` agora aceita `--client-id` e `--client-secret` diretamente, sem obrigar o usuário a caçar JSON no labirinto do Google Cloud.
+- Novo teste unitário `runtime/tests/test_auth_google.py` cobrindo resolução de credenciais por flags e por arquivo.
+
+### Changed
+- `.gitignore` agora ignora `_secrets/`, `client_secret*.json`, `credentials*.json` e afins. Segredo em repositório é só autobiografia do desastre.
+- A proposta do dia do briefing deixou de tratar email banal de billing/upgrade como bússola moral quando já existe trabalho real na pauta.
+- A triagem Gmail ganhou um pouco mais de faro: assunto com cheiro de ação sobe para `P1`; notificação burocrática evidente cai para ruído.
+
 ## [4.11.0] - 2026-03-19
 
 ### Added

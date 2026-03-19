@@ -235,6 +235,7 @@ Diretriz:
 2. o workspace guarda estado e metadado, nao credencial em texto puro;
 3. no macOS, o storage sensivel vai para o Keychain;
 4. multi-conta continua backlog, nao pretexto para atrasar o primeiro cano que precisa funcionar.
+5. o onboarding nao pode depender exclusivamente de download de JSON pelo Google Cloud; `client_id` + `client_secret` diretos tambem sao trilho aceitavel quando a UI resolver brincar de esconde-esconde.
 
 ### 5.6. Coleta Google direta na Fase 1
 

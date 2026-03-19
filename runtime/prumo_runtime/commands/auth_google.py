@@ -68,8 +68,36 @@ def load_client_secrets(path: Path) -> dict:
         "client_secret": client_secret,
         "auth_uri": auth_uri,
         "token_uri": token_uri,
+        "project_id": str(block.get("project_id") or "").strip(),
         "source_path": str(path),
     }
+
+
+def resolve_client_config(args) -> dict:
+    if args.client_id:
+        client_id = str(args.client_id).strip()
+        client_secret = str(args.client_secret or "").strip()
+        if not client_secret:
+            raise WorkspaceError("faltou --client-secret; so o client_id nao abre porta nenhuma")
+        return {
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "auth_uri": str(args.auth_uri or DEFAULT_AUTH_URI).strip(),
+            "token_uri": str(args.token_uri or DEFAULT_TOKEN_URI).strip(),
+            "project_id": str(args.project_id or "").strip(),
+            "source_path": "inline-flags",
+        }
+
+    if not args.client_secrets:
+        raise WorkspaceError(
+            "informe --client-secrets ou o par --client-id/--client-secret; adivinhacao OAuth nao entrou no roadmap"
+        )
+
+    client_secrets_path = Path(args.client_secrets).expanduser().resolve()
+    client = load_client_secrets(client_secrets_path)
+    if args.project_id:
+        client["project_id"] = str(args.project_id).strip()
+    return client
 
 
 class OAuthCallbackServer(ThreadingHTTPServer):
@@ -181,8 +209,7 @@ def run_auth_google(args) -> int:
     workspace = Path(args.workspace).expanduser().resolve()
     config = build_config_from_existing(workspace)
 
-    client_secrets_path = Path(args.client_secrets).expanduser().resolve()
-    client = load_client_secrets(client_secrets_path)
+    client = resolve_client_config(args)
     profile = args.profile or DEFAULT_GOOGLE_PROFILE
     profile_state = default_profile_state(workspace, profile)
     scopes = list(profile_state["scopes"] or DEFAULT_GOOGLE_SCOPES)
@@ -271,6 +298,7 @@ def run_auth_google(args) -> int:
     print(f"- Conta: {account_email or 'nao foi possivel extrair email do id_token'}")
     print(f"- Escopos: {len(scopes)}")
     print(f"- Token storage: {stored['type']} ({stored['service']} / {stored['account']})")
+    print(f"- Credencial: {client['source_path']}")
     print("")
     print("Próximos passos:")
     print("1. Rode `prumo context-dump --workspace ... --format json` para conferir o estado da integração.")

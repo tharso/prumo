@@ -15,6 +15,7 @@ from prumo_runtime.google_api import (
     format_event_time,
     gmail_since_query,
     header_map,
+    is_actionable_subject,
     is_low_signal_sender,
 )
 
@@ -53,6 +54,10 @@ class GoogleApiParsingTests(unittest.TestCase):
                 {},
             )
         )
+
+    def test_actionable_subject_detects_real_action_language(self) -> None:
+        self.assertTrue(is_actionable_subject("Ajuste urgente no site", "precisa revisar hoje"))
+        self.assertFalse(is_actionable_subject("You have upgraded to a paid Google Cloud account", "Explore full access"))
 
     def test_compact_message_time_uses_internal_date(self) -> None:
         detail = {"internalDate": "1768870800000", "payload": {"headers": []}}
@@ -177,6 +182,7 @@ class GoogleApiParsingTests(unittest.TestCase):
             self.assertEqual(len(view_items), 1)
             self.assertEqual(len(no_action_items), 1)
             self.assertIn("Ajuste urgente no site", view_items[0])
+            self.assertTrue(view_items[0].startswith("P1 |"))
             self.assertIn("Gmail API", email_note)
 
 

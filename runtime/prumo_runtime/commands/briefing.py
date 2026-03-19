@@ -483,6 +483,22 @@ def compact_triage_item(value: str) -> str:
     return value
 
 
+def is_actionworthy_triage_item(value: str) -> bool:
+    lowered = value.lower()
+    if lowered.startswith("p1 |"):
+        return True
+    low_signal_hints = (
+        "upgraded to a paid google cloud account",
+        "terms of service",
+        "billing profile",
+        "newsletter",
+        "daily digest",
+        "faturamento recebido",
+        "welcome to google cloud",
+    )
+    return not any(hint in lowered for hint in low_signal_hints)
+
+
 def summarize_emails(snapshot: dict) -> str:
     email_note = snapshot.get("email_note")
     if snapshot.get("ok_profiles", 0) == 0:
@@ -543,14 +559,21 @@ def build_inbox_line(workspace: Path, inbox_text: str, preview: dict) -> str:
 def choose_proposal(quente: list[str], agendado: list[str], andamento: list[str], snapshot: dict) -> str:
     if quente:
         return quente[0]
-    for profile in snapshot.get("profiles", {}).values():
-        triage = profile.get("triage_reply", []) or profile.get("triage_view", [])
-        if triage:
-            return compact_triage_item(triage[0])
     if agendado:
         return agendado[0]
+    for profile in snapshot.get("profiles", {}).values():
+        triage_reply = profile.get("triage_reply", []) or []
+        if triage_reply:
+            return compact_triage_item(triage_reply[0])
+        triage = [item for item in (profile.get("triage_view", []) or []) if is_actionworthy_triage_item(item)]
+        if triage:
+            return compact_triage_item(triage[0])
     if andamento:
         return andamento[0]
+    for profile in snapshot.get("profiles", {}).values():
+        triage_view = profile.get("triage_view", []) or []
+        if triage_view:
+            return compact_triage_item(triage_view[0])
     return "Fazer um dump real de pendências antes que o sistema vire paisagem."
 
 

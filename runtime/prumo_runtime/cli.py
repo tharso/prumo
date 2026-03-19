@@ -35,9 +35,11 @@ def build_parser() -> argparse.ArgumentParser:
     auth_google.add_argument("--workspace", required=True, help="Caminho do workspace")
     auth_google.add_argument(
         "--client-secrets",
-        required=True,
         help="JSON OAuth do Google Desktop App (nao comita isso, por favor)",
     )
+    auth_google.add_argument("--client-id", help="Client ID OAuth do Google Desktop App")
+    auth_google.add_argument("--client-secret", help="Client secret OAuth do Google Desktop App")
+    auth_google.add_argument("--project-id", help="Project ID Google (opcional, para metadado)")
     auth_google.add_argument(
         "--profile",
         default="pessoal",

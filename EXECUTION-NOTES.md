@@ -185,3 +185,62 @@ Entrou cobertura unitaria em `runtime/tests/` para quatro frentes:
 4. manutencao dos smokes como cerca de fluxo.
 
 Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
+
+## 2026-03-19 — O Google Console escondeu o JSON; o runtime parou de depender disso
+
+### Descoberta
+
+No fluxo real, o Google Auth Platform deixou o download do JSON menos acessivel e o client secret passou a aparecer como segredo gerado e mascarado. Isso transforma um onboarding simples numa gincana de UI.
+
+### Por que importa
+
+Se o produto depende de o usuario baixar um arquivo que o proprio console trata como reliquia, o problema deixa de ser "documentacao ruim" e vira acoplamento estupido a um fluxo externo caprichoso.
+
+### Decisao
+
+`prumo auth google` agora aceita dois caminhos:
+
+1. `--client-secrets` com JSON;
+2. `--client-id` + `--client-secret` diretamente.
+
+Tambem blindamos o repo para `_secrets/`, `client_secret*.json` e `credentials*.json`, porque segredo versionado e so um vazamento que aprendeu Git.
+
+Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
+
+## 2026-03-19 — O Calendar API funcionou; a heuristica de proposta e que estava com faro torto
+
+### Descoberta
+
+No laboratorio `aVida`, a integracao direta finalmente trouxe agenda e email reais. O gargalo saiu da infraestrutura e mudou de andar: a `Proposta do dia` ainda conseguia puxar notificacao burocratica do Google Cloud como se fosse norte estrategico.
+
+### Por que importa
+
+Quando o produto escolhe um email banal como foco principal, ele nao parece cauteloso. Parece desorientado. E desorientacao com tom confiante e o jeito mais rapido de matar credibilidade.
+
+### Decisao
+
+1. billing/upgrade/ToS e parentes agora contam mais como ruido do que como estrela do palco;
+2. itens `P1` e temas com cheiro real de acao ganham prioridade;
+3. a proposta do dia passa a preferir pauta real antes de email `ver` que nao seja claramente acionavel.
+
+Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
+
+## 2026-03-19 — A UI do Google Calendar mostrou um item all-day que nao apareceu na Events API
+
+### Descoberta
+
+No laboratorio `aVida`, a integracao direta com Calendar API trouxe os eventos cronometrados corretos do dia, inclusive o jantar `Faísca c/ Flavio & Cris`. Mas a UI do Google Calendar tambem mostrava um item de dia inteiro ("Vai renovar a assinatura da Folha...") que nao apareceu no snapshot nem no briefing.
+
+### Por que importa
+
+Isso sugere um limite real do escopo atual: o briefing local pode estar lendo bem eventos de Calendar e ainda assim deixar passar itens exibidos na UI do Google Calendar que venham de outra fonte (por exemplo Tasks/Reminders ou calendario fora do recorte atual). Sem explicitar isso, o produto parece errado quando na verdade esta so olhando para uma fonte mais estreita.
+
+### Decisao
+
+Nao chamar isso de bug de formatacao. Tratar como gap de cobertura de fonte e deixar em backlog de integracoes:
+
+1. validar se o item ausente vem de Google Tasks/Reminders;
+2. decidir se Tasks entram como fonte formal do briefing em etapa futura;
+3. enquanto isso, manter a comunicacao honesta: a Fase 1 cobre Calendar API e Gmail API, nao a cosmologia inteira da interface do Google.
+
+Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)

@@ -76,12 +76,50 @@ cat >"$WORKSPACE/INBOX.md" <<'EOF'
 - [Email] Responder fornecedor.
 EOF
 
+mkdir -p "$WORKSPACE/Inbox4Mobile"
+cat >"$WORKSPACE/Inbox4Mobile/19 de mar. de 2026, 08:01_text.txt" <<'EOF'
+https://youtu.be/QT7W_uHjqWE
+EOF
+
+cat >"$TMP_DIR/fake_snapshot.sh" <<'EOF'
+#!/usr/bin/env bash
+cat <<'OUT'
+# Snapshot Google (Prumo Briefing)
+## Perfil: pessoal
+- GEMINI_CLI_HOME: /tmp/pessoal
+- Status: OK
+CONTA: batata@example.com
+AGENDA_HOJE:
+- 20:00-22:00 | pessoal | Jantar de teste
+AGENDA_AMANHA:
+- nenhum
+EMAILS_DESDE_ULTIMO_BRIEFING_TOTAL: 3
+TRIAGEM_RESPONDER:
+- P1 | 09:30 | Financeiro | Boleto pendente | pagar hoje
+TRIAGEM_VER:
+- P2 | 10:00 | Produto | Atualizacao de status | leitura rapida
+TRIAGEM_SEM_ACAO:
+- P3 | 11:00 | News | Newsletter | sem acao
+ERROS:
+- nenhum
+OUT
+EOF
+chmod +x "$TMP_DIR/fake_snapshot.sh"
+
+PRUMO_RUNTIME_SNAPSHOT_SCRIPT="$TMP_DIR/fake_snapshot.sh" \
 PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime briefing \
   --workspace "$WORKSPACE" >"$TMP_DIR/briefing.out"
 
 assert_contains "$TMP_DIR/briefing.out" "1. Preflight:" "briefing nao começou com preflight numerado"
-assert_contains "$TMP_DIR/briefing.out" "2. Quente:" "briefing nao manteve numeracao continua"
+assert_contains "$TMP_DIR/briefing.out" "2. Agenda:" "briefing nao trouxe agenda consolidada"
+assert_contains "$TMP_DIR/briefing.out" "Jantar de teste" "briefing nao incorporou snapshot dual"
+assert_contains "$TMP_DIR/briefing.out" "3. Inbox mobile:" "briefing nao trouxe bloco de inbox mobile"
+assert_contains "$TMP_DIR/briefing.out" "inbox-preview.html" "briefing nao linkou o preview do inbox"
+assert_contains "$TMP_DIR/briefing.out" "4. Emails:" "briefing nao trouxe bloco de emails"
+assert_contains "$TMP_DIR/briefing.out" "Responder: 1" "briefing nao resumiu a triagem de emails"
+assert_contains "$TMP_DIR/briefing.out" "5. Panorama local:" "briefing nao trouxe panorama local"
 assert_contains "$TMP_DIR/briefing.out" "6. Proposta do dia:" "briefing nao chegou ao bloco final com numeracao continua"
-assert_contains "$TMP_DIR/briefing.out" "a) ver a pauta detalhada" "briefing nao ofereceu alternativas"
+assert_contains "$TMP_DIR/briefing.out" "a) Aceitar e seguir" "briefing nao ofereceu a opcao a)"
+assert_contains "$TMP_DIR/briefing.out" "d) Tá bom por hoje" "briefing nao ofereceu a opcao d)"
 
 echo "ok: local runtime phase1 smoke"

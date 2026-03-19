@@ -1,16 +1,22 @@
 from __future__ import annotations
 
+import os
+from shutil import which as shutil_which
+import subprocess
+import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
+from prumo_runtime.constants import RUNTIME_VERSION, repo_root_from
 from prumo_runtime.workspace import (
     build_config_from_existing,
     extract_section,
+    load_json,
     parse_core_version,
     read_text,
     semantic_version_key,
     update_briefing_state,
 )
-from prumo_runtime.constants import RUNTIME_VERSION
 
 
 def list_or_placeholder(items: list[str], fallback: str) -> str:
@@ -32,18 +38,374 @@ def count_inbox_items(inbox_text: str) -> int:
     return count
 
 
+def find_existing_path(candidates: list[Path]) -> Path | None:
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def load_processed_filenames(workspace: Path) -> set[str]:
+    payload = load_json(workspace / "Inbox4Mobile" / "_processed.json")
+    items = payload.get("items", [])
+    names: set[str] = set()
+    if isinstance(items, list):
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            filename = item.get("filename")
+            if isinstance(filename, str) and filename.strip():
+                names.add(filename.strip())
+    return names
+
+
+def preview_script_path(repo_root: Path | None) -> Path | None:
+    if repo_root is None:
+        return None
+    return find_existing_path(
+        [
+            repo_root / "cowork-plugin" / "scripts" / "generate_inbox_preview.py",
+            repo_root / "scripts" / "generate_inbox_preview.py",
+        ]
+    )
+
+
+def snapshot_script_path(workspace: Path, repo_root: Path | None) -> Path | None:
+    env_path = os.environ.get("PRUMO_RUNTIME_SNAPSHOT_SCRIPT")
+    candidates: list[Path] = []
+    if env_path:
+        candidates.append(Path(env_path).expanduser())
+    candidates.append(workspace / "scripts" / "prumo_google_dual_snapshot.sh")
+    if repo_root is not None:
+        candidates.append(
+            repo_root
+            / "cowork-plugin"
+            / "skills"
+            / "prumo"
+            / "references"
+            / "prumo-google-dual-snapshot.sh"
+        )
+    return find_existing_path(candidates)
+
+
+def infer_domain(url: str | None) -> str | None:
+    if not url:
+        return None
+    try:
+        host = urlparse(url).netloc.lower()
+    except ValueError:
+        return None
+    return host.replace("www.", "") or None
+
+
+def summarize_text_preview(path: Path) -> str:
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        text = path.read_text(encoding="latin-1", errors="replace")
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped:
+            if len(stripped) > 120:
+                return stripped[:117] + "..."
+            return stripped
+    return path.name
+
+
+def summarize_inbox_entry(entry: dict) -> str:
+    filename = str(entry.get("filename") or "item sem nome")
+    kind = str(entry.get("kind") or "arquivo")
+    absolute_path = entry.get("absolute_path")
+    first_url = entry.get("first_url")
+    domain = infer_domain(first_url)
+
+    if kind == "image":
+        return f"{filename} (imagem/captura)"
+    if kind == "pdf":
+        return f"{filename} (PDF)"
+    if kind == "text" and isinstance(absolute_path, str):
+        path = Path(absolute_path)
+        if path.exists():
+            preview = summarize_text_preview(path)
+            if domain:
+                return f"{filename}: {preview} ({domain})"
+            return f"{filename}: {preview}"
+    if domain:
+        return f"{filename} ({domain})"
+    return filename
+
+
+def load_inbox_preview(workspace: Path, repo_root: Path | None) -> dict:
+    inbox_dir = workspace / "Inbox4Mobile"
+    preview_path = inbox_dir / "inbox-preview.html"
+    index_path = inbox_dir / "_preview-index.json"
+    processed = load_processed_filenames(workspace)
+    preview_status = "ausente"
+    preview_note = ""
+
+    if inbox_dir.exists():
+        script_path = preview_script_path(repo_root)
+        if script_path is not None:
+            try:
+                subprocess.run(
+                    [
+                        sys.executable,
+                        str(script_path),
+                        "--inbox-dir",
+                        str(inbox_dir),
+                        "--output",
+                        str(preview_path),
+                        "--index-output",
+                        str(index_path),
+                    ],
+                    cwd=str(workspace),
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    timeout=20,
+                )
+                preview_status = "gerado"
+            except Exception:
+                if preview_path.exists() and index_path.exists():
+                    preview_status = "stale"
+                    preview_note = "preview reaproveitado; a regeneração falhou e o resultado pode estar defasado."
+                else:
+                    preview_status = "falhou"
+                    preview_note = "preview indisponível; segui sem vitrine."
+
+    payload = load_json(index_path)
+    raw_items = payload.get("items", [])
+    items: list[dict] = []
+    if isinstance(raw_items, list):
+        for item in raw_items:
+            if not isinstance(item, dict):
+                continue
+            filename = item.get("filename")
+            if isinstance(filename, str) and filename in processed:
+                continue
+            items.append(item)
+
+    return {
+        "status": preview_status,
+        "note": preview_note,
+        "preview_path": preview_path,
+        "index_path": index_path,
+        "count": len(items),
+        "items": items,
+    }
+
+
+def parse_snapshot_output(output: str) -> dict:
+    result = {"profiles": {}, "ok_profiles": 0}
+    current_profile: str | None = None
+    current_section: str | None = None
+
+    for raw_line in output.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if line.startswith("## Perfil:"):
+            current_profile = line.split(":", 1)[1].strip()
+            result["profiles"][current_profile] = {
+                "status": "unknown",
+                "account": "desconhecido",
+                "agenda_today": [],
+                "agenda_tomorrow": [],
+                "emails_total": 0,
+                "triage_reply": [],
+                "triage_view": [],
+                "triage_no_action": [],
+                "errors": [],
+            }
+            current_section = None
+            continue
+        if current_profile is None:
+            continue
+
+        profile = result["profiles"][current_profile]
+        if line.startswith("- Status:"):
+            status = line.split(":", 1)[1].strip()
+            profile["status"] = status
+            if status.startswith("OK") or status.startswith("AVISO"):
+                result["ok_profiles"] += 1
+            continue
+        if line.startswith("CONTA:"):
+            profile["account"] = line.split(":", 1)[1].strip()
+            continue
+        if line.startswith("EMAILS_DESDE_ULTIMO_BRIEFING_TOTAL:"):
+            raw_value = line.split(":", 1)[1].strip()
+            try:
+                profile["emails_total"] = int(raw_value)
+            except ValueError:
+                profile["emails_total"] = 0
+            continue
+        if line.endswith(":") and line in {
+            "AGENDA_HOJE:",
+            "AGENDA_AMANHA:",
+            "TRIAGEM_RESPONDER:",
+            "TRIAGEM_VER:",
+            "TRIAGEM_SEM_ACAO:",
+            "ERROS:",
+        }:
+            current_section = line[:-1]
+            continue
+        if line.startswith("- ") and current_section:
+            payload = line[2:].strip()
+            if current_section == "AGENDA_HOJE":
+                profile["agenda_today"].append(payload)
+            elif current_section == "AGENDA_AMANHA":
+                profile["agenda_tomorrow"].append(payload)
+            elif current_section == "TRIAGEM_RESPONDER":
+                profile["triage_reply"].append(payload)
+            elif current_section == "TRIAGEM_VER":
+                profile["triage_view"].append(payload)
+            elif current_section == "TRIAGEM_SEM_ACAO":
+                profile["triage_no_action"].append(payload)
+            elif current_section == "ERROS" and payload.lower() != "nenhum":
+                profile["errors"].append(payload)
+
+    return result
+
+
+def run_dual_snapshot(workspace: Path, repo_root: Path | None) -> dict:
+    if os.environ.get("PRUMO_RUNTIME_DISABLE_SNAPSHOT") == "1":
+        return {"status": "disabled", "note": "snapshot dual desligado por ambiente", "profiles": {}, "ok_profiles": 0}
+
+    script_path = snapshot_script_path(workspace, repo_root)
+    if script_path is None:
+        return {"status": "unavailable", "note": "script dual indisponível", "profiles": {}, "ok_profiles": 0}
+
+    if shutil_which("gemini") is None:
+        return {"status": "unavailable", "note": "gemini CLI ausente; sem snapshot dual", "profiles": {}, "ok_profiles": 0}
+
+    env = os.environ.copy()
+    env["TZ_NAME"] = env.get("TZ_NAME", "America/Sao_Paulo")
+    env["STATE_FILE"] = str(workspace / "_state" / "briefing-state.json")
+    env["GEMINI_TIMEOUT_SEC"] = env.get("GEMINI_TIMEOUT_SEC", "8")
+
+    try:
+        completed = subprocess.run(
+            ["bash", str(script_path)],
+            cwd=str(workspace),
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=12,
+            env=env,
+        )
+    except subprocess.TimeoutExpired:
+        return {"status": "timeout", "note": "snapshot dual passou do limite e foi deixado pra lá", "profiles": {}, "ok_profiles": 0}
+    except subprocess.CalledProcessError as exc:
+        output = (exc.stdout or "") + ("\n" + exc.stderr if exc.stderr else "")
+        parsed = parse_snapshot_output(output)
+        parsed["status"] = "partial" if parsed.get("ok_profiles") else "error"
+        parsed["note"] = "snapshot dual respondeu torto; preservei o que prestava." if parsed.get("ok_profiles") else "snapshot dual falhou."
+        return parsed
+
+    parsed = parse_snapshot_output(completed.stdout)
+    parsed["status"] = "ok" if parsed.get("ok_profiles") else "empty"
+    parsed["note"] = "snapshot dual sem contas úteis." if not parsed.get("ok_profiles") else ""
+    return parsed
+
+
+def summarize_agenda(snapshot: dict) -> str:
+    items: list[str] = []
+    for profile_name, profile in snapshot.get("profiles", {}).items():
+        for event in profile.get("agenda_today", [])[:3]:
+            items.append(f"[{profile_name}] {event}")
+    if not items:
+        note = snapshot.get("note") or "Sem agenda consolidada via snapshot local."
+        return note
+    return "; ".join(items[:4])
+
+
+def compact_triage_item(value: str) -> str:
+    parts = [part.strip() for part in value.split("|")]
+    if len(parts) >= 4:
+        return f"{parts[0]} {parts[2]} — {parts[3]}"
+    return value
+
+
+def summarize_emails(snapshot: dict) -> str:
+    if snapshot.get("ok_profiles", 0) == 0:
+        note = snapshot.get("note") or "Sem email consolidado via snapshot local."
+        return note
+
+    total = 0
+    reply: list[str] = []
+    view: list[str] = []
+    no_action = 0
+    for profile in snapshot.get("profiles", {}).values():
+        total += int(profile.get("emails_total") or 0)
+        reply.extend(profile.get("triage_reply", []))
+        view.extend(profile.get("triage_view", []))
+        no_action += len(profile.get("triage_no_action", []))
+
+    highlights = [compact_triage_item(item) for item in (reply + view)[:3]]
+    parts = [
+        f"{total} email(ns) desde a última janela",
+        f"Responder: {len(reply)}",
+        f"Ver: {len(view)}",
+        f"Sem ação: {no_action}",
+    ]
+    if highlights:
+        parts.append("Destaques: " + "; ".join(highlights))
+    return ". ".join(parts) + "."
+
+
+def build_inbox_line(workspace: Path, inbox_text: str, preview: dict) -> str:
+    inbox_count = count_inbox_items(inbox_text)
+    preview_count = int(preview.get("count") or 0)
+    preview_path = preview.get("preview_path")
+    preview_hint = ""
+    if isinstance(preview_path, Path) and preview_path.exists():
+        preview_hint = f" Preview: `{preview_path}`."
+
+    if preview_count == 0 and (preview.get("status") in {"gerado", "stale"}):
+        note = preview.get("note") or "Inbox4Mobile sem itens novos."
+        return f"Inbox4Mobile: 0 item(ns). {note}{preview_hint}".strip()
+
+    if preview_count == 0:
+        if inbox_count == 0 or "_Inbox limpo._" in inbox_text:
+            return "Inbox4Mobile: 0 item(ns). Inbox limpa."
+        return f"INBOX.md acusa {inbox_count} item(ns), mas o preview local não trouxe vitrine.{preview_hint}"
+
+    top_items = [summarize_inbox_entry(item) for item in preview.get("items", [])[:3]]
+    summary = "; ".join(top_items) if top_items else "há item, mas sem resumo leve decente."
+    note = f" {preview.get('note')}" if preview.get("note") else ""
+    return f"Inbox4Mobile: {preview_count} item(ns). {summary}.{note}{preview_hint}"
+
+
+def choose_proposal(quente: list[str], agendado: list[str], andamento: list[str], snapshot: dict) -> str:
+    if quente:
+        return quente[0]
+    for profile in snapshot.get("profiles", {}).values():
+        triage = profile.get("triage_reply", []) or profile.get("triage_view", [])
+        if triage:
+            return compact_triage_item(triage[0])
+    if agendado:
+        return agendado[0]
+    if andamento:
+        return andamento[0]
+    return "Fazer um dump real de pendências antes que o sistema vire paisagem."
+
+
 def run_briefing(args) -> int:
     workspace = Path(args.workspace).expanduser().resolve()
     config = build_config_from_existing(workspace)
-    update_briefing_state(workspace, config.timezone_name)
+    repo_root = repo_root_from(Path(__file__))
 
     pauta_text = read_text(workspace / "PAUTA.md")
     inbox_text = read_text(workspace / "INBOX.md")
     quente = extract_section(pauta_text, "Quente (precisa de atenção agora)")
     andamento = extract_section(pauta_text, "Em andamento")
     agendado = extract_section(pauta_text, "Agendado / Lembretes")
-    inbox_count = count_inbox_items(inbox_text)
-    inbox_clean = "_Inbox limpo._" in inbox_text or inbox_count == 0
+
+    preview = load_inbox_preview(workspace, repo_root)
+    snapshot = run_dual_snapshot(workspace, repo_root)
+
+    update_briefing_state(workspace, config.timezone_name)
+
     core_version = parse_core_version(workspace)
     core_outdated = bool(core_version and semantic_version_key(core_version) < semantic_version_key(RUNTIME_VERSION))
 
@@ -59,37 +421,29 @@ def run_briefing(args) -> int:
         lines.append(f"{n}. Preflight: runtime e workspace parecem minimamente alinhados.")
     n += 1
 
-    lines.append(f"{n}. Quente: {len(quente)} item(ns). {list_or_placeholder(quente, 'Nada pegando fogo agora.')}")
+    lines.append(f"{n}. Agenda: {summarize_agenda(snapshot)}")
     n += 1
 
-    lines.append(
-        f"{n}. Em andamento: {len(andamento)} item(ns). "
-        f"{list_or_placeholder(andamento, 'Sem tração registrada no momento.')}"
-    )
+    lines.append(f"{n}. Inbox mobile: {build_inbox_line(workspace, inbox_text, preview)}")
     n += 1
 
-    lines.append(
-        f"{n}. Agendado: {len(agendado)} item(ns). "
-        f"{list_or_placeholder(agendado, 'Nenhum lembrete gritando por data neste instante.')}"
-    )
+    lines.append(f"{n}. Emails: {summarize_emails(snapshot)}")
     n += 1
 
-    inbox_summary = "Inbox limpa." if inbox_clean else f"Inbox com {inbox_count} item(ns) pendente(s)."
-    lines.append(f"{n}. Inbox: {inbox_summary}")
+    pauta_parts = [
+        f"Quente {len(quente)}",
+        f"Em andamento {len(andamento)}",
+        f"Agendado {len(agendado)}",
+    ]
+    hottest = list_or_placeholder(quente or andamento or agendado, "Pauta sem tração aparente.")
+    lines.append(f"{n}. Panorama local: {' | '.join(pauta_parts)}. {hottest}")
     n += 1
 
-    if quente:
-        proposal = quente[0]
-    elif agendado:
-        proposal = agendado[0]
-    elif andamento:
-        proposal = andamento[0]
-    else:
-        proposal = "Fazer um dump real de pendências antes que o sistema vire paisagem."
-
+    proposal = choose_proposal(quente, agendado, andamento, snapshot)
     lines.append(f"{n}. Proposta do dia: atacar primeiro `{proposal}`.")
-    lines.append("a) ver a pauta detalhada")
-    lines.append("b) seguir com a proposta do dia")
-    lines.append("c) rodar repair se algo parecer fora do lugar")
+    lines.append("a) Aceitar e seguir")
+    lines.append("b) Ajustar")
+    lines.append("c) Ver lista completa")
+    lines.append("d) Tá bom por hoje")
     print("\n".join(lines))
     return 0

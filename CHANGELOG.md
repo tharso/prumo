@@ -4,6 +4,16 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.9.1] - 2026-03-19
+
+### Changed
+- O `prumo briefing` do runtime local deixou de ser só um leitor tímido de `PAUTA.md`. Agora ele tenta gerar preview de `Inbox4Mobile`, reaproveita `_preview-index.json`, tenta o snapshot dual com timeout curto e organiza o panorama em blocos mais próximos do briefing real.
+- O fallback do snapshot dual ficou civilizado: se o script demorar, o briefing o abandona sem transformar a manhã do usuário em retiro espiritual.
+- O módulo `runtime-paths.md` agora deixa explícito que `scripts/prumo_google_dual_snapshot.sh` pode existir como artefato gerado no workspace enquanto o repo guarda o template/fallback em `references/`.
+
+### Added
+- O smoke `local_runtime_phase1_smoke.sh` agora cobre agenda via snapshot fake, preview de inbox e saída com opções `a)` a `d)` no briefing local.
+
 ## [4.9.0] - 2026-03-19
 
 ### Added

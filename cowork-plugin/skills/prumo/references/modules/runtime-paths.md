@@ -1,6 +1,6 @@
 # Runtime Paths
 
-> **module_version: 4.9.0**
+> **module_version: 4.9.1**
 >
 > Fonte canônica dos paths válidos de scripts no runtime do Prumo.
 
@@ -13,6 +13,11 @@ Resolver scripts nesta ordem:
 3. `Prumo/scripts/`
 
 ## Scripts oficiais
+
+Observação importante:
+
+1. alguns scripts existem como artefato gerado no workspace do usuário (ex.: `scripts/prumo_google_dual_snapshot.sh`);
+2. o repo também pode carregar um template/fallback canônico do mesmo script em `cowork-plugin/skills/prumo/references/`.
 
 - `prumo_auto_sanitize.py`
 - `prumo_archive_cold_files.py`

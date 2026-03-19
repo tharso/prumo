@@ -59,7 +59,8 @@ python3 "$ROOT_DIR/scripts/prumo_cowork_bridge.py" \
   --command briefing >"$TMP_DIR/bridge-ok.out"
 
 assert_contains "$TMP_DIR/bridge-ok.out" "1. Preflight:" "bridge nao devolveu saida do runtime"
-assert_contains "$TMP_DIR/bridge-ok.out" "6. Proposta do dia:" "bridge nao manteve briefing completo"
+assert_contains "$TMP_DIR/bridge-ok.out" "2. Google:" "bridge nao trouxe status da integracao Google"
+assert_contains "$TMP_DIR/bridge-ok.out" "7. Proposta do dia:" "bridge nao manteve briefing completo"
 
 set +e
 python3 "$ROOT_DIR/scripts/prumo_cowork_bridge.py" \

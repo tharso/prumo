@@ -2,7 +2,7 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.11.1**
+Versão atual: **4.11.2**
 
 Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
 
@@ -136,6 +136,13 @@ Esse fluxo abre o navegador, pede consentimento e grava só metadado no workspac
 
 Se o Google Console resolver esconder o download do JSON como se fosse herança de família, o runtime também aceita `--client-id` e `--client-secret` diretamente. Produto bom não devia depender do humor de uma UI barroca.
 
+Depois de conectado, o `briefing` mostra explicitamente:
+
+1. status da integração Google;
+2. conta ativa;
+3. último refresh útil;
+4. caminho de reauth quando o token morrer.
+
 Descobertas tecnicas que mudam direcao agora ficam registradas em `EXECUTION-NOTES.md`. O objetivo e simples: nao repetir a mesma escavacao toda vez que um host resolver brincar de labirinto.
 
 ### Opção 3: Doctor e update do Cowork
@@ -230,7 +237,7 @@ Se o painel do app disser que atualizou, mas o plugin continuar em versão velha
 
 ## Versão
 
-Versão atual: `4.11.1`
+Versão atual: `4.11.2`
 
 ## Licença
 

@@ -244,3 +244,22 @@ Nao chamar isso de bug de formatacao. Tratar como gap de cobertura de fonte e de
 3. enquanto isso, manter a comunicacao honesta: a Fase 1 cobre Calendar API e Gmail API, nao a cosmologia inteira da interface do Google.
 
 Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
+
+## 2026-03-19 — Falha de token precisa parecer reauth, nao neblina
+
+### Descoberta
+
+Depois que a autenticacao direta finalmente funcionou, ficou obvio outro problema: quando o token morrer, o produto corre o risco de voltar a parecer "sem agenda" ou "sem email" sem dizer por que.
+
+### Por que importa
+
+Silencio operacional e so um bug que aprendeu etiqueta. Se o briefing nao disser quando a conexao esta viva, cansada ou morta, o usuario volta a discutir com sintoma.
+
+### Decisao
+
+1. o briefing passa a mostrar status explicito da integracao Google;
+2. `invalid_grant` e equivalentes marcam o perfil como `needs_reauth`;
+3. o briefing manda o usuario para `prumo auth google --workspace ...` quando necessario;
+4. email vazio vira mensagem humana (`Nenhum email novo...`), nao silencio constrangedor.
+
+Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,6 +11,7 @@ from prumo_runtime.commands.briefing import (
     is_actionworthy_triage_item,
     load_snapshot_cache,
     resolve_snapshot_data,
+    summarize_google_status,
     summarize_emails,
     write_snapshot_cache,
 )
@@ -125,6 +127,72 @@ class BriefingSnapshotTests(unittest.TestCase):
             }
         )
         self.assertEqual(rendered, "email direto ainda nao entrou")
+
+    def test_summarize_emails_explicitly_reports_zero_messages(self) -> None:
+        rendered = summarize_emails(
+            {
+                "ok_profiles": 1,
+                "profiles": {
+                    "pessoal": {
+                        "emails_total": 0,
+                        "triage_reply": [],
+                        "triage_view": [],
+                        "triage_no_action": [],
+                    }
+                },
+                "email_note": "Gmail API respondeu vazio; pelo menos desta vez foi vazio honesto.",
+            }
+        )
+        self.assertIn("Nenhum email novo", rendered)
+        self.assertIn("Gmail API respondeu vazio", rendered)
+
+    def test_summarize_google_status_reports_refresh_and_reauth(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            state_dir = workspace / "_state"
+            state_dir.mkdir(parents=True, exist_ok=True)
+            (state_dir / "google-integration.json").write_text(
+                json.dumps(
+                    {
+                        "status": "connected",
+                        "active_profile": "pessoal",
+                        "profiles": {
+                            "pessoal": {
+                                "status": "connected",
+                                "account_email": "batata@example.com",
+                                "last_authenticated_at": "2026-03-19T19:53:00-03:00",
+                                "last_refresh_at": "2026-03-19T20:03:00-03:00",
+                                "last_error": "",
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            rendered = summarize_google_status(workspace, "America/Sao_Paulo")
+            self.assertIn("conectado", rendered)
+            self.assertIn("batata@example.com", rendered)
+            self.assertIn("20:03", rendered)
+
+            (state_dir / "google-integration.json").write_text(
+                json.dumps(
+                    {
+                        "status": "needs_reauth",
+                        "active_profile": "pessoal",
+                        "profiles": {
+                            "pessoal": {
+                                "status": "needs_reauth",
+                                "account_email": "batata@example.com",
+                                "last_error": "Google pediu reautenticacao.",
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            rendered = summarize_google_status(workspace, "America/Sao_Paulo")
+            self.assertIn("precisa reautenticar", rendered)
+            self.assertIn("prumo auth google", rendered)
 
     def test_choose_proposal_ignores_low_signal_email_before_andamento(self) -> None:
         proposal = choose_proposal(

@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 
 from prumo_runtime.constants import RUNTIME_VERSION, repo_root_from
 from prumo_runtime.google_api import connected_google_profile, fetch_google_workspace_snapshot
+from prumo_runtime.google_integration import google_integration_summary
 from prumo_runtime.workspace import (
     build_config_from_existing,
     extract_section,
@@ -115,6 +116,13 @@ def age_in_minutes(value: str | None, timezone_name: str) -> int | None:
         return None
     now = datetime.now(ZoneInfo(timezone_name))
     return max(0, int((now - dt_value).total_seconds() // 60))
+
+
+def short_clock(value: str | None, timezone_name: str) -> str | None:
+    dt_value = parse_iso_datetime(value)
+    if dt_value is None:
+        return None
+    return dt_value.astimezone(ZoneInfo(timezone_name)).strftime("%H:%M")
 
 
 def infer_domain(url: str | None) -> str | None:
@@ -345,7 +353,21 @@ def resolve_snapshot_data(
     cached = load_snapshot_cache(workspace, timezone_name)
     if cached and not refresh_snapshot:
         return cached
+    google = google_integration_summary(workspace)
     connected_profile = connected_google_profile(workspace)
+    if not connected_profile and google.get("active_profile_status") == "needs_reauth":
+        note = "Google pediu reautenticacao; rode `prumo auth google --workspace ...`."
+        if cached:
+            cached["note"] = f"{cached['note']} {note}"
+            return cached
+        return {
+            "status": "needs_reauth",
+            "note": note,
+            "email_note": "Nenhum email novo por enquanto; a integracao Google esta pedindo reauth.",
+            "profiles": {},
+            "ok_profiles": 0,
+            "source": "google-direct-api",
+        }
     if connected_profile:
         try:
             direct_snapshot = fetch_google_workspace_snapshot(
@@ -515,6 +537,10 @@ def summarize_emails(snapshot: dict) -> str:
         view.extend(profile.get("triage_view", []))
         no_action += len(profile.get("triage_no_action", []))
 
+    if total == 0:
+        note = email_note or "Gmail API respondeu vazio; pelo menos desta vez foi vazio honesto."
+        return f"Nenhum email novo desde a ultima janela. {note}"
+
     highlights = [compact_triage_item(item) for item in (reply + view)[:3]]
     parts = [
         f"{total} email(ns) desde a última janela",
@@ -531,6 +557,35 @@ def summarize_emails(snapshot: dict) -> str:
         if note:
             parts.append(note)
     return ". ".join(parts) + "."
+
+
+def summarize_google_status(workspace: Path, timezone_name: str) -> str:
+    google = google_integration_summary(workspace)
+    status = str(google.get("active_profile_status") or google.get("status") or "disconnected")
+    account = str(google.get("active_account_email") or "").strip()
+    last_refresh = short_clock(str(google.get("active_last_refresh_at") or ""), timezone_name)
+    last_auth = short_clock(str(google.get("active_last_authenticated_at") or ""), timezone_name)
+    last_error = str(google.get("active_last_error") or "").strip()
+
+    if status == "connected":
+        who = account or str(google.get("active_profile") or "perfil ativo")
+        if last_refresh:
+            return f"conectado ({who}, ultimo refresh {last_refresh})"
+        if last_auth:
+            return f"conectado ({who}, auth {last_auth})"
+        return f"conectado ({who})"
+
+    if status == "needs_reauth":
+        who = account or str(google.get("active_profile") or "perfil ativo")
+        detail = f" precisa reautenticar ({who})"
+        if last_error:
+            detail = f"{detail}. {last_error}"
+        return detail + " Rode `prumo auth google --workspace ...`."
+
+    if status == "disconnected":
+        return "desconectado. Rode `prumo auth google --workspace ...` se quiser agenda e email diretos."
+
+    return f"{status}. Rode `prumo context-dump --workspace ... --format json` antes de chutar a parede."
 
 
 def build_inbox_line(workspace: Path, inbox_text: str, preview: dict) -> str:
@@ -610,6 +665,9 @@ def run_briefing(args) -> int:
         )
     else:
         lines.append(f"{n}. Preflight: runtime e workspace parecem minimamente alinhados.")
+    n += 1
+
+    lines.append(f"{n}. Google: {summarize_google_status(workspace, config.timezone_name)}")
     n += 1
 
     lines.append(f"{n}. Agenda: {summarize_agenda(snapshot)}")

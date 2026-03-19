@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import io
+import json
 import tempfile
 import unittest
+import urllib.error
 from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
@@ -13,11 +16,13 @@ from prumo_runtime.google_api import (
     fetch_calendar_events,
     fetch_gmail_triage,
     format_event_time,
+    refresh_google_access_token,
     gmail_since_query,
     header_map,
     is_actionable_subject,
     is_low_signal_sender,
 )
+from prumo_runtime.workspace import WorkspaceError
 
 
 class GoogleApiParsingTests(unittest.TestCase):
@@ -184,6 +189,56 @@ class GoogleApiParsingTests(unittest.TestCase):
             self.assertIn("Ajuste urgente no site", view_items[0])
             self.assertTrue(view_items[0].startswith("P1 |"))
             self.assertIn("Gmail API", email_note)
+
+    @patch("prumo_runtime.google_api.update_profile_state")
+    @patch("prumo_runtime.google_api.load_google_integration")
+    @patch("prumo_runtime.google_api.load_oauth_bundle_from_keychain")
+    @patch("urllib.request.urlopen")
+    def test_refresh_google_access_token_marks_profile_needs_reauth_on_invalid_grant(
+        self,
+        mock_urlopen,
+        mock_load_bundle,
+        mock_load_integration,
+        mock_update_profile,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            mock_load_bundle.return_value = {
+                "oauth_client": {
+                    "client_id": "client-id",
+                    "client_secret": "client-secret",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                },
+                "token_payload": {
+                    "refresh_token": "refresh-token",
+                },
+            }
+            mock_load_integration.return_value = {
+                "profiles": {
+                    "pessoal": {
+                        "account_email": "batata@example.com",
+                        "scopes": ["openid", "email"],
+                    }
+                }
+            }
+            mock_urlopen.side_effect = urllib.error.HTTPError(
+                url="https://oauth2.googleapis.com/token",
+                code=400,
+                msg="Bad Request",
+                hdrs=None,
+                fp=io.BytesIO(
+                    json.dumps({"error": "invalid_grant", "error_description": "Token expired"}).encode("utf-8")
+                ),
+            )
+
+            with self.assertRaises(WorkspaceError):
+                refresh_google_access_token(workspace, "pessoal", "America/Sao_Paulo")
+
+            mock_update_profile.assert_called_once()
+            kwargs = mock_update_profile.call_args.kwargs
+            self.assertEqual(kwargs["status"], "needs_reauth")
+            self.assertEqual(kwargs["account_email"], "batata@example.com")
+            self.assertIn("auth", kwargs["last_error"].lower())
 
 
 if __name__ == "__main__":

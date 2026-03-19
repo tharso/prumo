@@ -9,6 +9,7 @@ from unittest.mock import patch
 from prumo_runtime.google_integration import (
     DEFAULT_GOOGLE_PROFILE,
     default_google_integration_payload,
+    google_integration_summary,
     load_google_integration,
     resolve_token_storage,
     update_profile_state,
@@ -69,6 +70,26 @@ class GoogleIntegrationTests(unittest.TestCase):
             self.assertEqual(profile["account_email"], "batata@example.com")
             self.assertEqual(profile["last_authenticated_at"], "2026-03-19T12:00:00-03:00")
             self.assertEqual(profile["last_refresh_at"], "2026-03-19T12:05:00-03:00")
+            self.assertEqual(profile["last_error"], "")
+
+    def test_google_integration_summary_exposes_active_profile_details(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            update_profile_state(
+                workspace,
+                "pessoal",
+                status="needs_reauth",
+                account_email="batata@example.com",
+                scopes=["openid", "email"],
+                last_authenticated_at="2026-03-19T19:53:00-03:00",
+                last_refresh_at="2026-03-19T20:03:00-03:00",
+                last_error="Google pediu reauth.",
+            )
+            payload = google_integration_summary(workspace)
+            self.assertEqual(payload["active_profile_status"], "needs_reauth")
+            self.assertEqual(payload["active_account_email"], "batata@example.com")
+            self.assertEqual(payload["active_last_refresh_at"], "2026-03-19T20:03:00-03:00")
+            self.assertEqual(payload["active_last_error"], "Google pediu reauth.")
 
     @patch("prumo_runtime.google_integration.keychain_supported", return_value=True)
     def test_resolve_token_storage_prefers_saved_storage(self, _mock_supported) -> None:

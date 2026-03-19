@@ -244,7 +244,8 @@ Responsabilidade:
 1. usar Calendar API direta como fonte primaria de agenda quando houver conta conectada;
 2. usar Gmail API direta como fonte primaria de email quando houver conta conectada;
 3. manter o cache local como trilho normal do briefing;
-4. deixar o fallback anterior vivo enquanto a fonte nova ainda esta ganhando musculo.
+4. deixar o fallback anterior vivo enquanto a fonte nova ainda esta ganhando musculo;
+5. expor no briefing o estado da integracao Google e o caminho de reauth quando o token cansar.
 
 Guardrails:
 
@@ -252,7 +253,7 @@ Guardrails:
 2. o briefing deve dizer de onde vieram agenda e email;
 3. se a fonte direta falhar, o runtime cai para cache ou snapshot dual em vez de fingir onisciencia.
 
-### 5.5. `prumo context-dump`
+### 5.7. `prumo context-dump`
 
 Responsabilidade:
 
@@ -484,6 +485,8 @@ Escopo minimo desejado:
 4. testar conexao, credenciais e freshness de snapshot;
 5. explicitar fallback e prioridade de fontes sem exigir fe do usuario;
 6. manter tudo local, auditavel e desinstalavel sem levar embora dado do usuario.
+7. incluir Google Tasks API como proxima fonte formal para cobrir itens all-day que a `events.list` nao enxerga;
+8. tratar Reminders como fora de escopo ate aparecer uma rota menos pantanosa.
 
 Nao objetivo:
 

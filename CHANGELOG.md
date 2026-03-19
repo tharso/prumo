@@ -4,6 +4,17 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.11.2] - 2026-03-19
+
+### Added
+- O briefing local agora mostra explicitamente o estado da integração Google, a conta ativa e o último refresh útil.
+- Quando o refresh token do Google azeda, o runtime marca o perfil como `needs_reauth` em vez de deixar a falha virar neblina.
+
+### Changed
+- A seção `Emails` do briefing passou a dizer `Nenhum email novo...` quando a Gmail API vier limpa. Silêncio com cara de bug foi demitido.
+- O briefing passou a indicar o caminho de reauth (`prumo auth google --workspace ...`) quando a integração Google precisar ser refeita.
+- Os smokes do runtime/bridge foram alinhados ao briefing com bloco explícito `Google`.
+
 ## [4.11.1] - 2026-03-19
 
 ### Added

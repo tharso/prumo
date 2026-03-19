@@ -286,6 +286,7 @@ def run_auth_google(args) -> int:
         account_email=account_email,
         scopes=scopes,
         last_authenticated_at=now_iso(config.timezone_name),
+        last_error="",
     )
     payload["profiles"][profile]["token_storage"] = stored
     payload["status"] = "connected"

@@ -17,6 +17,7 @@ DEFAULT_GOOGLE_SCOPES = (
     "https://www.googleapis.com/auth/gmail.readonly",
 )
 KEYCHAIN_SERVICE_PREFIX = "me.prumo.google.oauth"
+UNSET = object()
 
 
 def keychain_supported() -> bool:
@@ -65,6 +66,7 @@ def default_profile_state(workspace: Path, profile: str = DEFAULT_GOOGLE_PROFILE
         "scopes": list(DEFAULT_GOOGLE_SCOPES),
         "last_authenticated_at": "",
         "last_refresh_at": "",
+        "last_error": "",
         "source": "browser-oauth",
         "token_storage": storage,
     }
@@ -130,6 +132,7 @@ def update_profile_state(
     scopes: list[str] | None = None,
     last_authenticated_at: str = "",
     last_refresh_at: str = "",
+    last_error: str | None | object = UNSET,
 ) -> dict:
     payload = load_google_integration(workspace)
     profile_payload = payload["profiles"].get(profile, default_profile_state(workspace, profile))
@@ -143,6 +146,8 @@ def update_profile_state(
             "source": "browser-oauth",
         }
     )
+    if last_error is not UNSET:
+        profile_payload["last_error"] = str(last_error or "").strip()
     payload["profiles"][profile] = profile_payload
     payload["active_profile"] = profile
     payload["status"] = "connected" if any(
@@ -155,6 +160,8 @@ def update_profile_state(
 def google_integration_summary(workspace: Path) -> dict:
     payload = load_google_integration(workspace)
     profiles = payload.get("profiles") or {}
+    active_profile = str(payload.get("active_profile") or DEFAULT_GOOGLE_PROFILE)
+    active_payload = profiles.get(active_profile) if isinstance(profiles.get(active_profile), dict) else {}
     connected_profiles = [
         name
         for name, profile_payload in profiles.items()
@@ -164,7 +171,12 @@ def google_integration_summary(workspace: Path) -> dict:
         "provider": payload.get("provider", "google"),
         "strategy": payload.get("strategy", "direct-google-api"),
         "status": payload.get("status", "disconnected"),
-        "active_profile": payload.get("active_profile", DEFAULT_GOOGLE_PROFILE),
+        "active_profile": active_profile,
+        "active_profile_status": str(active_payload.get("status") or "disconnected"),
+        "active_account_email": str(active_payload.get("account_email") or ""),
+        "active_last_authenticated_at": str(active_payload.get("last_authenticated_at") or ""),
+        "active_last_refresh_at": str(active_payload.get("last_refresh_at") or ""),
+        "active_last_error": str(active_payload.get("last_error") or ""),
         "connected_profiles": connected_profiles,
         "profiles": profiles,
         "token_storage_supported": keychain_supported(),

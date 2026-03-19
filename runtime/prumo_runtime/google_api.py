@@ -86,6 +86,27 @@ def refresh_google_access_token(workspace: Path, profile: str, timezone_name: st
             refreshed = json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
+        body_lower = body.lower()
+        if exc.code in {400, 401} and (
+            "invalid_grant" in body_lower
+            or "invalid_client" in body_lower
+            or "unauthorized_client" in body_lower
+        ):
+            integration = load_google_integration(workspace)
+            profile_payload = integration["profiles"].get(profile, {})
+            account_email = str(profile_payload.get("account_email") or "")
+            scopes = list(profile_payload.get("scopes") or [])
+            update_profile_state(
+                workspace,
+                profile,
+                status="needs_reauth",
+                account_email=account_email,
+                scopes=scopes,
+                last_error="Google recusou o refresh token; rode `prumo auth google --workspace ...` de novo.",
+            )
+            raise WorkspaceError(
+                "Google pediu reautenticacao; rode `prumo auth google --workspace ...` antes de culpar o briefing"
+            ) from exc
         raise WorkspaceError(f"falha refrescando token Google: HTTP {exc.code} {body}") from exc
 
     access_token = str(refreshed.get("access_token") or "").strip()
@@ -110,6 +131,7 @@ def refresh_google_access_token(workspace: Path, profile: str, timezone_name: st
         account_email=account_email,
         scopes=scopes,
         last_refresh_at=now_iso(timezone_name),
+        last_error="",
     )
     return access_token, integration["profiles"].get(profile, {})
 

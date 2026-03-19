@@ -4,6 +4,17 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.9.4] - 2026-03-19
+
+### Added
+- Novo `EXECUTION-NOTES.md` para registrar descobertas tecnicas que realmente mudam direcao. Nem amnesia de sessao, nem ata de condomínio.
+
+### Changed
+- O `snapshot-refresh` e o shell script dual deixaram de fazer um auth check textual redundante no Gemini antes de consultar o MCP.
+- A coleta dual agora roda os perfis em paralelo, porque esperar um de cada vez era um jeito bem elaborado de chamar lentidao de prudencia.
+- A janela de timeout do refresh explicito ficou um pouco mais realista para esse fluxo externo, sem transformar o briefing em retiro espiritual.
+- Quando o refresh estoura no meio, o runtime agora tenta preservar resultado parcial util em vez de jogar fora o que ja chegou.
+
 ## [4.9.3] - 2026-03-19
 
 ### Added

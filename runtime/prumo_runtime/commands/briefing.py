@@ -360,7 +360,8 @@ def run_dual_snapshot(workspace: Path, repo_root: Path | None) -> dict:
     env = os.environ.copy()
     env["TZ_NAME"] = env.get("TZ_NAME", "America/Sao_Paulo")
     env["STATE_FILE"] = str(workspace / "_state" / "briefing-state.json")
-    env["GEMINI_TIMEOUT_SEC"] = env.get("GEMINI_TIMEOUT_SEC", "8")
+    env["GEMINI_TIMEOUT_SEC"] = env.get("GEMINI_TIMEOUT_SEC", "15")
+    process_timeout = int(env.get("PRUMO_SNAPSHOT_PROCESS_TIMEOUT_SEC", "25"))
 
     try:
         completed = subprocess.run(
@@ -369,10 +370,19 @@ def run_dual_snapshot(workspace: Path, repo_root: Path | None) -> dict:
             check=True,
             capture_output=True,
             text=True,
-            timeout=12,
+            timeout=process_timeout,
             env=env,
         )
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as exc:
+        partial_output = exc.stdout or ""
+        if isinstance(partial_output, bytes):
+            partial_output = partial_output.decode("utf-8", errors="replace")
+        parsed = parse_snapshot_output(partial_output or "")
+        if parsed.get("ok_profiles"):
+            parsed["status"] = "partial"
+            parsed["note"] = "snapshot dual terminou pela metade; preservei o que chegou antes do estouro."
+            write_snapshot_cache(workspace, timezone_name, parsed)
+            return parsed
         cached = load_snapshot_cache(workspace, timezone_name)
         if cached:
             cached["note"] = f"{cached['note']} Fonte ao vivo passou do limite."

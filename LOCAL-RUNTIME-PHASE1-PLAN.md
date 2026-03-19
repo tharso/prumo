@@ -33,6 +33,7 @@ A Fase 1 inclui apenas:
 7. adapter experimental do Cowork
 8. fluxo de update do runtime local
 9. trilha minima de migracao do workspace
+10. trilha minima de documentacao de execucao
 
 Fora da Fase 1:
 
@@ -62,6 +63,7 @@ E se um usuario existente conseguir:
 2. detectar drift de core/workspace;
 3. regenerar wrappers ou arquivos recriaveis que sumiram;
 4. receber briefing coerente sem regressao grosseira de contrato.
+5. nao perder descobertas tecnicas que mudem direcao entre uma sessao e outra.
 
 ## 4. Decisoes tecnicas principais
 
@@ -319,6 +321,21 @@ Nao inclui, por obrigacao:
 1. toda conversa exploratoria;
 2. brainstorm sem consequencia;
 3. cada suspiro dramatico do host.
+
+### 6.5. Contrato de documentacao de execucao
+
+O projeto tambem precisa registrar descobertas tecnicas que mudem direcao, sem virar prontuario infinito de shell.
+
+Artefatos:
+
+1. `EXECUTION-NOTES.md` no repo para descobertas com valor duravel;
+2. comentario na issue de execucao correspondente quando a descoberta afetar roadmap, escopo ou estrategia.
+
+Regra:
+
+1. registrar apenas o que muda arquitetura, criterio de debug ou plano;
+2. nao registrar microteste sem valor futuro;
+3. preferir nota curta e util a ata de condomínio.
 
 ## 7. Estrategia de distribuicao da Fase 1
 

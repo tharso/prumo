@@ -6,9 +6,13 @@ PROFILE_BASE="${GEMINI_PROFILE_BASE:-$HOME/.gemini-profiles}"
 MAX_EMAILS="${MAX_EMAILS:-20}"
 FALLBACK_HOURS="${FALLBACK_HOURS:-24}"
 STATE_FILE="${STATE_FILE:-_state/briefing-state.json}"
-GEMINI_TIMEOUT_SEC="${GEMINI_TIMEOUT_SEC:-120}"
+GEMINI_TIMEOUT_SEC="${GEMINI_TIMEOUT_SEC:-15}"
 
-PROFILES=("pessoal" "trabalho")
+if [[ -n "${PRUMO_GEMINI_PROFILES:-}" ]]; then
+  IFS=',' read -r -a PROFILES <<<"${PRUMO_GEMINI_PROFILES}"
+else
+  PROFILES=("pessoal" "trabalho")
+fi
 MCP_NAME="google-workspace"
 MODE="${1:-snapshot}"
 
@@ -128,7 +132,7 @@ run_for_profile() {
   local output
   local cleaned_output
   local cmd_status
-  local auth_output
+  local mcp_output
 
   echo "## Perfil: ${profile}"
   echo "- GEMINI_CLI_HOME: ${profile_home}"
@@ -140,17 +144,20 @@ run_for_profile() {
   fi
 
   set +e
-  auth_output="$(GEMINI_CLI_HOME="$profile_home" run_gemini_query -p "Diga apenas OK" --output-format text 2>&1)"
+  mcp_output="$(GEMINI_CLI_HOME="$profile_home" run_gemini_query mcp list 2>&1)"
   cmd_status=$?
   set -e
-  if [[ $cmd_status -ne 0 ]] || ! printf "%s\n" "$auth_output" | grep -q "OK"; then
-    echo "- Status: ERRO (auth pendente/falha, codigo ${cmd_status})"
+  if [[ $cmd_status -ne 0 ]]; then
+    echo "- Status: ERRO (Gemini indisponivel/auth pendente, codigo ${cmd_status})"
     echo "- Acao: GEMINI_CLI_HOME=\"${profile_home}\" gemini"
+    if [[ -n "$mcp_output" ]]; then
+      printf "%s\n" "$mcp_output"
+    fi
     echo
     return
   fi
 
-  if ! GEMINI_CLI_HOME="$profile_home" gemini mcp list 2>&1 | grep -q "${MCP_NAME}:"; then
+  if ! printf "%s\n" "$mcp_output" | grep -q "${MCP_NAME}:"; then
     echo "- Status: ERRO (MCP '${MCP_NAME}' nao configurado)"
     echo "- Acao: GEMINI_CLI_HOME=\"${profile_home}\" gemini mcp add -s user -e GEMINI_CLI_WORKSPACE_FORCE_FILE_STORAGE=true ${MCP_NAME} npx -y @presto-ai/google-workspace-mcp"
     echo
@@ -190,6 +197,9 @@ run_for_profile() {
 
 main() {
   local i
+  local tmp_dir
+  local pids=()
+  local outputs=()
   require_cmd gemini
 
   if [[ "$MODE" == "--mark-briefing-complete" ]]; then
@@ -224,8 +234,18 @@ main() {
   echo "- Estado briefing: ${STATE_FILE}"
   echo
 
+  tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$tmp_dir"' EXIT
+
   for i in "${!PROFILES[@]}"; do
-    run_for_profile "${PROFILES[$i]}"
+    outputs+=("$tmp_dir/${PROFILES[$i]}.out")
+    run_for_profile "${PROFILES[$i]}" >"${outputs[$i]}" &
+    pids+=("$!")
+  done
+
+  for i in "${!outputs[@]}"; do
+    wait "${pids[$i]}"
+    cat "${outputs[$i]}"
   done
 
   echo "Proximo passo: apos finalizar o briefing, rode:"

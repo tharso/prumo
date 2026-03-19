@@ -164,3 +164,24 @@ Escopo ruim e um jeito sofisticado de sabotar produto nascente.
 Na Fase 1, o runtime assume um perfil Google principal (`pessoal`) por padrao. Multi-conta volta depois, quando o cano de uma conta so parar de vazar.
 
 Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
+
+## 2026-03-19 — A qualidade do runtime deixou de depender so de smoke
+
+### Descoberta
+
+Os smokes ja estavam pegando quebra grosseira, mas a base nova de Google API e fallback do briefing ainda ficava exposta a regressao silenciosa em funcao pequena: parser de email, merge de estado, cache do snapshot. Traduzindo: a cerca estava no terreno, nao nas janelas.
+
+### Por que importa
+
+Quando integracao externa e estado local se encontram, o produto costuma quebrar justamente no detalhe arrogante que "parecia obvio". Sem testes unitarios nos pontos certos, a gente so descobre isso depois que o usuario ja tomou na testa.
+
+### Decisao
+
+Entrou cobertura unitaria em `runtime/tests/` para quatro frentes:
+
+1. parser e triagem de `google_api.py`;
+2. serializacao/merge de `google_integration.py`;
+3. fallback e cache de `commands/briefing.py`;
+4. manutencao dos smokes como cerca de fluxo.
+
+Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)

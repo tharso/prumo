@@ -9,6 +9,7 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 ### Added
 - `snapshot-refresh` passou a usar Google Calendar API e Gmail API diretas quando houver conta conectada no runtime.
 - Novo smoke `local_runtime_google_calendar_smoke.sh` cobrindo refresh direto via Google APIs fake locais, com agenda e email.
+- Nova suíte unitária em `runtime/tests/` cobrindo parser Google, estado da integração e fallback/cache do briefing local.
 
 ### Changed
 - O briefing agora prefere cache abastecido por Google APIs diretas quando ele existir, sem perder o fallback anterior quando a fonte nova tropeçar.

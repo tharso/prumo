@@ -1,6 +1,6 @@
 # Prumo Core — Motor do sistema
 
-> **prumo_version: 4.8.0**
+> **prumo_version: 4.8.1**
 >
 > Este arquivo é o núcleo estável do Prumo.
 > Ele define regras, guardrails e a localização dos módulos canônicos.
@@ -69,6 +69,7 @@ Quando um comando específico for executado, o agente deve ler o módulo corresp
 | Sanitização | `Prumo/cowork-plugin/skills/prumo/references/modules/sanitization.md` |
 | Higiene do CLAUDE | `Prumo/cowork-plugin/skills/prumo/references/modules/claude-hygiene.md` |
 | Runtime do Cowork | `Prumo/cowork-plugin/skills/prumo/references/modules/cowork-runtime-maintenance.md` |
+| Bridge do runtime no Cowork | `Prumo/cowork-plugin/skills/prumo/references/modules/cowork-runtime-bridge.md` |
 | Contrato de interface | `Prumo/cowork-plugin/skills/prumo/references/modules/interaction-format.md` |
 | Governança de arquivos | `Prumo/cowork-plugin/skills/prumo/references/modules/runtime-file-governance.md` |
 | Política de leitura | `Prumo/cowork-plugin/skills/prumo/references/modules/load-policy.md` |
@@ -280,8 +281,8 @@ Histórico completo de versão vive em `CHANGELOG.md`.
 
 Versão atual deste core:
 
-- `4.8.0`
+- `4.8.1`
 
 ---
 
-*Prumo Core v4.8.0 — https://github.com/tharso/prumo*
+*Prumo Core v4.8.1 — https://github.com/tharso/prumo*

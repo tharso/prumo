@@ -24,8 +24,21 @@ O fluxo detalhado não mora mais aqui. A fonte canônica agora é modular, porqu
    - `Prumo/cowork-plugin/skills/prumo/references/modules/version-update.md`
    - `Prumo/cowork-plugin/skills/prumo/references/modules/interaction-format.md`
    - `Prumo/cowork-plugin/skills/prumo/references/modules/runtime-paths.md`
+   - `Prumo/cowork-plugin/skills/prumo/references/modules/cowork-runtime-bridge.md`
 
 Se o workspace não expuser o repo `Prumo/`, use a referência equivalente do bundle instalado. O que não vale é inventar um atalho novo e chamar isso de interpretação.
+
+## Preflight do runtime experimental
+
+Antes de entrar no procedimento legado do briefing:
+
+1. Se houver shell, verificar se o workspace já está no trilho novo (`AGENT.md` + `_state/workspace-schema.json`).
+2. Se estiver, carregar `cowork-runtime-bridge.md` e tentar o bridge experimental para `briefing`.
+3. Se o bridge sair com código `0`, devolver a saída do runtime como resposta final e encerrar.
+4. Se o bridge sair com código `12`, seguir silenciosamente para o fluxo legado.
+5. Se o bridge falhar com outro código, avisar em uma linha curta que o runtime experimental falhou e seguir para o fluxo legado.
+
+O Cowork não deve reescrever a resposta do runtime como se estivesse melhorando literatura. Aqui ele é interface, não ghostwriter.
 
 ## Fonte de autoridade
 
@@ -59,6 +72,7 @@ Em caso de conflito:
 - Update sem transporte seguro de aplicação não bloqueia briefing.
 - Se houver versão nova detectável, o briefing deve avisar antes do panorama e oferecer alternativas curtas.
 - Se o `PRUMO-CORE.md` do workspace estiver atrás do `Prumo/VERSION` local, isso deve ser tratado como core defasado do workspace, não como detalhe invisível.
+- Quando o workspace já estiver no trilho novo e houver shell, tentar o bridge do runtime antes do fluxo legado.
 - Quando isso acontecer, preferir:
   - `a) atualizar agora`
   - `b) seguir mesmo assim`

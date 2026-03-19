@@ -1,6 +1,6 @@
 # Briefing Procedure
 
-> **module_version: 4.8.0**
+> **module_version: 4.8.1**
 >
 > Fonte canônica do procedimento de `/prumo:briefing`.
 > Se este módulo conflitar com um resumo em `SKILL.md`, este módulo vence.
@@ -15,6 +15,17 @@ Antes de executar o briefing:
 3. Ler `Prumo/cowork-plugin/skills/prumo/references/modules/load-policy.md` quando o repo local estiver disponível.
 4. Ler `Prumo/cowork-plugin/skills/prumo/references/modules/version-update.md`.
 5. Ler `Prumo/cowork-plugin/skills/prumo/references/modules/runtime-paths.md` quando houver shell.
+
+## Passo 0: Bridge experimental do runtime local
+
+Antes de montar o briefing legado dentro do host:
+
+1. Se houver shell e o workspace expuser `AGENT.md` + `_state/workspace-schema.json`, tentar o procedimento de `cowork-runtime-bridge.md`.
+2. Se o bridge devolver saída com código `0`, usar essa saída como briefing final e encerrar.
+3. Se o bridge devolver `12`, seguir silenciosamente para o briefing legado.
+4. Se o bridge falhar por outro motivo, registrar isso em uma linha curta e seguir.
+
+O objetivo aqui não é heroísmo. É só deixar o Cowork fazer papel de interface quando o runtime novo já estiver de pé.
 
 ## Passo 1: Configuração e data local
 

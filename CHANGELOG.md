@@ -4,6 +4,18 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.8.1] - 2026-03-19
+
+### Added
+- Novo `scripts/prumo_cowork_bridge.py` como bridge experimental entre Cowork e o runtime local.
+- Novo smoke `cowork-plugin/scripts/tests/cowork_runtime_bridge_smoke.sh` cobrindo o caminho feliz do bridge e o fallback silencioso para workspace legado.
+- Novo módulo canônico `cowork-runtime-bridge.md` para tirar essa lógica do campo da telepatia.
+
+### Changed
+- O `/briefing` no Cowork agora deve tentar o runtime local primeiro quando o workspace já estiver no trilho novo (`AGENT.md` + `_state/workspace-schema.json`) e houver shell.
+- Se o bridge funcionar, o Cowork devolve a saída do runtime e encerra. Se não, cai para o fluxo legado sem chilique.
+- `.gitignore` deixou de esconder scripts oficiais novos como se release fosse contrabando.
+
 ## [4.8.0] - 2026-03-19
 
 ### Added

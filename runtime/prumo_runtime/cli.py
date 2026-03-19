@@ -3,7 +3,14 @@ from __future__ import annotations
 import argparse
 
 from prumo_runtime import __version__
-from prumo_runtime.commands import run_briefing, run_context_dump, run_migrate, run_repair, run_setup
+from prumo_runtime.commands import (
+    run_briefing,
+    run_context_dump,
+    run_migrate,
+    run_repair,
+    run_setup,
+    run_snapshot_refresh,
+)
 from prumo_runtime.workspace import WorkspaceError
 
 
@@ -40,7 +47,20 @@ def build_parser() -> argparse.ArgumentParser:
 
     briefing = subparsers.add_parser("briefing", help="Rodar um briefing local minimo")
     briefing.add_argument("--workspace", required=True, help="Caminho do workspace")
+    briefing.add_argument(
+        "--refresh-snapshot",
+        action="store_true",
+        help="Tentar refresh ao vivo do snapshot dual antes de responder",
+    )
     briefing.set_defaults(handler=run_briefing)
+
+    snapshot_refresh = subparsers.add_parser(
+        "snapshot-refresh",
+        help="Atualizar o cache local de agenda/email a partir do snapshot dual",
+    )
+    snapshot_refresh.add_argument("--workspace", required=True, help="Caminho do workspace")
+    snapshot_refresh.add_argument("--format", choices=["json", "text"], default="text")
+    snapshot_refresh.set_defaults(handler=run_snapshot_refresh)
     return parser
 
 

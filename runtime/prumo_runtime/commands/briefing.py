@@ -321,6 +321,18 @@ def write_snapshot_cache(workspace: Path, timezone_name: str, snapshot: dict) ->
     write_json(snapshot_cache_path(workspace), payload)
 
 
+def resolve_snapshot_data(
+    workspace: Path,
+    repo_root: Path | None,
+    refresh_snapshot: bool = False,
+) -> dict:
+    timezone_name = infer_timezone_name(workspace)
+    cached = load_snapshot_cache(workspace, timezone_name)
+    if cached and not refresh_snapshot:
+        return cached
+    return run_dual_snapshot(workspace, repo_root)
+
+
 def run_dual_snapshot(workspace: Path, repo_root: Path | None) -> dict:
     timezone_name = infer_timezone_name(workspace)
     if os.environ.get("PRUMO_RUNTIME_DISABLE_SNAPSHOT") == "1":
@@ -496,7 +508,11 @@ def run_briefing(args) -> int:
     agendado = extract_section(pauta_text, "Agendado / Lembretes")
 
     preview = load_inbox_preview(workspace, repo_root)
-    snapshot = run_dual_snapshot(workspace, repo_root)
+    snapshot = resolve_snapshot_data(
+        workspace,
+        repo_root,
+        refresh_snapshot=bool(getattr(args, "refresh_snapshot", False)),
+    )
 
     update_briefing_state(workspace, config.timezone_name)
 

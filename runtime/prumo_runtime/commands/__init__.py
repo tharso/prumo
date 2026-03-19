@@ -3,6 +3,7 @@ from prumo_runtime.commands.context_dump import run_context_dump
 from prumo_runtime.commands.migrate import run_migrate
 from prumo_runtime.commands.repair import run_repair
 from prumo_runtime.commands.setup import run_setup
+from prumo_runtime.commands.snapshot_refresh import run_snapshot_refresh
 
 __all__ = [
     "run_briefing",
@@ -10,4 +11,5 @@ __all__ = [
     "run_migrate",
     "run_repair",
     "run_setup",
+    "run_snapshot_refresh",
 ]

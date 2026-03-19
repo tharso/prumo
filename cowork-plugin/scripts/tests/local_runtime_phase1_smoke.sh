@@ -107,6 +107,12 @@ EOF
 chmod +x "$TMP_DIR/fake_snapshot.sh"
 
 PRUMO_RUNTIME_SNAPSHOT_SCRIPT="$TMP_DIR/fake_snapshot.sh" \
+PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime snapshot-refresh \
+  --workspace "$WORKSPACE" >"$TMP_DIR/snapshot-refresh.out"
+
+assert_contains "$TMP_DIR/snapshot-refresh.out" "perfis ok: 1" "snapshot-refresh nao conseguiu atualizar o cache"
+[[ -f "$WORKSPACE/_state/google-dual-snapshot.json" ]] || fail "snapshot-refresh nao persistiu cache do snapshot dual"
+
 PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime briefing \
   --workspace "$WORKSPACE" >"$TMP_DIR/briefing.out"
 
@@ -117,17 +123,10 @@ assert_contains "$TMP_DIR/briefing.out" "3. Inbox mobile:" "briefing nao trouxe 
 assert_contains "$TMP_DIR/briefing.out" "inbox-preview.html" "briefing nao linkou o preview do inbox"
 assert_contains "$TMP_DIR/briefing.out" "4. Emails:" "briefing nao trouxe bloco de emails"
 assert_contains "$TMP_DIR/briefing.out" "Responder: 1" "briefing nao resumiu a triagem de emails"
+assert_contains "$TMP_DIR/briefing.out" "snapshot dual reaproveitado do cache local" "briefing nao preferiu o cache local"
 assert_contains "$TMP_DIR/briefing.out" "5. Panorama local:" "briefing nao trouxe panorama local"
 assert_contains "$TMP_DIR/briefing.out" "6. Proposta do dia:" "briefing nao chegou ao bloco final com numeracao continua"
 assert_contains "$TMP_DIR/briefing.out" "a) Aceitar e seguir" "briefing nao ofereceu a opcao a)"
 assert_contains "$TMP_DIR/briefing.out" "d) Tá bom por hoje" "briefing nao ofereceu a opcao d)"
-[[ -f "$WORKSPACE/_state/google-dual-snapshot.json" ]] || fail "briefing nao persistiu cache do snapshot dual"
-
-PRUMO_RUNTIME_DISABLE_SNAPSHOT=1 \
-PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime briefing \
-  --workspace "$WORKSPACE" >"$TMP_DIR/briefing-cache.out"
-
-assert_contains "$TMP_DIR/briefing-cache.out" "snapshot dual reaproveitado do cache local" "briefing nao reaproveitou cache do snapshot"
-assert_contains "$TMP_DIR/briefing-cache.out" "Jantar de teste" "briefing cacheado perdeu agenda do snapshot"
 
 echo "ok: local runtime phase1 smoke"

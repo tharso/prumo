@@ -26,12 +26,13 @@ A Fase 1 inclui apenas:
 
 1. `prumo setup`
 2. `prumo migrate`
-3. `prumo briefing`
-4. `prumo context-dump`
-5. `prumo repair`
-6. adapter experimental do Cowork
-7. fluxo de update do runtime local
-8. trilha minima de migracao do workspace
+3. `prumo snapshot-refresh`
+4. `prumo briefing`
+5. `prumo context-dump`
+6. `prumo repair`
+7. adapter experimental do Cowork
+8. fluxo de update do runtime local
+9. trilha minima de migracao do workspace
 
 Fora da Fase 1:
 
@@ -204,7 +205,16 @@ Importante:
 3. snapshots e integracoes pragmaticas continuam validos;
 4. o briefing nao deve depender do wrapper `CLAUDE.md` para achar o contexto se o `AGENT.md` estiver presente.
 
-### 5.4. `prumo context-dump`
+### 5.4. `prumo snapshot-refresh`
+
+Responsabilidade:
+
+1. atualizar explicitamente o cache local de agenda/email;
+2. desacoplar coleta externa da resposta do briefing;
+3. permitir automação futura sem obrigar o usuário a esperar integração ao vivo toda manhã;
+4. registrar com honestidade quando a fonte viva falhar e quando o runtime estiver só reaproveitando memória local.
+
+### 5.5. `prumo context-dump`
 
 Responsabilidade:
 
@@ -227,7 +237,7 @@ Conteudo minimo:
 6. sinais de drift
 7. capacidades disponiveis
 
-### 5.5. `prumo repair`
+### 5.6. `prumo repair`
 
 Responsabilidade:
 
@@ -243,7 +253,7 @@ Principio:
 1. o Prumo nao impede o usuario de apagar os arquivos dele;
 2. o Prumo detecta cedo, repara o que for recriavel e fala a verdade sobre o resto.
 
-### 5.6. Adapter experimental do Cowork
+### 5.7. Adapter experimental do Cowork
 
 Responsabilidade:
 
@@ -268,6 +278,7 @@ Exemplo:
 ```bash
 prumo setup --workspace /caminho
 prumo migrate --workspace /caminho
+prumo snapshot-refresh --workspace /caminho
 prumo briefing --workspace /caminho
 prumo context-dump --workspace /caminho --format json
 prumo repair --workspace /caminho

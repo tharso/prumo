@@ -4,6 +4,14 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.9.3] - 2026-03-19
+
+### Added
+- Novo comando `prumo snapshot-refresh` para atualizar explicitamente o cache local de agenda/email antes do briefing. O produto parou de fingir que supermercado e geladeira são a mesma coisa.
+
+### Changed
+- O `prumo briefing` agora prefere o cache local de snapshot dual por padrão e só depende de refresh ao vivo quando isso for explicitamente pedido ou necessário.
+
 ## [4.9.2] - 2026-03-19
 
 ### Changed

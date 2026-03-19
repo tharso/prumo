@@ -2,7 +2,7 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.9.2**
+Versão atual: **4.9.3**
 
 Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
 
@@ -76,6 +76,7 @@ Depois:
 ```bash
 prumo setup --workspace /caminho/do/workspace
 prumo migrate --workspace /caminho/do/workspace
+prumo snapshot-refresh --workspace /caminho/do/workspace
 prumo context-dump --workspace /caminho/do/workspace --format json
 prumo briefing --workspace /caminho/do/workspace
 prumo repair --workspace /caminho/do/workspace
@@ -100,6 +101,14 @@ Esse comando:
 1. cria `AGENT.md` e o schema do workspace;
 2. faz backup antes de sobrescrever wrappers e `PRUMO-CORE.md`;
 3. preserva o `CLAUDE.md` legado em `Agente/LEGADO-CLAUDE.md`.
+
+Se quiser abastecer agenda/email sem obrigar o briefing a esperar coleta ao vivo:
+
+```bash
+prumo snapshot-refresh --workspace /caminho/do/workspace
+```
+
+Esse comando tenta atualizar o cache local de snapshot dual. O briefing passa a preferir esse cache por padrão, em vez de bancar o herói toda vez que a integração externa decide atrasar.
 
 ### Opção 3: Doctor e update do Cowork
 
@@ -193,7 +202,7 @@ Se o painel do app disser que atualizou, mas o plugin continuar em versão velha
 
 ## Versão
 
-Versão atual: `4.9.2`
+Versão atual: `4.9.3`
 
 ## Licença
 

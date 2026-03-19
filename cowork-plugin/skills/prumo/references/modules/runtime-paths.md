@@ -1,6 +1,6 @@
 # Runtime Paths
 
-> **module_version: 4.9.2**
+> **module_version: 4.9.3**
 >
 > Fonte canônica dos paths válidos de scripts no runtime do Prumo.
 

@@ -425,6 +425,15 @@ Avaliar conectores próprios do runtime para:
 3. Drive
 4. outros serviços recorrentes
 
+Isso pede uma peça de produto explícita, não só scripts avulsos:
+
+1. uma interface de configuração de integrações;
+2. cadastro e edição de contas de email;
+3. cadastro e edição de calendários;
+4. escolha de fontes por workspace;
+5. validação de credenciais, snapshots e healthcheck da integração;
+6. explicação didática de qual conta/fonte o Prumo está usando e por quê.
+
 ### 10.3. Princípio
 
 Integração deve servir ao runtime local. Não capturá-lo.
@@ -511,6 +520,13 @@ Objetivo:
 
 1. reduzir dependência de MCPs e conectores do host;
 2. trazer olhos e mãos para dentro do runtime do Prumo.
+
+Entregas esperadas:
+
+1. interface local de configuração de email, calendário e fontes relacionadas;
+2. trilha de healthcheck e diagnóstico por conta/fonte;
+3. escolha explícita de prioridades e fallbacks por integração;
+4. documentação local das integrações ativas no workspace do usuário.
 
 ## 12. Critérios de sucesso
 

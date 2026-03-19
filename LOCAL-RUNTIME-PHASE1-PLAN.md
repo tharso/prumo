@@ -41,6 +41,7 @@ Fora da Fase 1:
 4. `doctor` como comando nativo do runtime
 5. conectores proprios
 6. adapters para Codex, Gemini e IDEs
+7. interface local de configuracao de email/calendario e outras fontes
 
 ## 3. Criterio de sucesso
 
@@ -404,3 +405,21 @@ Isso pode ser feito com:
 4. modo de habilitacao do adapter experimental no Cowork;
 5. quando `faxina` vira nome de produto e `sanitize` fica so como nome tecnico;
 6. onde exatamente termina Fase 1 e comeca Fase 2 sem truque retorico.
+
+## 14. Backlog ja assumido para a fase seguinte
+
+Quando a Fase 1 deixar de tossir, a proxima camada de produto deve incluir uma interface local de configuracao de fontes.
+
+Escopo minimo desejado:
+
+1. cadastrar contas e fontes de email;
+2. cadastrar calendarios e definir quais entram no briefing;
+3. mostrar claramente quais fontes estao ativas por workspace;
+4. testar conexao, credenciais e freshness de snapshot;
+5. explicitar fallback e prioridade de fontes sem exigir fe do usuario;
+6. manter tudo local, auditavel e desinstalavel sem levar embora dado do usuario.
+
+Nao objetivo:
+
+1. enterrar isso em arquivo obscuro e chamar de UX;
+2. depender de plugin ou marketplace para o usuario entender qual conta o Prumo esta lendo.

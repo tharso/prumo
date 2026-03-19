@@ -1,6 +1,6 @@
 # Version Update
 
-> **module_version: 4.10.0**
+> **module_version: 4.11.0**
 >
 > Fonte canônica do fluxo de verificação e aplicação de atualização do Prumo.
 

@@ -6,6 +6,7 @@ import os
 import platform
 import subprocess
 from pathlib import Path
+from typing import Any
 
 GOOGLE_INTEGRATION_RELATIVE = "_state/google-integration.json"
 DEFAULT_GOOGLE_PROFILE = "pessoal"
@@ -32,7 +33,31 @@ def keychain_account_name(workspace: Path, profile: str) -> str:
     return f"{digest}:{profile}"
 
 
+def resolve_token_storage(workspace: Path, profile: str) -> dict:
+    payload = load_google_integration(workspace)
+    profiles = payload.get("profiles") or {}
+    profile_payload = profiles.get(profile)
+    if isinstance(profile_payload, dict):
+        storage = profile_payload.get("token_storage")
+        if isinstance(storage, dict) and storage.get("service") and storage.get("account"):
+            return {
+                "type": str(storage.get("type") or ("macos-keychain" if keychain_supported() else "unsupported")),
+                "service": str(storage["service"]),
+                "account": str(storage["account"]),
+            }
+    return {
+        "type": "macos-keychain" if keychain_supported() else "unsupported",
+        "service": keychain_service_name(),
+        "account": keychain_account_name(workspace, profile),
+    }
+
+
 def default_profile_state(workspace: Path, profile: str = DEFAULT_GOOGLE_PROFILE) -> dict:
+    storage = {
+        "type": "macos-keychain" if keychain_supported() else "unsupported",
+        "service": keychain_service_name(),
+        "account": keychain_account_name(workspace, profile),
+    }
     return {
         "label": "Conta pessoal" if profile == "pessoal" else f"Conta {profile}",
         "status": "disconnected",
@@ -41,11 +66,7 @@ def default_profile_state(workspace: Path, profile: str = DEFAULT_GOOGLE_PROFILE
         "last_authenticated_at": "",
         "last_refresh_at": "",
         "source": "browser-oauth",
-        "token_storage": {
-            "type": "macos-keychain" if keychain_supported() else "unsupported",
-            "service": keychain_service_name(),
-            "account": keychain_account_name(workspace, profile),
-        },
+        "token_storage": storage,
     }
 
 
@@ -174,3 +195,43 @@ def store_token_in_keychain(workspace: Path, profile: str, secret: str) -> dict:
         stderr = (completed.stderr or completed.stdout or "").strip()
         raise RuntimeError(stderr or "nao foi possivel gravar token no Keychain")
     return {"type": "macos-keychain", "service": service, "account": account}
+
+
+def load_secret_from_keychain(workspace: Path, profile: str) -> str:
+    if not keychain_supported():
+        raise RuntimeError("token storage seguro no runtime ainda so esta implementado no macOS")
+    storage = resolve_token_storage(workspace, profile)
+    service = storage["service"]
+    account = storage["account"]
+    command = [
+        "security",
+        "find-generic-password",
+        "-a",
+        account,
+        "-s",
+        service,
+        "-w",
+    ]
+    try:
+        completed = subprocess.run(command, capture_output=True, text=True)
+    except FileNotFoundError as exc:
+        raise RuntimeError("comando `security` indisponivel; sem isso o Keychain nao entra em cena") from exc
+    if completed.returncode != 0:
+        stderr = (completed.stderr or completed.stdout or "").strip()
+        raise RuntimeError(stderr or "nao foi possivel ler token do Keychain")
+    return completed.stdout.strip()
+
+
+def store_oauth_bundle_in_keychain(workspace: Path, profile: str, bundle: dict[str, Any]) -> dict:
+    return store_token_in_keychain(workspace, profile, json.dumps(bundle, ensure_ascii=True))
+
+
+def load_oauth_bundle_from_keychain(workspace: Path, profile: str) -> dict[str, Any]:
+    raw = load_secret_from_keychain(workspace, profile)
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("token no Keychain esta ilegivel; alguem guardou um tijolo onde devia haver JSON") from exc
+    if not isinstance(payload, dict):
+        raise RuntimeError("token no Keychain nao tem formato valido")
+    return payload

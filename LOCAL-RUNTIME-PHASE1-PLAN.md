@@ -236,6 +236,21 @@ Diretriz:
 3. no macOS, o storage sensivel vai para o Keychain;
 4. multi-conta continua backlog, nao pretexto para atrasar o primeiro cano que precisa funcionar.
 
+### 5.6. Coleta Google direta na Fase 1
+
+Responsabilidade:
+
+1. usar Calendar API direta como fonte primaria de agenda quando houver conta conectada;
+2. usar Gmail API direta como fonte primaria de email quando houver conta conectada;
+3. manter o cache local como trilho normal do briefing;
+4. deixar o fallback anterior vivo enquanto a fonte nova ainda esta ganhando musculo.
+
+Guardrails:
+
+1. triagem de email nesta fase pode ser conservadora; melhor isso do que banca de adivinhacao;
+2. o briefing deve dizer de onde vieram agenda e email;
+3. se a fonte direta falhar, o runtime cai para cache ou snapshot dual em vez de fingir onisciencia.
+
 ### 5.5. `prumo context-dump`
 
 Responsabilidade:

@@ -4,8 +4,17 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
-## [4.10.0] - 2026-03-19
+## [4.11.0] - 2026-03-19
 
+### Added
+- `snapshot-refresh` passou a usar Google Calendar API e Gmail API diretas quando houver conta conectada no runtime.
+- Novo smoke `local_runtime_google_calendar_smoke.sh` cobrindo refresh direto via Google APIs fake locais, com agenda e email.
+
+### Changed
+- O briefing agora prefere cache abastecido por Google APIs diretas quando ele existir, sem perder o fallback anterior quando a fonte nova tropeçar.
+- A triagem de email via Gmail API entra de forma conservadora. Melhor modéstia operacional do que teatro com prioridade inventada.
+
+## [4.10.0] - 2026-03-19
 ### Added
 - Novo comando `prumo auth google` para conectar a conta Google via navegador, sem depender de host externo como atravessador.
 - Novo arquivo derivado `_state/google-integration.json` para guardar estado e metadado da integração Google dentro do workspace.

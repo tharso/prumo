@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 from prumo_runtime.constants import RUNTIME_VERSION, repo_root_from
+from prumo_runtime.google_api import connected_google_profile, fetch_google_workspace_snapshot
 from prumo_runtime.workspace import (
     build_config_from_existing,
     extract_section,
@@ -303,11 +304,19 @@ def load_snapshot_cache(workspace: Path, timezone_name: str) -> dict | None:
         return None
     cached_at = payload.get("cached_at")
     age = age_in_minutes(cached_at, timezone_name)
+    cached_note = str(payload.get("note") or "").strip()
+    source = str(payload.get("source") or "google-dual-snapshot")
+    base_label = "snapshot dual" if source == "google-dual-snapshot" else "snapshot"
+    cache_prefix = (
+        f"{base_label} reaproveitado do cache local ({age} min atrás)"
+        if age is not None
+        else f"{base_label} reaproveitado do cache local"
+    )
     payload["status"] = "cache"
     payload["note"] = (
-        f"snapshot dual reaproveitado do cache local ({age} min atrás)."
-        if age is not None
-        else "snapshot dual reaproveitado do cache local."
+        f"{cached_note} {cache_prefix}."
+        if cached_note
+        else f"{cache_prefix}."
     )
     payload["cache_age_minutes"] = age
     return payload
@@ -319,7 +328,11 @@ def write_snapshot_cache(workspace: Path, timezone_name: str, snapshot: dict) ->
         "ok_profiles": snapshot.get("ok_profiles", 0),
         "profiles": snapshot.get("profiles", {}),
         "source": "google-dual-snapshot",
+        "note": snapshot.get("note", ""),
+        "email_note": snapshot.get("email_note", ""),
     }
+    if snapshot.get("source"):
+        payload["source"] = snapshot["source"]
     write_json(snapshot_cache_path(workspace), payload)
 
 
@@ -332,6 +345,36 @@ def resolve_snapshot_data(
     cached = load_snapshot_cache(workspace, timezone_name)
     if cached and not refresh_snapshot:
         return cached
+    connected_profile = connected_google_profile(workspace)
+    if connected_profile:
+        try:
+            direct_snapshot = fetch_google_workspace_snapshot(
+                workspace,
+                timezone_name,
+                profile=connected_profile,
+            )
+            write_snapshot_cache(workspace, timezone_name, direct_snapshot)
+            direct_snapshot["cached_at"] = now_iso(timezone_name)
+            return direct_snapshot
+        except Exception as exc:
+            if cached:
+                cached["note"] = f"{cached['note']} Google API falhou ({exc}); usei cache."
+                return cached
+            fallback_snapshot = run_dual_snapshot(workspace, repo_root)
+            if fallback_snapshot.get("ok_profiles", 0):
+                fallback_snapshot["note"] = (
+                    f"Google API falhou ({exc}). "
+                    f"{fallback_snapshot.get('note') or 'Segui pelo fallback que ainda respirava.'}"
+                )
+                return fallback_snapshot
+            return {
+                "status": "error",
+                "note": f"Google API falhou ({exc})",
+                "email_note": "email direto via Gmail API ainda nao entrou; briefing segue sem isso por enquanto.",
+                "profiles": {},
+                "ok_profiles": 0,
+                "source": "google-direct-api",
+            }
     return run_dual_snapshot(workspace, repo_root)
 
 
@@ -428,7 +471,7 @@ def summarize_agenda(snapshot: dict) -> str:
         note = snapshot.get("note") or "Sem agenda consolidada via snapshot local."
         return note
     summary = "; ".join(items[:4])
-    if snapshot.get("status") == "cache" and snapshot.get("note"):
+    if snapshot.get("note"):
         summary = f"{summary}. {snapshot['note']}"
     return summary
 
@@ -441,8 +484,9 @@ def compact_triage_item(value: str) -> str:
 
 
 def summarize_emails(snapshot: dict) -> str:
+    email_note = snapshot.get("email_note")
     if snapshot.get("ok_profiles", 0) == 0:
-        note = snapshot.get("note") or "Sem email consolidado via snapshot local."
+        note = email_note or snapshot.get("note") or "Sem email consolidado via snapshot local."
         return note
 
     total = 0
@@ -464,7 +508,9 @@ def summarize_emails(snapshot: dict) -> str:
     ]
     if highlights:
         parts.append("Destaques: " + "; ".join(highlights))
-    if snapshot.get("status") == "cache":
+    if email_note:
+        parts.append(email_note)
+    elif snapshot.get("status") == "cache":
         note = snapshot.get("note")
         if note:
             parts.append(note)

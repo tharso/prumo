@@ -46,6 +46,25 @@ Entrou `prumo auth google`:
 
 Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
 
+## 2026-03-19 — Calendar e Gmail diretos entraram no `snapshot-refresh`
+
+### Descoberta
+
+Autenticar bem sem usar a conta para nada e' so um jeito sofisticado de pendurar cracha no vazio. A primeira entrega util tinha que ser o briefing trazendo agenda e email sem pedir favor ao Gemini.
+
+### Por que importa
+
+Foi aqui que a tese do runtime local saiu da fase "consigo conectar" e entrou na fase "consigo usar". Sem isso, a integracao Google continuaria sendo showroom.
+
+### Decisao
+
+1. `snapshot-refresh` passa a preferir Google APIs diretas quando houver conta conectada;
+2. agenda vem da Calendar API;
+3. email entra pela Gmail API com triagem conservadora;
+4. fallback antigo via snapshot dual continua existindo para quando a fonte nova falhar.
+
+Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
+
 ## 2026-03-19 — O briefing local funciona; o gargalo era a coleta dual
 
 ### Descoberta

@@ -17,8 +17,9 @@ from prumo_runtime.google_integration import (
     DEFAULT_GOOGLE_PROFILE,
     DEFAULT_GOOGLE_SCOPES,
     default_profile_state,
-    store_token_in_keychain,
+    store_oauth_bundle_in_keychain,
     update_profile_state,
+    write_google_integration,
 )
 from prumo_runtime.workspace import WorkspaceError, build_config_from_existing, now_iso
 
@@ -241,7 +242,16 @@ def run_auth_google(args) -> int:
 
     id_claims = _decode_jwt_payload(str(token_payload.get("id_token") or ""))
     account_email = str(id_claims.get("email") or "").strip()
-    stored = store_token_in_keychain(workspace, profile, json.dumps(token_payload, ensure_ascii=True))
+    oauth_bundle = {
+        "oauth_client": {
+            "client_id": client["client_id"],
+            "client_secret": client["client_secret"],
+            "auth_uri": args.auth_uri or client["auth_uri"],
+            "token_uri": args.token_uri or client["token_uri"],
+        },
+        "token_payload": token_payload,
+    }
+    stored = store_oauth_bundle_in_keychain(workspace, profile, oauth_bundle)
     payload = update_profile_state(
         workspace,
         profile,
@@ -252,8 +262,6 @@ def run_auth_google(args) -> int:
     )
     payload["profiles"][profile]["token_storage"] = stored
     payload["status"] = "connected"
-    from prumo_runtime.google_integration import write_google_integration
-
     write_google_integration(workspace, payload)
 
     print("")

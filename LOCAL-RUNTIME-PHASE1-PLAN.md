@@ -44,6 +44,7 @@ Fora da Fase 1:
 5. conectores proprios
 6. adapters para Codex, Gemini e IDEs
 7. interface local de configuracao de email/calendario e outras fontes
+8. multi-conta Google como comportamento padrao
 
 ## 3. Criterio de sucesso
 
@@ -437,6 +438,8 @@ Isso pode ser feito com:
 ## 14. Backlog ja assumido para a fase seguinte
 
 Quando a Fase 1 deixar de tossir, a proxima camada de produto deve incluir uma interface local de configuracao de fontes.
+
+Para evitar teatro cedo demais, a Fase 1 assume um perfil Google principal (`pessoal`) por padrao. Multi-conta volta quando uma conta so parar de sangrar.
 
 Escopo minimo desejado:
 

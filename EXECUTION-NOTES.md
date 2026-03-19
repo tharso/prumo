@@ -76,3 +76,51 @@ O proximo corte tecnico nao deve ser mais um aumento cego de timeout. Deve ser u
 3. trocar a fonte dessa coleta por uma via local mais previsivel.
 
 Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
+
+## 2026-03-19 — Separar por escopo como fallback automatico so alongou o sofrimento
+
+### Descoberta
+
+Testar refresh conjunto, depois por perfil e depois por escopo pareceu inteligente no papel. Na pratica, isso esticou o tempo total sem entregar cache util no laboratorio `aVida`.
+
+### Por que importa
+
+Quando a estrategia de recuperacao piora a experiencia sem aumentar resultado, ela deixa de ser resiliencia e vira tortura educada.
+
+### Decisao
+
+Nao manter fallback automatico por escopo nesta fase. O proximo corte deve ser mais cirurgico: ou refresh explicitamente orientado por perfil, ou troca da fonte da coleta. Dividir tudo automaticamente so porque parece modular e' um bom jeito de esconder lentidao atras de arquitetura.
+
+Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
+
+## 2026-03-19 — Agenda sozinha e email sozinho tambem expiraram
+
+### Descoberta
+
+Mesmo restringindo o refresh ao perfil `pessoal` e depois testando `agenda` e `email` separadamente, o comando continuou estourando exatamente na mesma janela de timeout.
+
+### Por que importa
+
+Isso enfraquece a hipótese de que o problema era apenas volume da consulta combinada. O gargalo parece estar mais fundo no caminho Gemini+MCP usado para essa coleta.
+
+### Decisao
+
+Parar de apostar em cirurgias cosméticas no prompt como solução principal. O proximo corte deve questionar a fonte e o mecanismo de coleta, nao apenas a embalagem do pedido.
+
+Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)
+
+## 2026-03-19 — Multi-conta sai do caminho da Fase 1
+
+### Descoberta
+
+Mesmo a conta `pessoal` isolada continua expirando no caminho atual. Manter multi-conta como requisito imediato so aumenta o atrito sem comprar capacidade nova.
+
+### Por que importa
+
+Escopo ruim e um jeito sofisticado de sabotar produto nascente.
+
+### Decisao
+
+Na Fase 1, o runtime assume um perfil Google principal (`pessoal`) por padrao. Multi-conta volta depois, quando o cano de uma conta so parar de vazar.
+
+Issue relacionada: [#41](https://github.com/tharso/prumo/issues/41)

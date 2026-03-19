@@ -2,7 +2,7 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.9.4**
+Versão atual: **4.9.5**
 
 Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
 
@@ -77,6 +77,7 @@ Depois:
 prumo setup --workspace /caminho/do/workspace
 prumo migrate --workspace /caminho/do/workspace
 prumo snapshot-refresh --workspace /caminho/do/workspace
+prumo snapshot-refresh --workspace /caminho/do/workspace --profile pessoal
 prumo context-dump --workspace /caminho/do/workspace --format json
 prumo briefing --workspace /caminho/do/workspace
 prumo repair --workspace /caminho/do/workspace
@@ -109,6 +110,8 @@ prumo snapshot-refresh --workspace /caminho/do/workspace
 ```
 
 Esse comando tenta atualizar o cache local de snapshot dual. O briefing passa a preferir esse cache por padrão, em vez de bancar o herói toda vez que a integração externa decide atrasar.
+
+Na Fase 1, o runtime assume um perfil Google principal (`pessoal`) por padrão. Multi-conta ficou para depois. Antes de querer dois fogões, convém fazer um acender sem drama.
 
 Descobertas tecnicas que mudam direcao agora ficam registradas em `EXECUTION-NOTES.md`. O objetivo e simples: nao repetir a mesma escavacao toda vez que um host resolver brincar de labirinto.
 
@@ -204,7 +207,7 @@ Se o painel do app disser que atualizou, mas o plugin continuar em versão velha
 
 ## Versão
 
-Versão atual: `4.9.4`
+Versão atual: `4.9.5`
 
 ## Licença
 

@@ -279,6 +279,8 @@ def parse_snapshot_output(output: str) -> dict:
             continue
         if line.startswith("- ") and current_section:
             payload = line[2:].strip()
+            if payload.lower() == "nenhum":
+                continue
             if current_section == "AGENDA_HOJE":
                 profile["agenda_today"].append(payload)
             elif current_section == "AGENDA_AMANHA":

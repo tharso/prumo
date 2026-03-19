@@ -59,6 +59,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Atualizar o cache local de agenda/email a partir do snapshot dual",
     )
     snapshot_refresh.add_argument("--workspace", required=True, help="Caminho do workspace")
+    snapshot_refresh.add_argument(
+        "--profile",
+        choices=["pessoal", "trabalho"],
+        help="Atualizar apenas um perfil e deixar o outro em paz",
+    )
     snapshot_refresh.add_argument("--format", choices=["json", "text"], default="text")
     snapshot_refresh.set_defaults(handler=run_snapshot_refresh)
     return parser

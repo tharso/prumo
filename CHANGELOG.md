@@ -4,6 +4,16 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.9.5] - 2026-03-19
+
+### Added
+- `prumo snapshot-refresh` agora aceita `--profile pessoal|trabalho`, para refresh explícito sem arrastar a outra conta junto.
+
+### Changed
+- O experimento de resgate automático por perfil/escopo foi descartado. Parecia resiliente no papel e só alongou o sofrimento no runtime real.
+- `EXECUTION-NOTES.md` passou a registrar explicitamente que agenda e email, mesmo isolados no perfil pessoal, continuam expirando no caminho atual Gemini+MCP.
+- A Fase 1 assume `pessoal` como perfil Google padrão. Multi-conta sai do caminho por enquanto.
+
 ## [4.9.4] - 2026-03-19
 
 ### Added

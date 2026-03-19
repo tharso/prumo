@@ -15,6 +15,7 @@ else
 fi
 MCP_NAME="google-workspace"
 MODE="${1:-snapshot}"
+SNAPSHOT_SCOPE="${PRUMO_SNAPSHOT_SCOPE:-full}"
 
 require_cmd() {
   local cmd="$1"
@@ -80,6 +81,68 @@ read_last_briefing_at() {
 }
 
 build_prompt() {
+  if [[ "$SNAPSHOT_SCOPE" == "agenda" ]]; then
+    cat <<EOF
+Use apenas ferramentas MCP do servidor ${MCP_NAME}.
+Fuso horario: ${TZ_NAME}
+Datas de referencia:
+- hoje: ${TODAY}
+- amanha: ${TOMORROW}
+
+Objetivo:
+1) Agenda de hoje (${TODAY}) com hora inicio, hora fim, titulo e calendario.
+2) Agenda de amanha (${TOMORROW}) com hora inicio, hora fim, titulo e calendario.
+3) Conta principal identificada (se possivel).
+
+Responda SOMENTE no formato abaixo (texto puro, sem markdown):
+CONTA: <email-ou-desconhecido>
+AGENDA_HOJE:
+- <HH:MM-HH:MM> | <calendario> | <titulo>
+AGENDA_AMANHA:
+- <HH:MM-HH:MM> | <calendario> | <titulo>
+EMAILS_DESDE_ULTIMO_BRIEFING_TOTAL: 0
+TRIAGEM_RESPONDER:
+- nenhum
+TRIAGEM_VER:
+- nenhum
+TRIAGEM_SEM_ACAO:
+- nenhum
+ERROS:
+- <erro ou "nenhum">
+EOF
+    return
+  fi
+
+  if [[ "$SNAPSHOT_SCOPE" == "email" ]]; then
+    cat <<EOF
+Use apenas ferramentas MCP do servidor ${MCP_NAME}.
+Fuso horario: ${TZ_NAME}
+Datas de referencia:
+- desde_ultimo_briefing: ${SINCE}
+
+Objetivo:
+1) Analisar emails recebidos desde ${SINCE} (nao apenas nao lidos), limite ${MAX_EMAILS}, e fazer curadoria por importancia/acao.
+2) Conta principal identificada (se possivel).
+
+Responda SOMENTE no formato abaixo (texto puro, sem markdown):
+CONTA: <email-ou-desconhecido>
+AGENDA_HOJE:
+- nenhum
+AGENDA_AMANHA:
+- nenhum
+EMAILS_DESDE_ULTIMO_BRIEFING_TOTAL: <numero>
+TRIAGEM_RESPONDER:
+- <P1|P2|P3> | <HH:MM> | <remetente> | <assunto> | <motivo objetivo>
+TRIAGEM_VER:
+- <P1|P2|P3> | <HH:MM> | <remetente> | <assunto> | <motivo objetivo>
+TRIAGEM_SEM_ACAO:
+- <P1|P2|P3> | <HH:MM> | <remetente> | <assunto> | <motivo objetivo>
+ERROS:
+- <erro ou "nenhum">
+EOF
+    return
+  fi
+
   cat <<EOF
 Use apenas ferramentas MCP do servidor ${MCP_NAME}.
 Fuso horario: ${TZ_NAME}

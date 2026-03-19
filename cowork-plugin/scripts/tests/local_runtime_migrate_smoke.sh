@@ -70,7 +70,7 @@ PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime migrate \
 [[ -f "$WORKSPACE/Agente/LEGADO-CLAUDE.md" ]] || fail "migrate nao preservou CLAUDE legado"
 
 assert_contains "$WORKSPACE/CLAUDE.md" 'Leia `AGENT.md` primeiro.' "migrate nao reescreveu CLAUDE.md como wrapper"
-assert_contains "$WORKSPACE/PRUMO-CORE.md" "prumo_version: 4.9.4" "migrate nao atualizou PRUMO-CORE.md"
+assert_contains "$WORKSPACE/PRUMO-CORE.md" "prumo_version: 4.9.5" "migrate nao atualizou PRUMO-CORE.md"
 assert_contains "$WORKSPACE/Agente/LEGADO-CLAUDE.md" "Passaporte 23/02" "migrate nao importou conteudo legado do CLAUDE"
 
 BACKUP_ROOT="$(find "$WORKSPACE/_backup/runtime-migrate" -mindepth 1 -maxdepth 1 -type d | head -n 1)"

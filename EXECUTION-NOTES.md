@@ -9,6 +9,23 @@ Este arquivo guarda descobertas tecnicas que mudam a direcao do trabalho. Nao e 
 3. Microtestes, comandos triviais e tentativas sem valor duravel nao entram.
 4. Toda nota daqui deve ter espelho em issue relevante quando afetar roadmap ou execucao.
 
+## 2026-03-20 — O runtime funcionava; o instalador é que ainda vivia em 2019
+
+### Descoberta
+
+O comando `prumo` ainda não existia como experiência real de usuário porque `scripts/prumo_runtime_install.sh` e `scripts/prumo_runtime_update.sh` usavam `python3 -m pip install --user -e ...` sem olhar para o ambiente. No macOS desta máquina, `python3` era o 3.9.6 do sistema, enquanto o projeto exige `>=3.11`. Resultado: o motor estava pronto, mas o usuário recebia um carrinho sem roda.
+
+### Por que importa
+
+Sem instalador confiável, todo teste “como usuário” virava teste de oficina com `PYTHONPATH=... python3 -m ...`. Isso serve para engenharia. Para produto, serve tanto quanto chave de fenda como maçaneta.
+
+### Decisao
+
+1. fazer `install` e `update` preferirem `uv tool install --editable --python 3.11`;
+2. cair para `pip` só quando houver um Python 3.11+ de verdade;
+3. alinhar `pyproject.toml` com a versão corrente do runtime;
+4. validar o fluxo final com `which prumo`, `prumo --version` e comandos reais no workspace de laboratório.
+
 ## 2026-03-20 — O gargalo de Apple Reminders não era a lista; era o AppleScript lendo `due date`
 
 ### Descoberta

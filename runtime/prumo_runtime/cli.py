@@ -7,6 +7,7 @@ from prumo_runtime.commands import (
     run_auth_apple_reminders,
     run_auth_google,
     run_briefing,
+    run_config_apple_reminders,
     run_context_dump,
     run_migrate,
     run_repair,
@@ -74,6 +75,28 @@ def build_parser() -> argparse.ArgumentParser:
         help="Lista de lembretes a observar. Pode repetir a flag; sem isso, tenta ver tudo e sofre por isso.",
     )
     auth_apple.set_defaults(handler=run_auth_apple_reminders)
+
+    config_parser = subparsers.add_parser("config", help="Ajustar configuracoes do runtime")
+    config_subparsers = config_parser.add_subparsers(dest="config_target", required=True)
+
+    config_apple = config_subparsers.add_parser(
+        "apple-reminders",
+        help="Mostrar ou ajustar listas observadas de Apple Reminders",
+    )
+    config_apple.add_argument("--workspace", required=True, help="Caminho do workspace")
+    config_apple.add_argument(
+        "--list",
+        dest="observe_lists",
+        action="append",
+        help="Lista de lembretes para observar. Pode repetir.",
+    )
+    config_apple.add_argument(
+        "--all",
+        dest="all_lists",
+        action="store_true",
+        help="Voltar a observar todas as listas visíveis.",
+    )
+    config_apple.set_defaults(handler=run_config_apple_reminders)
 
     migrate = subparsers.add_parser("migrate", help="Adotar um workspace legado no trilho novo")
     migrate.add_argument("--workspace", required=True, help="Caminho do workspace")

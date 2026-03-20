@@ -25,6 +25,22 @@ Isso derruba uma premissa preguiçosa: não era “lista demais” nem “o brie
 2. deixar AppleScript como fallback e ponte, não como motor do dia a dia;
 3. adicionar cache local e listas observadas para Apple Reminders, porque fetch vivo sem escopo claro é só um convite educado à lentidão.
 
+## 2026-03-20 — Lista observada escondida em `auth` era UX de oficina, não de produto
+
+### Descoberta
+
+Depois de estabilizar Apple Reminders com `EventKit`, o próximo atrito não era mais técnico. Era ergonômico. Configurar `observed_lists` por `prumo auth apple-reminders --list ...` funciona, mas mistura pedir permissão com ajustar escopo.
+
+### Por que importa
+
+Quando configuração mora como efeito colateral de autenticação, o usuário não encontra onde mexer sem decorar sintaxe ou reler README como se fosse bula de antibiótico.
+
+### Decisao
+
+1. criar `prumo config apple-reminders`;
+2. deixar esse comando mostrar estado atual, definir listas observadas ou voltar para “todas” com `--all`;
+3. manter `auth apple-reminders --list ...` como atalho útil, não como único buraco da fechadura.
+
 ## 2026-03-20 — Tasks entrou no radar certo
 
 ## 2026-03-20 — O lembrete não era do Google; era da Apple usando o Calendário como vitrine

@@ -4,6 +4,14 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.13.2] - 2026-03-20
+
+### Added
+- Novo comando `prumo config apple-reminders` para mostrar, afunilar ou limpar listas observadas sem obrigar o usuário a usar o comando de auth como chave inglesa.
+
+### Changed
+- A configuração de `observed_lists` deixou de morar só em `prumo auth apple-reminders --list ...`. Agora ela tem endereço próprio no CLI, o que é bem melhor do que tratar configuração como efeito colateral.
+
 ## [4.13.1] - 2026-03-20
 
 ### Added

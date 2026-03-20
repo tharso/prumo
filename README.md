@@ -2,7 +2,7 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.13.1**
+Versão atual: **4.13.2**
 
 Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
 
@@ -106,6 +106,9 @@ Apple Reminders entrou como trilho experimental de laboratório:
 ```bash
 prumo auth apple-reminders --workspace /caminho/do/workspace
 prumo auth apple-reminders --workspace /caminho/do/workspace --list "A vida..."
+prumo config apple-reminders --workspace /caminho/do/workspace
+prumo config apple-reminders --workspace /caminho/do/workspace --list "A vida..."
+prumo config apple-reminders --workspace /caminho/do/workspace --all
 ```
 
 Hoje ele já consegue:
@@ -115,6 +118,14 @@ Hoje ele já consegue:
 3. limitar listas observadas quando você quiser parar de vasculhar o universo inteiro;
 4. expor esse estado no `briefing` e no `context-dump`;
 5. reaproveitar cache local de Apple Reminders.
+
+Se quiser ajustar isso depois, sem reencenar autenticação:
+
+```bash
+prumo config apple-reminders --workspace /caminho/do/workspace
+prumo config apple-reminders --workspace /caminho/do/workspace --list "A vida..."
+prumo config apple-reminders --workspace /caminho/do/workspace --all
+```
 
 O que ainda não está pronto o bastante para posar de produto acabado:
 

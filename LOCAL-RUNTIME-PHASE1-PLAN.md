@@ -37,6 +37,7 @@ A Fase 1 inclui apenas:
 10. trilha minima de migracao do workspace
 11. trilha minima de documentacao de execucao
 12. auth experimental de Apple Reminders no macOS, sem promessa ainda de cobertura total do briefing
+13. configuracao CLI minima de listas observadas para Apple Reminders
 
 Fora da Fase 1:
 

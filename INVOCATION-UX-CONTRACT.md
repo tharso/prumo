@@ -19,6 +19,7 @@ Em português simples: host não é cérebro. Host é campainha.
 Hoje, a porta técnica canônica é:
 
 ```bash
+prumo
 prumo start
 ```
 
@@ -29,7 +30,7 @@ prumo start --workspace /caminho/do/workspace
 prumo start --format json
 ```
 
-O `start` já tenta inferir o workspace pelo diretório atual ou por um pai reconhecível.
+O `start` já tenta inferir o workspace pelo diretório atual ou por um pai reconhecível. E o binário `prumo`, sem subcomando, já deve cair nesse mesmo fluxo. Se nem isso acontecer, a campainha ainda está parafusada pelo lado de dentro.
 
 ## UX final desejada
 

@@ -62,6 +62,22 @@ Se o primeiro adapter fino não souber chamar `start`, o risco é cristalizar um
 2. permitir `start` mesmo em workspace legado, porque ele justamente sabe orientar `migrate`;
 3. registrar o contrato de invocação em um documento próprio (`INVOCATION-UX-CONTRACT.md`) para que Cowork, Codex, Gemini e companhia parem de inventar porta por conta própria.
 
+## 2026-03-20 — O binário `prumo` ainda estava pedindo sobrenome
+
+### Descoberta
+
+Mesmo depois de termos eleito `start` como porta técnica canônica, o próprio comando `prumo` ainda respondia com erro de parser se viesse sem subcomando. Em português simples: vendíamos a ideia de "chamar o Prumo pelo nome", mas a própria CLI ainda exigia o prenome e o CPF.
+
+### Por que importa
+
+Isso parecia detalhe até bater na UX real. Host que só precisa executar "Prumo" fica mais simples de adaptar; usuário humano também. Se o binário puro ainda tropeça nisso, a distância entre contrato e experiência continua grande demais para chamar de acabamento.
+
+### Decisao
+
+1. fazer `prumo` sem subcomando cair em `start`;
+2. trocar o smoke principal para validar essa rota curta, não só `start` explícito;
+3. documentar isso no contrato de invocação para ninguém voltar a confundir parser com produto.
+
 ## 2026-03-20 — O runtime funcionava; o instalador é que ainda vivia em 2019
 
 ### Descoberta

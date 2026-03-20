@@ -43,7 +43,7 @@ PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime setup \
 
 (
   cd "$WORKSPACE"
-  PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime start >"$TMP_DIR/start.out"
+  PYTHONPATH="$ROOT_DIR/runtime" python3 -m prumo_runtime >"$TMP_DIR/start.out"
 )
 
 assert_contains "$TMP_DIR/start.out" "Minha sugestão:" "start nao sugeriu um caminho inicial"

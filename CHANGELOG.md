@@ -4,7 +4,15 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
-## [4.15.0] - 2026-03-20
+## [4.15.1] - 2026-03-20
+
+### Changed
+- `prumo` sem subcomando agora cai em `start`, em vez de responder com erro de parser como se o usuário tivesse digitado o nome do produto de forma ofensiva.
+
+### Fixed
+- O smoke principal do runtime deixou de validar só `start` explícito e passou a cercar também a rota curta (`prumo` puro), que é justamente a que interessa para host e para gente normal.
+
+## [4.14.1] - 2026-03-20
 
 ### Added
 - Novo [INVOCATION-UX-CONTRACT.md](/Users/tharsovieira/Documents/DailyLife/Prumo/INVOCATION-UX-CONTRACT.md) registrando sem ambiguidade qual é a porta técnica atual (`prumo start`) e qual é a UX final desejada por host (`/prumo`, `@Prumo`, `bom dia, Prumo` ou equivalente).

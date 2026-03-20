@@ -21,7 +21,7 @@ from prumo_runtime.workspace import WorkspaceError
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Prumo local runtime")
     parser.add_argument("--version", action="version", version=f"prumo {__version__}")
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="command")
 
     setup = subparsers.add_parser("setup", help="Preparar ou inicializar um workspace")
     setup.add_argument("--workspace", required=True, help="Caminho do workspace")
@@ -152,6 +152,8 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if getattr(args, "command", None) is None:
+        args = argparse.Namespace(command="start", workspace=None, format="text", handler=run_start)
     try:
         return args.handler(args)
     except WorkspaceError as exc:

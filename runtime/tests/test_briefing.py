@@ -8,8 +8,10 @@ from unittest.mock import patch
 
 from prumo_runtime.commands.briefing import (
     choose_proposal,
+    enrich_snapshot_with_apple_reminders,
     load_snapshot_cache,
     resolve_snapshot_data,
+    summarize_apple_reminders_status,
     summarize_google_status,
     summarize_emails,
     write_snapshot_cache,
@@ -201,6 +203,87 @@ class BriefingSnapshotTests(unittest.TestCase):
             rendered = summarize_google_status(workspace, "America/Sao_Paulo")
             self.assertIn("precisa reautenticar", rendered)
             self.assertIn("prumo auth google", rendered)
+
+    def test_summarize_apple_reminders_status_reports_connected_and_disconnected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            state_dir = workspace / "_state"
+            state_dir.mkdir(parents=True, exist_ok=True)
+            (state_dir / "apple-reminders-integration.json").write_text(
+                json.dumps(
+                    {
+                        "status": "connected",
+                        "authorization_status": "fullAccess",
+                        "last_refresh_at": "2026-03-20T15:13:00-03:00",
+                        "lists": ["A vida...", "Família"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            rendered = summarize_apple_reminders_status(workspace, "America/Sao_Paulo")
+            self.assertIn("conectado", rendered)
+            self.assertIn("2 lista(s)", rendered)
+            self.assertIn("15:13", rendered)
+
+            (state_dir / "apple-reminders-integration.json").write_text(
+                json.dumps(
+                    {
+                        "status": "disconnected",
+                        "authorization_status": "denied",
+                        "last_error": "Apple negou acesso",
+                        "lists": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            rendered = summarize_apple_reminders_status(workspace, "America/Sao_Paulo")
+            self.assertIn("desconectado", rendered)
+            self.assertIn("prumo auth apple-reminders", rendered)
+            self.assertIn("Apple negou acesso", rendered)
+
+    @patch(
+        "prumo_runtime.commands.briefing.fetch_apple_reminders_today",
+        return_value={
+            "status": "ok",
+            "items": ["16:00 | [Apple Reminders] Teste Prumo (A vida...)"],
+            "note": "Apple Reminders via EventKit.",
+        },
+    )
+    @patch(
+        "prumo_runtime.commands.briefing.apple_reminders_summary",
+        return_value={"status": "connected"},
+    )
+    def test_enrich_snapshot_with_apple_reminders_adds_local_profile(
+        self,
+        _mock_summary,
+        _mock_fetch,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            snapshot = {
+                "ok_profiles": 1,
+                "profiles": {
+                    "pessoal": {
+                        "status": "OK",
+                        "account": "tharso@gmail.com",
+                        "agenda_today": [],
+                        "agenda_tomorrow": [],
+                        "emails_total": 0,
+                        "triage_reply": [],
+                        "triage_view": [],
+                        "triage_no_action": [],
+                        "errors": [],
+                    }
+                },
+                "note": "agenda veio direto da Google Calendar API.",
+            }
+            enriched = enrich_snapshot_with_apple_reminders(workspace, "America/Sao_Paulo", snapshot)
+            self.assertIn("apple-reminders", enriched["profiles"])
+            self.assertEqual(enriched["ok_profiles"], 2)
+            self.assertEqual(
+                enriched["profiles"]["apple-reminders"]["agenda_today"],
+                ["16:00 | [Apple Reminders] Teste Prumo (A vida...)"],
+            )
 
     def test_choose_proposal_ignores_low_signal_email_before_andamento(self) -> None:
         proposal = choose_proposal(

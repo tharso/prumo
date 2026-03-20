@@ -19,6 +19,7 @@ from prumo_runtime.constants import (
     SCHEMA_VERSION,
     repo_root_from,
 )
+from prumo_runtime.apple_reminders import apple_reminders_summary, render_apple_reminders_json
 from prumo_runtime import templates
 from prumo_runtime.google_integration import google_integration_summary, render_google_integration_json
 
@@ -104,6 +105,7 @@ def render_files(config: WorkspaceConfig) -> dict[str, str]:
         "Referencias/INDICE.md": templates.render_referencias_md(setup_date),
         "_state/briefing-state.json": templates.render_briefing_state_json(),
         "_state/google-integration.json": render_google_integration_json(config.workspace),
+        "_state/apple-reminders-integration.json": render_apple_reminders_json(),
         "Inbox4Mobile/_processed.json": templates.render_inbox_processed_json(),
     }
 
@@ -421,6 +423,7 @@ def workspace_overview(workspace: Path) -> dict:
         "core_version": core_version or "",
         "core_outdated": bool(core_version and core_key < runtime_key),
         "google_integration": google_integration_summary(workspace),
+        "apple_reminders": apple_reminders_summary(workspace),
         "missing": missing,
         "pauta_exists": (workspace / "PAUTA.md").exists(),
         "inbox_exists": (workspace / "INBOX.md").exists(),

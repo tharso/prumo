@@ -6,6 +6,23 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 
 ## [4.12.1] - 2026-03-20
 
+## [4.13.0] - 2026-03-20
+
+### Added
+- Novo comando `prumo auth apple-reminders` para autenticar o runtime local no app `Lembretes` do macOS. O Prumo parou de olhar para lembrete da Apple e chamar isso de mistério do Google.
+- Novo estado derivado `_state/apple-reminders-integration.json`, com status, listas visíveis e último refresh da integração Apple Reminders.
+- O `briefing` e o `context-dump` agora expõem o estado de Apple Reminders separadamente do Google, porque misturar os dois só produz diagnóstico com cheiro de porão úmido.
+- Nova suíte unitária `runtime/tests/test_apple_reminders.py` cobrindo estado local e resolução do helper.
+
+### Changed
+- O runtime passou a identificar explicitamente que reminders vistos no Apple Calendar podem vir do ecossistema Apple, não do Google. Parece detalhe de taxonomia até você perceber que estava abrindo a porta do apartamento errado.
+- A integração Apple Reminders usa AppleScript como trilho principal de auth/local access no macOS CLI, porque o caminho EventKit puro sem bundle/Info.plist mostrou joelho mole para pedir permissão.
+
+### Known limitations
+- A autenticação Apple Reminders funciona, mas a coleta diária ainda está experimental: em bases maiores, o AppleScript do `Lembretes` pode ficar lento ou tropeçar em itens tortos. Em bom português: já temos a chave, ainda não temos a fechadura com bom amortecedor.
+
+## [4.12.1] - 2026-03-20
+
 ### Fixed
 - A chamada da `Tasks API` estava usando a rota errada (`/users/@me/lists/{id}/tasks`) e recebia `404` com a convicção de quem acha que está certo. Agora usa a rota correta (`/lists/{id}/tasks`) e parou de culpar o Google por um tropeço nosso.
 - O teste unitário de `fetch_tasks_today()` ficou mais rígido e agora acusa URL torta em vez de deixar bug passar de fininho com crachá de sucesso.

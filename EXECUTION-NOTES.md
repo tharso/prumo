@@ -11,6 +11,39 @@ Este arquivo guarda descobertas tecnicas que mudam a direcao do trabalho. Nao e 
 
 ## 2026-03-20 — Tasks entrou no radar certo
 
+## 2026-03-20 — O lembrete não era do Google; era da Apple usando o Calendário como vitrine
+
+### Descoberta
+
+O item “Vai renovar a assinatura da Folha...” e os novos lembretes criados pelo usuário não apareciam nem na `Calendar API` nem na `Tasks API`, mas a UI mostrava campos como `Lista`, `Etiquetas`, `Sinalizar`, `Prioridade`, `Localização` e `Ao Enviar Mensagem`. Isso é quase assinatura digital do app `Lembretes` da Apple.
+
+### Por que importa
+
+Sem essa distinção, qualquer tentativa de “resolver reminders” viraria escavação no cano errado. O Google não estava escondendo tudo; nós é que estávamos interrogando o suspeito errado.
+
+### Decisao
+
+1. tratar `Apple Reminders` como frente própria do runtime local;
+2. considerar `Google Calendar + Gmail + Tasks` cobertura válida da Fase 1;
+3. parar de chamar reminder da Apple de gap do Google só porque ele aparece na interface do Calendário.
+
+## 2026-03-20 — EventKit puro em CLI bate no teto cedo; AppleScript autentica melhor, mas fetch ainda manca
+
+### Descoberta
+
+O helper em Swift com `EventKit` conseguiu provar viabilidade técnica, mas mostrou um limite estrutural para CLI: pedir permissão a `Reminders` sem bundle/Info.plist é um caminho meio torto. Ao trocar o auth para AppleScript (`osascript` falando com `Lembretes.app`), a permissão entrou e as listas ficaram visíveis. Já a coleta diária continuou instável em bases maiores: lenta demais em alguns testes e sensível a reminders com dados tortos em outros.
+
+### Por que importa
+
+Isso muda a abordagem. Não é mais “falta descobrir a API certa”. A API local já foi encontrada. O problema agora é qualidade operacional do trilho AppleScript para fetch recorrente.
+
+### Decisao
+
+1. manter `auth apple-reminders` como trilho experimental útil na Fase 1;
+2. expor o estado Apple Reminders no `briefing` e no `context-dump`;
+3. registrar explicitamente que o fetch diário ainda não está pronto para ser vendido como cobertura definitiva;
+4. tratar a leitura de reminders Apple como frente separada de refinamento, não como bloqueio da integração Google.
+
 ### Descoberta
 
 O item all-day ausente no Google Calendar tinha cheiro de `Tasks/Reminders`, não de bug de hora ou fuso.

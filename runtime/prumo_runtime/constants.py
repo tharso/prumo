@@ -36,6 +36,7 @@ DERIVED_FILES = (
     "_state/workspace-schema.json",
     "_state/briefing-state.json",
     "_state/google-integration.json",
+    "_state/apple-reminders-integration.json",
     "Inbox4Mobile/_processed.json",
 )
 

@@ -9,6 +9,10 @@ from pathlib import Path
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
+from prumo_runtime.apple_reminders import (
+    apple_reminders_summary,
+    fetch_apple_reminders_today,
+)
 from prumo_runtime.constants import RUNTIME_VERSION, repo_root_from
 from prumo_runtime.google_api import (
     connected_google_profile,
@@ -391,6 +395,7 @@ def resolve_snapshot_data(
                 timezone_name,
                 profile=connected_profile,
             )
+            direct_snapshot = enrich_snapshot_with_apple_reminders(workspace, timezone_name, direct_snapshot)
             write_snapshot_cache(workspace, timezone_name, direct_snapshot)
             direct_snapshot["cached_at"] = now_iso(timezone_name)
             return direct_snapshot
@@ -399,6 +404,7 @@ def resolve_snapshot_data(
                 cached["note"] = f"{cached['note']} Google API falhou ({exc}); usei cache."
                 return cached
             fallback_snapshot = run_dual_snapshot(workspace, repo_root)
+            fallback_snapshot = enrich_snapshot_with_apple_reminders(workspace, timezone_name, fallback_snapshot)
             if fallback_snapshot.get("ok_profiles", 0):
                 fallback_snapshot["note"] = (
                     f"Google API falhou ({exc}). "
@@ -414,7 +420,8 @@ def resolve_snapshot_data(
                 "ok_profiles": 0,
                 "source": "google-direct-api",
             }
-    return run_dual_snapshot(workspace, repo_root)
+    fallback_snapshot = run_dual_snapshot(workspace, repo_root)
+    return enrich_snapshot_with_apple_reminders(workspace, timezone_name, fallback_snapshot)
 
 
 def run_dual_snapshot(workspace: Path, repo_root: Path | None) -> dict:
@@ -597,6 +604,85 @@ def summarize_google_status(workspace: Path, timezone_name: str) -> str:
     return f"{status}. Rode `prumo context-dump --workspace ... --format json` antes de chutar a parede."
 
 
+def summarize_apple_reminders_status(workspace: Path, timezone_name: str) -> str:
+    payload = apple_reminders_summary(workspace)
+    status = str(payload.get("status") or "disconnected")
+    auth_status = str(payload.get("authorization_status") or "unknown")
+    lists = [str(item).strip() for item in payload.get("lists", []) if str(item).strip()]
+    last_refresh = short_clock(str(payload.get("last_refresh_at") or ""), timezone_name)
+    last_refresh_age = age_in_minutes(str(payload.get("last_refresh_at") or ""), timezone_name)
+    last_error = str(payload.get("last_error") or "").strip()
+
+    if status == "connected":
+        suffix = f" ({len(lists)} lista(s))" if lists else ""
+        if last_refresh:
+            age_text = humanize_age_minutes(last_refresh_age)
+            if age_text:
+                return f"conectado{suffix}, ultimo refresh {last_refresh} ({age_text})"
+            return f"conectado{suffix}, ultimo refresh {last_refresh}"
+        return f"conectado{suffix}"
+
+    if status in {"denied", "disconnected"}:
+        base = "desconectado"
+        if auth_status in {"denied", "restricted"}:
+            base = f"{base}; a Apple negou acesso"
+        message = f"{base}. Rode `prumo auth apple-reminders --workspace ...` se quiser puxar lembretes locais."
+        if last_error:
+            return f"{message} {last_error}"
+        return message
+
+    if status == "error":
+        if last_error:
+            return f"erro lendo Apple Reminders. {last_error}"
+        return "erro lendo Apple Reminders. Rode `prumo auth apple-reminders --workspace ...` e tente de novo."
+
+    if status == "ok":
+        return "ok. Isso ficou com cheiro de estado intermediário demais, mas pelo menos não caiu."
+
+    return f"{status}. Rode `prumo context-dump --workspace ... --format json` antes de xingar a Apple."
+
+
+def enrich_snapshot_with_apple_reminders(
+    workspace: Path,
+    timezone_name: str,
+    snapshot: dict,
+) -> dict:
+    apple_state = apple_reminders_summary(workspace)
+    apple_status = str(apple_state.get("status") or "disconnected")
+    if apple_status not in {"connected", "ok"}:
+        return snapshot
+
+    try:
+        apple_payload = fetch_apple_reminders_today(workspace, timezone_name)
+    except Exception as exc:
+        note = f"Apple Reminders falhou ({exc}); ignorei o tropeço."
+        previous = str(snapshot.get("note") or "").strip()
+        snapshot["note"] = f"{previous} {note}".strip() if previous else note
+        return snapshot
+
+    items = list(apple_payload.get("items") or [])
+    note = str(apple_payload.get("note") or "").strip()
+    if items:
+        profiles = snapshot.setdefault("profiles", {})
+        profiles["apple-reminders"] = {
+            "status": "OK",
+            "account": "EventKit local",
+            "agenda_today": items,
+            "agenda_tomorrow": [],
+            "emails_total": 0,
+            "triage_reply": [],
+            "triage_view": [],
+            "triage_no_action": [],
+            "errors": [],
+        }
+        snapshot["ok_profiles"] = int(snapshot.get("ok_profiles") or 0) + 1
+
+    if note and not items:
+        previous = str(snapshot.get("note") or "").strip()
+        snapshot["note"] = f"{previous} {note}".strip() if previous else note
+    return snapshot
+
+
 def build_inbox_line(workspace: Path, inbox_text: str, preview: dict) -> str:
     inbox_count = count_inbox_items(inbox_text)
     preview_count = int(preview.get("count") or 0)
@@ -677,6 +763,9 @@ def run_briefing(args) -> int:
     n += 1
 
     lines.append(f"{n}. Google: {summarize_google_status(workspace, config.timezone_name)}")
+    n += 1
+
+    lines.append(f"{n}. Apple Reminders: {summarize_apple_reminders_status(workspace, config.timezone_name)}")
     n += 1
 
     lines.append(f"{n}. Agenda: {summarize_agenda(snapshot)}")

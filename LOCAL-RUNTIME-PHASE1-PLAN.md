@@ -36,6 +36,7 @@ A Fase 1 inclui apenas:
 9. fluxo de update do runtime local
 10. trilha minima de migracao do workspace
 11. trilha minima de documentacao de execucao
+12. auth experimental de Apple Reminders no macOS, sem promessa ainda de cobertura total do briefing
 
 Fora da Fase 1:
 
@@ -47,6 +48,7 @@ Fora da Fase 1:
 6. adapters para Codex, Gemini e IDEs
 7. interface local de configuracao de email/calendario e outras fontes
 8. multi-conta Google como comportamento padrao
+9. cobertura definitiva de Apple Reminders no briefing diario
 
 ## 3. Criterio de sucesso
 
@@ -254,6 +256,21 @@ Guardrails:
 3. se a fonte direta falhar, o runtime cai para cache ou snapshot dual em vez de fingir onisciencia.
 4. o briefing deve mostrar estado Google e idade do refresh sem obrigar o usuário a fazer conta de cabeça;
 5. notas internas de integração não devem vazar para a superfície do produto como se fossem texto final.
+
+### 5.6.1. Apple Reminders experimental no macOS
+
+Responsabilidade:
+
+1. reconhecer quando os “lembretes” do usuário são Apple, não Google;
+2. autenticar acesso local ao app `Lembretes`;
+3. expor estado e listas visíveis no workspace;
+4. não fingir que a coleta diária já está pronta quando ela ainda está temperamental.
+
+Guardrails:
+
+1. auth local no macOS pode entrar antes da coleta completa;
+2. se o fetch diário falhar ou ficar lento, isso vira estado explícito no briefing, não sumiço silencioso;
+3. Apple Reminders nesta fase é trilho experimental, não cobertura prometida como se já estivesse estável.
 
 ### 5.7. `prumo context-dump`
 

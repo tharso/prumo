@@ -2,7 +2,7 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.12.1**
+Versão atual: **4.13.0**
 
 Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
 
@@ -80,6 +80,7 @@ prumo setup --workspace /caminho/do/workspace
 prumo migrate --workspace /caminho/do/workspace
 prumo auth google --workspace /caminho/do/workspace --client-secrets /caminho/do/client_secret.json
 prumo auth google --workspace /caminho/do/workspace --client-id SEU_CLIENT_ID --client-secret SEU_CLIENT_SECRET
+prumo auth apple-reminders --workspace /caminho/do/workspace
 prumo snapshot-refresh --workspace /caminho/do/workspace
 prumo snapshot-refresh --workspace /caminho/do/workspace --profile pessoal
 prumo context-dump --workspace /caminho/do/workspace --format json
@@ -96,8 +97,27 @@ Esse trilho cria:
 E agora também deixa uma fundação decente para integrações:
 
 1. `_state/google-integration.json` guarda estado e metadado da conexão;
-2. token sensível fica fora do workspace, em storage seguro local;
-3. no macOS, o runtime usa o Keychain em vez de largar refresh token no chão.
+2. `_state/apple-reminders-integration.json` faz o mesmo para Apple Reminders;
+3. token sensível fica fora do workspace, em storage seguro local;
+4. no macOS, o runtime usa o Keychain em vez de largar refresh token no chão.
+
+Apple Reminders entrou como trilho experimental de laboratório:
+
+```bash
+prumo auth apple-reminders --workspace /caminho/do/workspace
+```
+
+Hoje ele já consegue:
+
+1. pedir permissão local no macOS;
+2. registrar estado e listas visíveis no workspace;
+3. expor esse estado no `briefing` e no `context-dump`.
+
+O que ainda não está pronto o bastante para posar de produto acabado:
+
+1. a coleta diária dos reminders ainda está instável em bases maiores;
+2. em alguns casos o AppleScript do app `Lembretes` fica lento ou tropeça em itens tortos;
+3. então, por enquanto, trate isso como fonte experimental, não como cobertura definitiva do briefing.
 
 E deixa uma coisa explícita, porque software adora esconder isso em rodapé: se você desinstalar o Prumo, seus arquivos continuam seus, legíveis e no mesmo lugar.
 
@@ -240,7 +260,7 @@ Se o painel do app disser que atualizou, mas o plugin continuar em versão velha
 
 ## Versão
 
-Versão atual: `4.12.1`
+Versão atual: `4.13.0`
 
 ## Licença
 

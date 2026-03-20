@@ -4,6 +4,7 @@ import argparse
 
 from prumo_runtime import __version__
 from prumo_runtime.commands import (
+    run_auth_apple_reminders,
     run_auth_google,
     run_briefing,
     run_context_dump,
@@ -60,6 +61,13 @@ def build_parser() -> argparse.ArgumentParser:
     auth_google.add_argument("--auth-uri", help=argparse.SUPPRESS)
     auth_google.add_argument("--token-uri", help=argparse.SUPPRESS)
     auth_google.set_defaults(handler=run_auth_google)
+
+    auth_apple = auth_subparsers.add_parser(
+        "apple-reminders",
+        help="Conectar Apple Reminders localmente via EventKit (macOS)",
+    )
+    auth_apple.add_argument("--workspace", required=True, help="Caminho do workspace")
+    auth_apple.set_defaults(handler=run_auth_apple_reminders)
 
     migrate = subparsers.add_parser("migrate", help="Adotar um workspace legado no trilho novo")
     migrate.add_argument("--workspace", required=True, help="Caminho do workspace")

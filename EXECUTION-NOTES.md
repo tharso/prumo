@@ -9,6 +9,27 @@ Este arquivo guarda descobertas tecnicas que mudam a direcao do trabalho. Nao e 
 3. Microtestes, comandos triviais e tentativas sem valor duravel nao entram.
 4. Toda nota daqui deve ter espelho em issue relevante quando afetar roadmap ou execucao.
 
+## 2026-03-20 — O runtime já existe; a invocação universal ainda não
+
+### Descoberta
+
+Depois que `prumo` virou comando real no sistema, ficou mais fácil separar duas coisas que estavam se misturando na conversa: ter um runtime local funcional e ter uma UX final decente de invocação dentro dos hosts. Hoje já dá para fazer teste sério pedindo ao host que execute `prumo ...`. Mas isso ainda não é a experiência-alvo.
+
+### Por que importa
+
+Sem registrar essa diferença, o time corre dois riscos igualmente irritantes:
+
+1. achar que a UX já está resolvida só porque o CLI funciona;
+2. ou achar que o runtime fracassou só porque a porta de entrada universal ainda não existe.
+
+É a velha confusão entre motor e ignição.
+
+### Decisao
+
+1. documentar explicitamente que a estrela polar de UX é o usuário abrir o host e chamar o Prumo por uma porta curta (`/prumo`, `@Prumo`, `bom dia, Prumo` ou equivalente);
+2. tratar `prumo ...` como contrato técnico canônico, não como experiência final canônica;
+3. abrir a próxima frente de produto como `Invocation UX`, em vez de continuar mexendo só em encanamento e auth como se isso resolvesse entrada por osmose.
+
 ## 2026-03-20 — O runtime funcionava; o instalador é que ainda vivia em 2019
 
 ### Descoberta

@@ -21,6 +21,12 @@ Essa prova precisa mostrar quatro coisas:
 
 Sem isso, a Fase 1 vira maquete de predio sem porta. Bonita para arquiteto. Irritante para morador.
 
+Nota para ninguém se perder no caminho:
+
+1. a Fase 1 está construindo e validando o runtime local;
+2. ela ainda não entrega a UX final de invocação do produto dentro dos hosts;
+3. a UX final desejada é o usuário abrir o host e chamar o Prumo por uma porta curta (`/prumo`, `@Prumo`, `bom dia, Prumo` ou equivalente), não por um subcomando cru.
+
 ## 2. Entregaveis da Fase 1
 
 A Fase 1 inclui apenas:
@@ -50,6 +56,7 @@ Fora da Fase 1:
 7. interface local de configuracao de email/calendario e outras fontes
 8. multi-conta Google como comportamento padrao
 9. cobertura definitiva de Apple Reminders no briefing diario
+10. UX final de invocação dentro de cada host (`/prumo`, `@Prumo`, “bom dia, Prumo” ou equivalente)
 
 ## 3. Criterio de sucesso
 
@@ -71,6 +78,18 @@ E se um usuario existente conseguir:
 4. receber briefing coerente sem regressao grosseira de contrato.
 5. nao perder descobertas tecnicas que mudem direcao entre uma sessao e outra.
 
+Isso valida a fundação. Não valida ainda a entrada final do produto.
+
+## 3.1. O que ainda não está validado nesta fase
+
+Ainda não consideraremos a Fase 1 falha só porque o usuário precise pedir ao host para executar `prumo ...`.
+
+Esse atrito é real, mas pertence ao bloco seguinte:
+
+1. `Invocation UX`
+2. `prumo start` ou equivalente como entrada canônica
+3. adapters finos por host para esconder o encanamento e expor uma porta humana
+
 ## 4. Decisoes tecnicas principais
 
 ### 4.1. Nucleo: biblioteca + CLI
@@ -85,6 +104,11 @@ Motivo:
 1. CLI resolve o uso humano e varios hosts simples;
 2. biblioteca evita subprocesso burro para tudo;
 3. adapters futuros podem chamar a biblioteca quando o host permitir.
+
+Corolário importante:
+
+1. o CLI é contrato técnico canônico;
+2. ele não deve ser confundido com a experiência final canônica do usuário.
 
 ### 4.2. Principio de propriedade
 
@@ -155,6 +179,23 @@ Objetivo:
 3. permitir reparo e regeneracao de wrappers sem amputar conteudo autoral.
 
 ## 5. Escopo tecnico detalhado
+
+### 5.0. Porta de entrada final (destino, não entrega desta fase)
+
+O comportamento-alvo do produto é:
+
+1. o usuário chama o Prumo no host;
+2. o runtime inspeciona o workspace;
+3. a resposta inicial oferece uma destas trilhas:
+   - briefing
+   - continuar algo em andamento
+   - setup
+   - repair
+   - auth/config quando faltar integração
+
+Em outras palavras: o primeiro contato do usuário não deve ser um subcomando. Deve ser uma conversa com porta de entrada clara.
+
+O que a Fase 1 faz é deixar o runtime pronto para que essa porta exista no bloco seguinte.
 
 ### 5.1. `prumo setup`
 

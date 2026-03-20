@@ -83,6 +83,20 @@ Não faremos:
 4. tornar o workspace irrelevante;
 5. transformar adapters em fontes concorrentes de verdade.
 
+### 3.4. Estrela polar de UX
+
+O destino do produto não é obrigar o usuário a decorar `prumo briefing --workspace ...` como se estivesse configurando impressora em repartição.
+
+O destino é este:
+
+1. o usuário instala o Prumo e faz setup uma vez;
+2. abre o host de preferência (Cowork, Claude Code, Codex, Gemini CLI, Antigravity, IDE etc.);
+3. chama o Prumo por uma porta simples e previsível, como `/prumo`, `@Prumo`, `bom dia, Prumo` ou affordance equivalente do host;
+4. o host encaminha essa invocação para o runtime local;
+5. o runtime responde oferecendo briefing, retomada de trabalho, setup, repair ou auth/config quando faltar alguma peça.
+
+Em português simples: o usuário não deveria sentir que está operando um pacote Python. Deveria sentir que chamou o Prumo.
+
 ## 4. Arquitetura alvo
 
 ### 4.1. Camadas
@@ -161,6 +175,8 @@ Responsabilidade:
 4. expor affordances do host (slash commands, autocomplete, menus, etc.).
 
 Esses adapters não carregam regra canônica de negócio.
+
+Também não devem empurrar o usuário para subcomando cru quando o host puder oferecer uma porta melhor. O adapter existe justamente para transformar runtime em invocação humana simples.
 
 #### Camada 4: Integrações externas
 

@@ -88,6 +88,15 @@ prumo briefing --workspace /caminho/do/workspace
 prumo repair --workspace /caminho/do/workspace
 ```
 
+Importante, para não vender andaime como se já fosse varanda:
+
+1. `prumo ...` é a porta técnica do runtime hoje;
+2. a UX final desejada do produto não é obrigar o usuário a decorar subcomandos;
+3. o destino é o usuário abrir Cowork, Claude Code, Codex, Gemini CLI, Antigravity ou host equivalente e chamar o Prumo por uma porta curta (`/prumo`, `@Prumo`, `bom dia, Prumo` ou affordance parecida);
+4. o host então deve encaminhar isso para o runtime local.
+
+Em português simples: agora estamos construindo o motor. A ignição universal vem logo depois.
+
 Esse trilho cria:
 
 1. `AGENT.md` como índice canônico do workspace;

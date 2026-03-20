@@ -227,6 +227,7 @@ O produto deve poder ser chamado assim:
 
 ```bash
 prumo setup
+prumo start
 prumo briefing
 prumo context-dump
 prumo repair

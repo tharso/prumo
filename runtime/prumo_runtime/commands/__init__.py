@@ -7,6 +7,7 @@ from prumo_runtime.commands.migrate import run_migrate
 from prumo_runtime.commands.repair import run_repair
 from prumo_runtime.commands.setup import run_setup
 from prumo_runtime.commands.snapshot_refresh import run_snapshot_refresh
+from prumo_runtime.commands.start import run_start
 
 __all__ = [
     "run_auth_apple_reminders",
@@ -18,4 +19,5 @@ __all__ = [
     "run_repair",
     "run_setup",
     "run_snapshot_refresh",
+    "run_start",
 ]

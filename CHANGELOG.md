@@ -4,6 +4,19 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.14.0] - 2026-03-20
+
+### Added
+- Novo comando `prumo start` como porta de entrada canônica do runtime. Ele olha o estado do workspace e oferece o próximo caminho sensato, em vez de obrigar o usuário a adivinhar se hoje a palavra mágica é `briefing`, `repair` ou `auth`.
+- Nova suíte `runtime/tests/test_start.py`, cobrindo workspace ausente, workspace legado, workspace saudável e saída JSON das ações sugeridas.
+
+### Changed
+- A documentação agora separa melhor duas coisas que estavam se agarrando pela gola: o contrato técnico (`prumo ...`) e a UX final desejada do produto (`/prumo`, `@Prumo`, `bom dia, Prumo` ou equivalente no host).
+- `local_runtime_phase1_smoke.sh` passou a validar também a porta de entrada `start`, porque feature sem cerca de teste vira folclore rápido.
+
+### Fixed
+- O instalador e o updater do runtime deixaram de confiar cegamente no Python 3.9 do macOS e passaram a preferir `uv` com Python 3.11. O produto finalmente consegue ser testado como usuário, não só como mecânico.
+
 ## [4.13.2] - 2026-03-20
 
 ### Added

@@ -13,6 +13,7 @@ from prumo_runtime.commands import (
     run_repair,
     run_setup,
     run_snapshot_refresh,
+    run_start,
 )
 from prumo_runtime.workspace import WorkspaceError
 
@@ -29,6 +30,11 @@ def build_parser() -> argparse.ArgumentParser:
     setup.add_argument("--timezone", default="America/Sao_Paulo", help="Fuso IANA")
     setup.add_argument("--briefing-time", default="09:00", help="Horario preferido do briefing")
     setup.set_defaults(handler=run_setup)
+
+    start = subparsers.add_parser("start", help="Abrir a porta de entrada do Prumo no workspace")
+    start.add_argument("--workspace", required=True, help="Caminho do workspace")
+    start.add_argument("--format", choices=["text", "json"], default="text")
+    start.set_defaults(handler=run_start)
 
     auth = subparsers.add_parser("auth", help="Conectar integracoes externas ao runtime")
     auth_subparsers = auth.add_subparsers(dest="auth_provider", required=True)

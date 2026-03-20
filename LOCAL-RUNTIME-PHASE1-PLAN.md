@@ -32,18 +32,19 @@ Nota para ninguém se perder no caminho:
 A Fase 1 inclui apenas:
 
 1. `prumo setup`
-2. `prumo migrate`
-3. `prumo snapshot-refresh`
-4. `prumo auth google`
-5. `prumo briefing`
-6. `prumo context-dump`
-7. `prumo repair`
-8. adapter experimental do Cowork
-9. fluxo de update do runtime local
-10. trilha minima de migracao do workspace
-11. trilha minima de documentacao de execucao
-12. auth experimental de Apple Reminders no macOS, sem promessa ainda de cobertura total do briefing
-13. configuracao CLI minima de listas observadas para Apple Reminders
+2. `prumo start`
+3. `prumo migrate`
+4. `prumo snapshot-refresh`
+5. `prumo auth google`
+6. `prumo briefing`
+7. `prumo context-dump`
+8. `prumo repair`
+9. adapter experimental do Cowork
+10. fluxo de update do runtime local
+11. trilha minima de migracao do workspace
+12. trilha minima de documentacao de execucao
+13. auth experimental de Apple Reminders no macOS, sem promessa ainda de cobertura total do briefing
+14. configuracao CLI minima de listas observadas para Apple Reminders
 
 Fora da Fase 1:
 
@@ -87,7 +88,7 @@ Ainda não consideraremos a Fase 1 falha só porque o usuário precise pedir ao 
 Esse atrito é real, mas pertence ao bloco seguinte:
 
 1. `Invocation UX`
-2. `prumo start` ou equivalente como entrada canônica
+2. adapters finos que traduzam a invocação do host para `prumo start`
 3. adapters finos por host para esconder o encanamento e expor uma porta humana
 
 ## 4. Decisoes tecnicas principais
@@ -196,6 +197,8 @@ O comportamento-alvo do produto é:
 Em outras palavras: o primeiro contato do usuário não deve ser um subcomando. Deve ser uma conversa com porta de entrada clara.
 
 O que a Fase 1 faz é deixar o runtime pronto para que essa porta exista no bloco seguinte.
+
+O primeiro slice disso já entrou: `prumo start` como porta de entrada do runtime. O que ainda falta é o host bater nessa porta por conta própria.
 
 ### 5.1. `prumo setup`
 

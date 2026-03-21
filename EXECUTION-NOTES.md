@@ -132,6 +132,31 @@ Se o projeto continuar nomeando adapters pelo sobrenome do modelo, vai herdar bu
 3. tratar `Codex` como primeiro adapter implementado, sem chamar isso de favoritismo estrutural;
 4. explicitar que `Cowork != Claude Code` e `Gemini CLI != Antigravity`.
 
+## 2026-03-21 — Documentação oficial boa resolve metade do mapa; a outra metade ainda exige bota
+
+### Descoberta
+
+O levantamento das fontes oficiais confirmou uma assimetria importante:
+
+1. `Codex`, `Claude Code` e `Gemini CLI` têm documentação oficial suficientemente boa para orientar adapter com base documental real;
+2. `Cowork` e `Antigravity` ainda exigem mais leitura operacional e teste de campo do que seria elegante admitir.
+
+### Por que importa
+
+Sem registrar isso, alguém inevitavelmente vai concluir uma destas duas bobagens:
+
+1. "tem doc oficial, então já dá para implementar tudo no seco";
+2. ou "como um host está mal documentado, então todos dependem do mesmo empirismo".
+
+As duas leituras são preguiçosas.
+
+### Decisao
+
+1. incorporar a matriz de fontes oficiais no plano de adapters;
+2. tratar `Codex`, `Claude Code` e `Gemini CLI` como superfícies com base documental forte;
+3. tratar `Cowork` e `Antigravity` como superfícies que ainda pedem validação prática mais pesada;
+4. não usar a pobreza documental de um host como desculpa para empastar a execução dos outros.
+
 ## 2026-03-20 — O runtime funcionava; o instalador é que ainda vivia em 2019
 
 ### Descoberta

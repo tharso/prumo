@@ -12,6 +12,7 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 
 ### Docs
 - Novo [HOST-ADAPTER-IMPLEMENTATION-PLAN.md](/Users/tharsovieira/Documents/DailyLife/Prumo/HOST-ADAPTER-IMPLEMENTATION-PLAN.md) explicitando a próxima trilha: adapters por host, com taxonomia clara de que mesma família de modelo não significa mesmo adapter (`Cowork != Claude Code`, `Gemini CLI != Antigravity`).
+- O plano de adapters agora inclui uma matriz de documentação oficial por host, distinguindo onde o terreno é sólido (`Codex`, `Claude Code`, `Gemini CLI`) e onde a execução ainda depende mais de teste de campo (`Cowork`, `Antigravity`).
 
 ## [4.15.2] - 2026-03-20
 

@@ -79,6 +79,123 @@ Estas premissas ficam explícitas para ninguém voltar a escorregar:
 4. A ordem de implementação não define host favorito. Define apenas por onde começamos a asfaltar a estrada.
 5. Permissões locais são por app. `Codex.app` autorizado para Apple Reminders não implica `Cowork.app` ou `Antigravity.app` autorizados.
 
+## 3.1. Mapa de documentação oficial por host
+
+Antes de codar adapter, vale fixar onde a documentação oficial realmente existe e onde ela começa a rarear.
+
+### Codex
+
+Fontes oficiais relevantes:
+
+1. OpenAI Codex docs: [developers.openai.com/codex/cloud](https://developers.openai.com/codex/cloud)
+2. OpenAI local shell tool: [developers.openai.com/api/docs/guides/tools-local-shell](https://developers.openai.com/api/docs/guides/tools-local-shell)
+3. Repositório oficial do Codex CLI: [github.com/openai/codex](https://github.com/openai/codex)
+
+O que essas fontes deixam claro:
+
+1. Codex é um agente de código que lê, edita e executa código.
+2. O CLI roda localmente na máquina do usuário.
+3. O ecossistema oficial aceita contexto por arquivo (`AGENTS.md`) e inclui superfície local/IDE/app.
+
+O que isso implica para o adapter:
+
+1. `Codex` é candidato natural ao primeiro slice porque a documentação oficial já assume operação local real.
+2. O adapter não precisa inventar teoria para shell local. A própria documentação já vive nesse terreno.
+
+### Claude Code
+
+Fontes oficiais relevantes:
+
+1. Overview: [code.claude.com/docs/en/overview](https://code.claude.com/docs/en/overview)
+2. CLI reference: [code.claude.com/docs/en/cli-reference](https://code.claude.com/docs/en/cli-reference)
+3. Plugins reference: [code.claude.com/docs/en/plugins-reference](https://code.claude.com/docs/en/plugins-reference)
+4. Skills: [code.claude.com/docs/en/slash-commands](https://code.claude.com/docs/en/slash-commands)
+
+O que essas fontes deixam claro:
+
+1. Claude Code existe em múltiplas superfícies: terminal, IDE, desktop app e web.
+2. O terminal/CLI é first-class.
+3. O sistema de plugins, skills, agents, hooks e MCP é formal e bem documentado.
+
+O que isso implica para o adapter:
+
+1. `Claude Code` merece adapter próprio.
+2. Não devemos tratá-lo como sinônimo de `Cowork`.
+3. O terreno documental aqui é mais sólido do que no Cowork.
+
+### Cowork
+
+Fontes oficiais relevantes:
+
+1. O melhor chão oficial público disponível hoje continua sendo a documentação do ecossistema Claude Code acima.
+2. Para comportamento operacional específico do Cowork neste projeto, ainda dependemos do playbook local: [COWORK-MARKETPLACE-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/COWORK-MARKETPLACE-PLAYBOOK.md)
+
+O que está claro:
+
+1. A família Claude tem documentação oficial robusta para CLI, plugins e desktop app.
+2. O comportamento específico do `Cowork` como casca de plugin/store/skill registry continua menos documentado publicamente do que seria saudável.
+
+O que isso implica para o adapter:
+
+1. O adapter de `Cowork` precisa ser guiado por teste real e pelo nosso playbook, não só por docs oficiais.
+2. Não convém vender abstração onde a própria documentação pública ainda não fecha o circuito.
+
+### Gemini CLI
+
+Fontes oficiais relevantes:
+
+1. Google for Developers summary: [developers.google.com/gemini-code-assist/docs/gemini-cli](https://developers.google.com/gemini-code-assist/docs/gemini-cli)
+2. Repositório oficial: [github.com/google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli)
+
+O que essas fontes deixam claro:
+
+1. Gemini CLI é um agente open source de terminal.
+2. Ele usa ferramentas embutidas, shell local, operações de arquivo, MCP e saídas estruturadas.
+3. O Google o trata como peça canônica do ecossistema Gemini Code Assist.
+
+O que isso implica para o adapter:
+
+1. `Gemini CLI` pode ser trabalhado com a mesma lógica de adapter fino usada em `Codex`, mas não por copiar e colar contrato no escuro.
+2. A documentação já sinaliza shell, arquivos, MCP e JSON. Isso reduz a necessidade de arqueologia por tentativa e erro.
+
+### Antigravity
+
+Fontes oficiais relevantes:
+
+1. Codelab oficial: [codelabs.developers.google.com/getting-started-google-antigravity](https://codelabs.developers.google.com/getting-started-google-antigravity)
+2. Blog do Google sobre Gemini 3 / Antigravity: [blog.google/intl/en-mena/product-updates/explore-get-answers/gemini-3-launches-in-mena/](https://blog.google/intl/en-mena/product-updates/explore-get-answers/gemini-3-launches-in-mena/)
+
+Observação importante:
+
+1. o codelab aponta para `antigravity.google` e `antigravity.google/docs` como destinos oficiais;
+2. nesta sessão, esses endpoints não entregaram conteúdo utilizável;
+3. então a base oficial concreta acessível aqui ficou no codelab e no blog do Google.
+
+O que essas fontes deixam claro:
+
+1. Antigravity é host agent-first, não mero wrapper de chat.
+2. Ele tem acesso ao editor, terminal e browser.
+3. Ele trabalha com workspaces locais.
+4. Permissões e autonomia são por política do app, inclusive para terminal e browser.
+5. Ele possui regras, workflows e skills próprios no workspace.
+
+O que isso implica para o adapter:
+
+1. `Antigravity` não deve ser tratado como `Gemini CLI com UI`.
+2. O adapter dele terá de respeitar uma superfície própria: Manager View, Editor View, browser agent, políticas de autonomia e arquivos `.agents/...`.
+
+## 3.2. Conclusão da pesquisa documental
+
+Depois de levantar a documentação oficial, a situação fica assim:
+
+1. `Codex`: terreno oficial forte para operação local.
+2. `Claude Code`: terreno oficial forte para CLI, plugins, skills e múltiplas superfícies.
+3. `Cowork`: terreno oficial parcial; operação real ainda depende mais de teste de campo e playbook local.
+4. `Gemini CLI`: terreno oficial forte para terminal, shell, MCP e saída estruturada.
+5. `Antigravity`: terreno oficial suficiente para provar que é outro host, mas ainda menos confortável do que Gemini CLI em documentação acessível.
+
+Em português simples: a documentação oficial já basta para impedir a confusão conceitual. Mas não basta, sozinha, para nos poupar de teste real em `Cowork` e `Antigravity`.
+
 ## 4. Objetivo deste bloco
 
 Depois da Fase 1, o objetivo muda de natureza.

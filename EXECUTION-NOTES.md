@@ -111,6 +111,27 @@ Se um host mais obediente tentar executar toda ação JSON como shell, ele vai t
 3. expor `host_prompt` para o que for continuação guiada pelo host;
 4. manter `command` como compat layer por enquanto, mas deixar claro na documentação que adapter novo não deveria depender de adivinhação.
 
+## 2026-03-21 — Mesma família de modelo não significa mesmo adapter
+
+### Descoberta
+
+Os testes reais escancararam uma distinção que estava implícita demais: `Cowork` e `Claude Code` podem compartilhar a família Claude, mas não compartilham a mesma superfície de execução. O mesmo vale para `Gemini CLI` e `Antigravity`.
+
+### Por que importa
+
+Se o projeto continuar nomeando adapters pelo sobrenome do modelo, vai herdar bugs conceituais logo no começo:
+
+1. permissões por app vão parecer detalhe;
+2. affordances do host vão parecer intercambiáveis;
+3. um sucesso em um host vai contaminar a leitura do outro sem merecer.
+
+### Decisao
+
+1. formalizar a taxonomia `família de modelo != host`;
+2. criar um plano operacional próprio para implementação de adapters por host;
+3. tratar `Codex` como primeiro adapter implementado, sem chamar isso de favoritismo estrutural;
+4. explicitar que `Cowork != Claude Code` e `Gemini CLI != Antigravity`.
+
 ## 2026-03-20 — O runtime funcionava; o instalador é que ainda vivia em 2019
 
 ### Descoberta

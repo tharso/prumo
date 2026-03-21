@@ -1,0 +1,311 @@
+# Plano de implementacao: adapters de host do Prumo
+
+Status: plano operacional do bloco seguinte
+
+Relacionado:
+
+1. [LOCAL-RUNTIME-TRANSITION-PLAN.md](/Users/tharsovieira/Documents/DailyLife/Prumo/LOCAL-RUNTIME-TRANSITION-PLAN.md)
+2. [LOCAL-RUNTIME-PHASE1-PLAN.md](/Users/tharsovieira/Documents/DailyLife/Prumo/LOCAL-RUNTIME-PHASE1-PLAN.md)
+3. [INVOCATION-UX-CONTRACT.md](/Users/tharsovieira/Documents/DailyLife/Prumo/INVOCATION-UX-CONTRACT.md)
+4. Issue pública da Fase 1: [#41](https://github.com/tharso/prumo/issues/41)
+
+## 1. Por que este plano existe
+
+Porque já ficou claro demais que "host" e "modelo" não são a mesma coisa.
+
+Se tratarmos:
+
+1. `Cowork` e `Claude Code` como uma coisa só porque ambos orbitam o universo Claude;
+2. `Gemini CLI` e `Antigravity` como uma coisa só porque ambos orbitam o universo Gemini;
+
+vamos enfiar a cabeça num balde metodológico e chamar isso de abstração.
+
+O que muda o adapter do Prumo não é o sobrenome do modelo. É a superfície real do host:
+
+1. como ele invoca;
+2. se ele tem shell local;
+3. se ele tem acesso a arquivos locais;
+4. como lida com permissões por app;
+5. quais affordances ele expõe (`/prumo`, prompt livre, command palette, tool call, skill, bridge, JSON etc.).
+
+Em português simples: mesma família de cérebro não significa mesma porta, mesma maçaneta, nem mesma fechadura.
+
+## 2. Taxonomia correta
+
+Para o Prumo, precisamos separar duas camadas:
+
+### 2.1. Família de modelo / provedor
+
+Exemplos:
+
+1. Anthropic / Claude
+2. OpenAI / Codex
+3. Google / Gemini
+
+Isso importa para:
+
+1. disponibilidade de modelos;
+2. personalidade da interface;
+3. algumas integrações de produto.
+
+Mas isso nao define adapter.
+
+### 2.2. Host / superfície de execução
+
+Exemplos:
+
+1. `Cowork`
+2. `Claude Code`
+3. `Codex`
+4. `Gemini CLI`
+5. `Antigravity`
+
+Isso sim define adapter.
+
+Porque adapter precisa saber:
+
+1. como o usuário chama o Prumo;
+2. como o host executa `prumo`;
+3. como o host consome `prumo start --format json`;
+4. como permissões locais se comportam naquele app.
+
+## 3. Premissas de trabalho
+
+Estas premissas ficam explícitas para ninguém voltar a escorregar:
+
+1. `Cowork` e `Claude Code` são hosts diferentes e merecem adapters diferentes, mesmo quando usarem a mesma família Claude.
+2. `Gemini CLI` e `Antigravity` são hosts diferentes e merecem adapters diferentes, mesmo quando usarem a mesma família Gemini.
+3. `Codex` é host próprio e não deve ser tratado como benchmark universal. Ele é só o primeiro trilho de implementação porque já mostrou o comportamento mais promissor.
+4. A ordem de implementação não define host favorito. Define apenas por onde começamos a asfaltar a estrada.
+5. Permissões locais são por app. `Codex.app` autorizado para Apple Reminders não implica `Cowork.app` ou `Antigravity.app` autorizados.
+
+## 4. Objetivo deste bloco
+
+Depois da Fase 1, o objetivo muda de natureza.
+
+Nao estamos mais tentando provar que o runtime existe.
+
+Estamos tentando provar que o usuário consegue:
+
+1. abrir o host de preferência;
+2. chamar o Prumo de forma curta;
+3. ter o host encaminhando isso para o runtime;
+4. receber uma experiência coerente sem precisar saber que existe `prumo start`.
+
+Em outras palavras: o próximo bloco é `Invocation UX` materializada por host.
+
+## 5. Contrato canônico que todos os adapters devem respeitar
+
+Todos os adapters partem do mesmo núcleo:
+
+1. porta curta técnica:
+   - `prumo`
+   - `prumo start`
+2. briefing explícito:
+   - `prumo briefing --workspace . --refresh-snapshot`
+3. resposta estruturada:
+   - `prumo start --format json`
+
+Campos importantes do JSON:
+
+1. `kind = shell` -> executar `shell_command`
+2. `kind = host-prompt` -> usar `host_prompt` como continuação guiada
+
+O adapter não deve:
+
+1. reinterpretar setup;
+2. reinterpretar migrate;
+3. inventar heurística paralela para auth/repair;
+4. rodar briefing por reflexo só porque não sabe o que fazer.
+
+## 6. Ordem de implementação
+
+Esta é ordem de implementação. Não é ranking de produto.
+
+### 6.1. Slice 1: Codex
+
+Motivo:
+
+1. já mostrou, em teste real, que responde a `Prumo` de forma muito próxima do comportamento desejado;
+2. tem shell local;
+3. lê os wrappers do workspace;
+4. reduz atrito para validar adapter fino sem depender do circo de plugin do Cowork.
+
+Objetivo:
+
+1. consolidar `Codex` como primeiro adapter implementado;
+2. validar que `Prumo` vira `prumo`;
+3. validar que `briefing explícito` vira `prumo briefing`;
+4. validar consumo de `start --format json` quando fizer sentido.
+
+### 6.2. Slice 2: Claude Code
+
+Motivo:
+
+1. pertence à família Claude, mas não carrega o mesmo teatro de plugin do Cowork;
+2. ajuda a testar se a lógica da família Claude ainda se comporta quando a superfície muda;
+3. impede que `Cowork` vire sinônimo mental de "host Claude".
+
+Objetivo:
+
+1. provar que a diferença relevante é host, não sobrenome do modelo;
+2. validar invocação curta e acesso local em outro ambiente Claude.
+
+### 6.3. Slice 3: Cowork
+
+Motivo:
+
+1. continua importante para usuários reais;
+2. já mostrou que funciona como casca fina quando executa `prumo`;
+3. continua instável quando tenta agir como ecossistema nativo de plugin/skill.
+
+Objetivo:
+
+1. manter o Cowork no papel de adapter fino;
+2. evitar reabrir o romance tóxico com plugin como motor;
+3. se `/prumo` existir, ele deve bater em `start` e não inventar outro Prumo dentro do host.
+
+### 6.4. Slice 4: Gemini CLI
+
+Motivo:
+
+1. permite validar a mesma tese num host de outra família;
+2. shell local tende a deixar o teste mais limpo.
+
+Objetivo:
+
+1. provar que a arquitetura é de fato host-agnostic;
+2. validar paridade mínima do contrato em outro ecossistema.
+
+### 6.5. Slice 5: Antigravity
+
+Motivo:
+
+1. expõe outra superfície dentro do universo Gemini;
+2. força a disciplina de não confundir família de modelo com adapter reaproveitável.
+
+Objetivo:
+
+1. validar o par `Gemini CLI` versus `Antigravity` como hosts distintos;
+2. garantir que a taxonomia deste plano não era só discurso bonito.
+
+## 7. Critério de aceite por host
+
+Um host será considerado "no trilho" quando:
+
+1. o usuário puder chamar `Prumo` de forma curta;
+2. o host encaminhar isso para `prumo start` ou `prumo`;
+3. o host não improvisar briefing por conta própria;
+4. o host conseguir executar `prumo briefing --workspace . --refresh-snapshot` quando o pedido for explícito;
+5. quando consumir JSON, respeitar `kind`, `shell_command` e `host_prompt`.
+
+Um host não será considerado pronto só porque:
+
+1. roda um comando no terminal quando alguém dita a linha completa;
+2. parece funcionar no caminho feliz;
+3. compartilha a mesma família de modelo com outro host.
+
+## 8. Matriz mínima de adapter
+
+### 8.1. Codex
+
+Porta curta desejada:
+
+1. `Prumo`
+
+Bridge esperado:
+
+1. `Prumo` -> `prumo`
+2. pedido de briefing explícito -> `prumo briefing --workspace . --refresh-snapshot`
+
+Risco principal:
+
+1. o host acertar por boa vontade em vez de contrato.
+
+### 8.2. Claude Code
+
+Porta curta desejada:
+
+1. `Prumo`
+
+Bridge esperado:
+
+1. igual ao Codex, mas validado como host distinto
+
+Risco principal:
+
+1. tratarmos "Claude" como categoria única e deixarmos Cowork contaminar a leitura.
+
+### 8.3. Cowork
+
+Porta curta desejada:
+
+1. `/prumo`
+2. ou instrução textual equivalente que execute `prumo`
+
+Bridge esperado:
+
+1. `/prumo` -> `start`
+2. `/briefing` ou `/prumo:briefing` -> `briefing`
+
+Risco principal:
+
+1. plugin/skill registry velho voltar a sequestrar a UX.
+
+### 8.4. Gemini CLI
+
+Porta curta desejada:
+
+1. `Prumo`
+
+Bridge esperado:
+
+1. igual ao Codex no nível de contrato
+
+Risco principal:
+
+1. assumir que comportamento bom em Codex se transfere automaticamente.
+
+### 8.5. Antigravity
+
+Porta curta desejada:
+
+1. `Prumo`
+2. affordance equivalente da interface, se houver
+
+Bridge esperado:
+
+1. mesmo contrato do Gemini CLI;
+2. implementação própria por ser outro host.
+
+Risco principal:
+
+1. permissões por app e affordances diferentes serem tratadas como detalhe irrelevante.
+
+## 9. Entregáveis deste novo bloco
+
+1. este plano operacional;
+2. documentação explícita da taxonomia `família != host`;
+3. adapter `Codex` como primeiro implementado;
+4. adapter `Claude Code` como segundo corte;
+5. critérios de aceite do `Cowork` como adapter fino;
+6. backlog explícito para `Gemini CLI` e `Antigravity`.
+
+## 10. O que não fazer agora
+
+1. não reabrir batalha filosófica sobre plugin;
+2. não chamar nenhum host de "prioritário" no produto;
+3. não assumir paridade automática entre hosts da mesma família;
+4. não empilhar integração nova antes de fechar a invocação;
+5. não tentar implementar cinco adapters ao mesmo tempo e chamar isso de estratégia.
+
+## 11. Próxima ação recomendada
+
+A próxima ação recomendada é:
+
+1. consolidar `Codex` como primeiro adapter implementado;
+2. testar e documentar `Claude Code` como host distinto de `Cowork`;
+3. só depois encostar de novo no `Cowork` como adapter fino;
+4. deixar `Gemini CLI` e `Antigravity` como próximos slices claros, não como promessa nebulosa.
+
+Se isso não ficar explícito agora, o projeto volta a confundir ecossistema de marca com superfície de execução. E isso seria como escolher marceneiro pela cor do caminhão.

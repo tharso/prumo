@@ -8,6 +8,7 @@ Relacionado:
 2. Issue publica base: [#40](https://github.com/tharso/prumo/issues/40)
 3. [ADR-001-GOOGLE-INTEGRATION.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ADR-001-GOOGLE-INTEGRATION.md)
 4. [INVOCATION-UX-CONTRACT.md](/Users/tharsovieira/Documents/DailyLife/Prumo/INVOCATION-UX-CONTRACT.md)
+5. [HOST-ADAPTER-IMPLEMENTATION-PLAN.md](/Users/tharsovieira/Documents/DailyLife/Prumo/HOST-ADAPTER-IMPLEMENTATION-PLAN.md)
 
 ## 1. Objetivo da Fase 1
 
@@ -91,6 +92,7 @@ Esse atrito é real, mas pertence ao bloco seguinte:
 1. `Invocation UX`
 2. adapters finos que traduzam a invocação do host para `prumo start`
 3. adapters finos por host para esconder o encanamento e expor uma porta humana
+4. distinção explícita entre família de modelo e host de execução (`Cowork != Claude Code`, `Gemini CLI != Antigravity`)
 
 ## 4. Decisoes tecnicas principais
 

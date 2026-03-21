@@ -10,6 +10,9 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 - `prumo start --format json` agora separa ação de shell e continuação conversacional com `kind`, `shell_command` e `host_prompt`, em vez de jogar tudo em `command` e esperar que o host seja vidente.
 - O contrato de invocação passou a dizer isso com todas as letras, para Codex, Cowork, Gemini e companhia pararem de tratar prosa como terminal.
 
+### Docs
+- Novo [HOST-ADAPTER-IMPLEMENTATION-PLAN.md](/Users/tharsovieira/Documents/DailyLife/Prumo/HOST-ADAPTER-IMPLEMENTATION-PLAN.md) explicitando a próxima trilha: adapters por host, com taxonomia clara de que mesma família de modelo não significa mesmo adapter (`Cowork != Claude Code`, `Gemini CLI != Antigravity`).
+
 ## [4.15.2] - 2026-03-20
 
 ### Added

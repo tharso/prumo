@@ -9,6 +9,7 @@ Relacionado:
 - Operação atual do Cowork: [COWORK-MARKETPLACE-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/COWORK-MARKETPLACE-PLAYBOOK.md)
 - Decisão de integração Google: [ADR-001-GOOGLE-INTEGRATION.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ADR-001-GOOGLE-INTEGRATION.md)
 - Porta de entrada do produto: [INVOCATION-UX-CONTRACT.md](/Users/tharsovieira/Documents/DailyLife/Prumo/INVOCATION-UX-CONTRACT.md)
+- Implementação dos adapters por host: [HOST-ADAPTER-IMPLEMENTATION-PLAN.md](/Users/tharsovieira/Documents/DailyLife/Prumo/HOST-ADAPTER-IMPLEMENTATION-PLAN.md)
 
 ## 1. Problema que estamos realmente tentando resolver
 
@@ -97,6 +98,13 @@ O destino é este:
 5. o runtime responde oferecendo briefing, retomada de trabalho, setup, repair ou auth/config quando faltar alguma peça.
 
 Em português simples: o usuário não deveria sentir que está operando um pacote Python. Deveria sentir que chamou o Prumo.
+
+Nota importante para ninguém voltar a tropeçar:
+
+1. mesma família de modelo não significa mesmo host;
+2. `Cowork` e `Claude Code` são adapters diferentes;
+3. `Gemini CLI` e `Antigravity` são adapters diferentes;
+4. a ordem de implementação desses adapters não define host favorito do produto.
 
 ## 4. Arquitetura alvo
 

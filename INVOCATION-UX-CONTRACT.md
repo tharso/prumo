@@ -42,6 +42,12 @@ O contrato de produto é:
 4. `Antigravity` e afins: idem;
 5. hosts sem shell local: não fingir suporte. Se não conseguem bater na porta, que assumam a limitação em vez de vender telepatia.
 
+Observação de governança:
+
+1. este contrato vale por host, não por família de modelo;
+2. `Cowork` e `Claude Code` não devem ser tratados como o mesmo adapter;
+3. `Gemini CLI` e `Antigravity` também não.
+
 ## Contrato do adapter
 
 Um adapter fino deve:

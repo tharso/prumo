@@ -22,6 +22,8 @@ O primeiro playbook host-específico também já existe: [CODEX-ADAPTER-PLAYBOOK
 
 O segundo playbook já deixa a taxonomia mais honesta: [CLAUDE-CODE-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/CLAUDE-CODE-ADAPTER-PLAYBOOK.md). Ele existe justamente para impedir que `Claude Code` seja confundido com `Cowork` só porque ambos andam pela mesma família de modelos.
 
+E o próximo corte já está preparado em [GEMINI-CLI-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/GEMINI-CLI-ADAPTER-PLAYBOOK.md). A lógica é simples: depois do `Codex` e do shell explícito no `Claude Code`, o próximo host limpo para validar campo é `Gemini CLI`, não o velho drama do `Cowork`.
+
 Para email e agenda multi-conta, o fluxo preferencial agora usa snapshots privados no Google Drive gerados por Google Apps Script e gravados como Google Docs com JSON texto. O motor do Prumo também saiu do formato armário de acumulador: o core agora é índice + guardrails, com procedimento detalhado em módulos canônicos. E a sanitização deixou de ser só “compactar handover”: o sistema agora já consegue arquivar frio seguro com índice global, sem brincar de sumiço.
 
 Seus dados ficam em arquivos Markdown no seu computador. Sem cloud, sem conta, sem lock-in.

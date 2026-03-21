@@ -279,6 +279,13 @@ Objetivo:
 1. provar que a diferença relevante é host, não sobrenome do modelo;
 2. validar invocação curta e acesso local em outro ambiente Claude.
 
+Estado atual:
+
+1. shell explícito validado;
+2. `start --format json` validado;
+3. invocação curta ainda fora do trilho;
+4. `Apple Reminders` bloqueado por limitação operacional de TCC/app no host.
+
 ### 6.3. Slice 3: Cowork
 
 Motivo:
@@ -304,6 +311,10 @@ Objetivo:
 
 1. provar que a arquitetura é de fato host-agnostic;
 2. validar paridade mínima do contrato em outro ecossistema.
+
+Playbook operacional:
+
+1. [GEMINI-CLI-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/GEMINI-CLI-ADAPTER-PLAYBOOK.md)
 
 ### 6.5. Slice 5: Antigravity
 

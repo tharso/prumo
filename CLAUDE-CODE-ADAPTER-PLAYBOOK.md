@@ -12,9 +12,27 @@ Hoje, a situação do `Claude Code` é esta:
 
 1. a base documental oficial é boa;
 2. o contrato do runtime já está pronto para ele;
-3. a validação de campo neste projeto ainda é menos rica do que em `Codex`.
+3. a validação de campo neste projeto já provou shell explícito, mas ainda não fechou invocação natural nem Apple Reminders por app.
 
 Traduzindo sem maquiagem: aqui o terreno é melhor documentado do que no `Cowork`, mas ainda menos testado em produção do que no `Codex`.
+
+## 1.1. Resultado da validação de campo (2026-03-21)
+
+O teste real no `Claude Code` mostrou um retrato misto:
+
+1. `Prumo`, sozinho, ainda caiu em fluxo torto (`prumo:setup` / leitura de arquivos) em vez de bater na porta canônica do runtime;
+2. comandos explícitos passaram:
+   - `prumo --version`
+   - `prumo start --workspace . --format json`
+   - `prumo briefing --workspace . --refresh-snapshot`
+3. `Apple Reminders` continuou bloqueado no host, mesmo depois de reset de TCC e auth repetido;
+4. o painel de `Privacidade e Segurança > Lembretes` mostrou apenas `Terminal.app`, não `Claude Code`.
+
+Conclusão prática:
+
+1. `Claude Code` está aprovado como host com shell;
+2. `Claude Code` está reprovado, por enquanto, em invocação natural;
+3. `Claude Code` está bloqueado, por enquanto, em `Apple Reminders` por limitação operacional do app/TCC.
 
 ## 2. Fontes oficiais que importam
 
@@ -84,6 +102,14 @@ O adapter `Claude Code` passa quando:
 4. o host não puxa o plugin do `Cowork` como muleta conceitual;
 5. o usuário não precisa decorar subcomando para começar.
 
+Status atual deste checklist:
+
+1. `Prumo` vira `prumo` -> `NAO`
+2. briefing explícito vira `prumo briefing --workspace . --refresh-snapshot` -> `SIM`
+3. `prumo start --format json` volta com estrutura íntegra e o host a respeita -> `SIM`
+4. o host não puxa o plugin do `Cowork` como muleta conceitual -> `SIM` no teste explícito, `NAO` no teste natural
+5. o usuário não precisa decorar subcomando para começar -> `NAO`
+
 ## 8. Diferença operacional para Cowork
 
 Esta é a parte que precisa ficar tatuada no plano:
@@ -94,8 +120,7 @@ Esta é a parte que precisa ficar tatuada no plano:
 
 ## 9. Próximo passo neste host
 
-1. rodar validação real em campo, como foi feito no `Codex`;
-2. testar invocação curta;
-3. testar briefing explícito;
-4. testar consumo de `start --format json`;
-5. registrar o que for superfície própria do `Claude Code`, em vez de jogar tudo na conta da família Claude.
+1. manter registrado que `shell explícito` já passou;
+2. tratar `invocação curta` como pendência real do adapter;
+3. tratar `Apple Reminders` como bloqueio operacional do host/TCC, não como bug central do Prumo;
+4. não deixar essa limitação sequestrar a sequência do roadmap.

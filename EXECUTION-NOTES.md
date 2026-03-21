@@ -210,6 +210,37 @@ Mesmo com a taxonomia corrigida no plano, ainda faltava um artefato operacional 
 2. separar explicitamente o comportamento esperado dele no contrato de invocação;
 3. registrar que a base documental é forte, mas a validação de campo ainda precisa acontecer.
 
+## 2026-03-21 — Claude Code passou no shell e tropeçou no TCC
+
+### Descoberta
+
+O teste de campo finalmente parou de ser abstrato:
+
+1. `Claude Code` conseguiu rodar `prumo --version`;
+2. conseguiu rodar `prumo start --workspace . --format json`;
+3. conseguiu rodar `prumo briefing --workspace . --refresh-snapshot`;
+4. falhou na invocação natural `Prumo`;
+5. falhou em `Apple Reminders`, porque o app não apareceu no painel de permissões e o TCC ficou preso em `notDetermined`.
+
+### Decisao
+
+1. registrar `Claude Code` como host validado para shell explícito;
+2. registrar `invocação curta` como pendência real do adapter;
+3. registrar `Apple Reminders` como limitação operacional do host/TCC, não como bug central do Prumo;
+4. seguir para o próximo host em vez de deixar o TCC virar gerente do roadmap.
+
+## 2026-03-21 — Depois do Claude Code, o próximo corte limpo é Gemini CLI
+
+### Descoberta
+
+Depois de `Codex` e do meio-acerto do `Claude Code`, insistir imediatamente em `Cowork` seria só voltar para o mesmo lamaçal com sapato novo.
+
+### Decisao
+
+1. abrir o playbook de `Gemini CLI`;
+2. tratar `Gemini CLI` como próximo host limpo para validação de campo;
+3. deixar `Cowork` para depois, no papel de adapter fino, sem reabrir o drama plugin-first.
+
 ## 2026-03-20 — O runtime funcionava; o instalador é que ainda vivia em 2019
 
 ### Descoberta

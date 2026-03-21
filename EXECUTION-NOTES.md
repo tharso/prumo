@@ -194,6 +194,22 @@ Depois de estabilizar o contrato e o JSON do `start`, o projeto ainda corria um 
 2. linkar esse playbook no plano host-by-host;
 3. tratar isso como trilho de execução, não como favoritismo de host.
 
+## 2026-03-21 — Claude Code precisava ganhar RG próprio antes que o Cowork o adotasse na marra
+
+### Descoberta
+
+Mesmo com a taxonomia corrigida no plano, ainda faltava um artefato operacional que impedisse a recaída mais provável:
+
+1. chamar `Claude Code` de "o outro Cowork";
+2. herdar para ele o drama de plugin store e slash command;
+3. acabar desenhando adapter com a superfície errada.
+
+### Decisao
+
+1. abrir um playbook próprio para `Claude Code`;
+2. separar explicitamente o comportamento esperado dele no contrato de invocação;
+3. registrar que a base documental é forte, mas a validação de campo ainda precisa acontecer.
+
 ## 2026-03-20 — O runtime funcionava; o instalador é que ainda vivia em 2019
 
 ### Descoberta

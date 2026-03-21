@@ -36,11 +36,12 @@ O `start` já tenta inferir o workspace pelo diretório atual ou por um pai reco
 
 O contrato de produto é:
 
-1. `Cowork` ou `Claude/Cowork`: `/prumo` ou affordance equivalente;
-2. `Codex`: comando curto, skill ou mensagem natural que faça o host rodar `prumo start`;
-3. `Gemini CLI`: idem;
-4. `Antigravity` e afins: idem;
-5. hosts sem shell local: não fingir suporte. Se não conseguem bater na porta, que assumam a limitação em vez de vender telepatia.
+1. `Cowork`: `/prumo` ou affordance equivalente;
+2. `Claude Code`: affordance curta ou mensagem natural que faça o host rodar `prumo start`;
+3. `Codex`: comando curto, skill ou mensagem natural que faça o host rodar `prumo start`;
+4. `Gemini CLI`: idem;
+5. `Antigravity` e afins: idem;
+6. hosts sem shell local: não fingir suporte. Se não conseguem bater na porta, que assumam a limitação em vez de vender telepatia.
 
 Observação de governança:
 
@@ -83,6 +84,12 @@ Um adapter fino não deve:
 2. `/prumo:briefing` ou `/briefing` podem continuar tentando `briefing` por compatibilidade;
 3. se o bridge falhar com `12`, cair para o legado sem espetáculo;
 4. se falhar com outro código, avisar em uma linha curta e cair para o legado.
+
+### Claude Code
+
+1. se o usuário disser "Prumo", "bom dia, Prumo" ou equivalente, o adapter deve rodar `prumo start`;
+2. se o usuário pedir briefing explicitamente, pode rodar `prumo briefing --refresh-snapshot`;
+3. não deve depender de slash command, plugin store ou bridge legado do Cowork para bater na porta do runtime.
 
 ### Codex
 

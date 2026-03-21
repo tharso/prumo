@@ -270,6 +270,10 @@ Motivo:
 2. ajuda a testar se a lógica da família Claude ainda se comporta quando a superfície muda;
 3. impede que `Cowork` vire sinônimo mental de "host Claude".
 
+Playbook operacional:
+
+1. [CLAUDE-CODE-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/CLAUDE-CODE-ADAPTER-PLAYBOOK.md)
+
 Objetivo:
 
 1. provar que a diferença relevante é host, não sobrenome do modelo;

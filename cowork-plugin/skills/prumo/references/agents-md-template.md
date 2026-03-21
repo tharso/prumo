@@ -25,6 +25,8 @@ INÍCIO DO TEMPLATE:
 6. Não leia arquivo para "simular" `prumo`, `briefing` ou `start`. Primeiro execute o comando.
 7. Não escreva `_state/briefing-state.json` nem qualquer outro arquivo de estado fingindo ser o runtime.
 8. Não fabrique JSON de `prumo start --format json`. Ou retorna a saída real, ou assume que falhou.
+9. Não rode comando extra sem necessidade. Execute o que foi pedido ou o que o runtime sugeriu.
+10. Se um comando falhar por uso ou argumento inválido, não repita a mesma linha como se insistência fosse método.
 
 ## Instruções primárias
 

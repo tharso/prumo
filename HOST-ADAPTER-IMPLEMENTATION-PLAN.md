@@ -339,6 +339,15 @@ Playbook operacional:
 
 1. [ANTIGRAVITY-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ANTIGRAVITY-ADAPTER-PLAYBOOK.md)
 
+Estado atual:
+
+1. invocação curta passou;
+2. briefing explícito passou;
+3. `start --format json` passou;
+4. o host respeitou o runtime, sem improvisar briefing por leitura de arquivo nem escrever `_state/` na unha;
+5. ainda tropeça em disciplina de execução (comando extra e repetição de flag inválida);
+6. `Apple Reminders` segue pendente por permissão por app.
+
 ## 7. Critério de aceite por host
 
 Um host será considerado "no trilho" quando:
@@ -433,6 +442,19 @@ Risco principal:
 
 1. permissões por app e affordances diferentes serem tratadas como detalhe irrelevante.
 
+Status de campo:
+
+1. melhor comportado do que o `Gemini CLI`;
+2. ainda não disciplinado o bastante para nota máxima.
+
+### 8.6. Fotografia atual dos hosts
+
+1. `Codex` -> aprovado como primeiro adapter implementado.
+2. `Claude Code` -> shell explícito aprovado; invocação curta e `Apple Reminders` ainda pendentes.
+3. `Cowork` -> serve como casca fina quando executa `prumo`; ecossistema plugin-first continua pouco confiável.
+4. `Gemini CLI` -> reprovado como adapter nesta rodada.
+5. `Antigravity` -> parcialmente validado; respeita o runtime, mas ainda tropeça em disciplina operacional.
+
 ## 9. Entregáveis deste novo bloco
 
 1. este plano operacional;
@@ -458,5 +480,6 @@ A próxima ação recomendada é:
 2. testar e documentar `Claude Code` como host distinto de `Cowork`;
 3. só depois encostar de novo no `Cowork` como adapter fino;
 4. deixar `Gemini CLI` e `Antigravity` como próximos slices claros, não como promessa nebulosa.
+5. tratar `Antigravity` como host mais promissor do lado Gemini do que o `Gemini CLI`, sem transformar isso em atestado de maturidade precoce.
 
 Se isso não ficar explícito agora, o projeto volta a confundir ecossistema de marca com superfície de execução. E isso seria como escolher marceneiro pela cor do caminhão.

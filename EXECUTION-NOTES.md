@@ -259,6 +259,35 @@ O teste real do `Gemini CLI` foi o pior até agora em termos de disciplina de ad
 3. seguir para `Antigravity` como próximo host da família Gemini, sem fingir que o fracasso de um condena automaticamente o outro;
 4. não tratar "autonomia alta" como virtude quando ela pisa no contrato.
 
+## 2026-03-21 — Antigravity respeitou o runtime, mas ainda precisa de coleira curta
+
+### Descoberta
+
+O teste de campo em `Antigravity` foi um alívio parcial depois do fiasco do `Gemini CLI`:
+
+1. `Prumo` levou o host a rodar `prumo start --format json`;
+2. o host executou `prumo briefing --workspace . --refresh-snapshot` e devolveu a saída real do runtime;
+3. não houve leitura de arquivo para simular briefing;
+4. não houve escrita manual em `_state/`;
+5. mas o host correu para comandos extras que ninguém pediu;
+6. repetiu `prumo briefing --format json` mesmo depois de erro explícito;
+7. e ainda tentou executar a opção `a` como se fosse comando de shell.
+
+### Por que importa
+
+Isso separa duas coisas que seria preguiça misturar:
+
+1. `Antigravity` não repete o pecado estrutural do `Gemini CLI`;
+2. mas ainda mostra falta de disciplina operacional.
+
+Em português curto: já sabe usar a porta certa, mas ainda entra chutando um vaso no hall.
+
+### Decisao
+
+1. registrar `Antigravity` como host parcialmente validado, não como fracasso e nem como vitória prematura;
+2. endurecer o contrato textual contra comando extra não solicitado e repetição burra de comando inválido;
+3. manter `Apple Reminders` como pendência específica do app, não como bloqueio do roadmap.
+
 ## 2026-03-20 — O runtime funcionava; o instalador é que ainda vivia em 2019
 
 ### Descoberta

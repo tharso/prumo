@@ -60,6 +60,8 @@ def render_agent_md(
 8. Não leia arquivo para simular `prumo`, `briefing` ou `start`. Primeiro execute o comando.
 9. Não escreva arquivos em `_state/` fingindo ser o runtime.
 10. Não fabrique JSON de `prumo start --format json`. Ou retorna a saída real, ou assume que falhou.
+11. Não rode comando extra só porque ficou curioso. Execute o que foi pedido ou o que o runtime sugeriu.
+12. Se um comando falhar por uso ou argumento inválido, não repita a mesma linha cegamente.
 """
 
 
@@ -78,6 +80,8 @@ def render_claude_wrapper(user_name: str, agent_name: str) -> str:
 5. Não invente setup, migrate, repair ou auth por conta própria. O runtime já sabe dirigir.
 6. Não leia arquivo para simular briefing ou start. Primeiro execute `prumo`.
 7. Não escreva `_state/` fingindo ser o runtime.
+8. Não rode comando extra sem necessidade.
+9. Se um comando falhar por uso ou argumento inválido, não repita a mesma linha como disco riscado.
 
 ## Instrução primária
 
@@ -104,6 +108,8 @@ def render_agents_wrapper(user_name: str, agent_name: str) -> str:
 5. Não reinvente setup, migrate, repair ou auth. Deixe o runtime tomar a primeira decisão.
 6. Não leia arquivo para simular briefing ou start. Primeiro execute `prumo`.
 7. Não escreva `_state/` fingindo ser o runtime.
+8. Não rode comando extra sem necessidade.
+9. Se um comando falhar por uso ou argumento inválido, não repita a mesma linha como disco riscado.
 
 ## Instrução primária
 

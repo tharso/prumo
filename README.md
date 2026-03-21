@@ -26,6 +26,13 @@ E o próximo corte já está preparado em [GEMINI-CLI-ADAPTER-PLAYBOOK.md](/User
 
 Como o `Gemini CLI` resolveu improvisar runtime em vez de obedecer comando, o projeto já ganhou também [ANTIGRAVITY-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ANTIGRAVITY-ADAPTER-PLAYBOOK.md). Nem todo primo do mesmo sobrenome merece herdar a culpa sem teste, mas também não merece cheque em branco.
 
+O retrato de campo dos hosts, hoje, ficou assim:
+
+1. `Codex` já passou como primeiro adapter implementado.
+2. `Claude Code` passou no shell explícito, mas ainda tropeça na invocação curta e no TCC de `Apple Reminders`.
+3. `Gemini CLI` foi reprovado como adapter porque tentou improvisar runtime e até mexeu em `_state/`.
+4. `Antigravity` foi melhor que o `Gemini CLI`: usou o runtime de verdade, mas ainda tropeça em disciplina de execução e continua pendente em `Apple Reminders`.
+
 Para email e agenda multi-conta, o fluxo preferencial agora usa snapshots privados no Google Drive gerados por Google Apps Script e gravados como Google Docs com JSON texto. O motor do Prumo também saiu do formato armário de acumulador: o core agora é índice + guardrails, com procedimento detalhado em módulos canônicos. E a sanitização deixou de ser só “compactar handover”: o sistema agora já consegue arquivar frio seguro com índice global, sem brincar de sumiço.
 
 Seus dados ficam em arquivos Markdown no seu computador. Sem cloud, sem conta, sem lock-in.
@@ -113,6 +120,8 @@ Importante, para não vender andaime como se já fosse varanda:
 3. o destino é o usuário abrir Cowork, Claude Code, Codex, Gemini CLI, Antigravity ou host equivalente e chamar o Prumo por uma porta curta (`/prumo`, `@Prumo`, `bom dia, Prumo` ou affordance parecida);
 4. o host então deve encaminhar isso para o runtime local.
 5. se o host consumir `prumo start --format json`, deve tratar `shell_command` e `host_prompt` como coisas diferentes. Máquina que tenta executar conversa vira liquidificador sem tampa.
+6. se um comando falhar com erro explícito de uso, o host não deve repetir a mesma linha como se insistência fosse estratégia.
+7. host bom também não sai rodando comando extra por tédio ou por confiança demais.
 
 Em português simples: agora estamos construindo o motor. A ignição universal vem logo depois.
 

@@ -4,6 +4,15 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [Unreleased]
+
+### Changed
+- Os wrappers do workspace ficaram mais chatos com dois vícios que apareceram no campo: rodar comando extra sem necessidade e insistir na mesma linha depois de um erro explícito. Produto bom não precisa de tutor de obviedade, mas alguns hosts claramente ainda precisam.
+
+### Docs
+- O playbook de `Antigravity` agora registra o resultado real do teste de campo: bem melhor do que o `Gemini CLI`, ainda longe de comportamento impecável.
+- O plano de adapters agora fecha uma fotografia curta dos hosts já testados, o que evita transformar memória recente em lenda oral de corredor.
+
 ## [4.15.4] - 2026-03-21
 
 ### Changed

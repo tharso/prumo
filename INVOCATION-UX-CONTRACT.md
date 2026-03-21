@@ -52,6 +52,9 @@ Um adapter fino deve:
 4. chamar `prumo briefing` diretamente apenas quando a intenção do usuário for briefing explícito;
 5. usar `prumo start --format json` quando o host conseguir renderizar ações/interações próprias.
 6. quando depender de arquivos-guia do workspace (`AGENTS.md`, `CLAUDE.md`), manter esses wrappers alinhados com a mesma porta curta em vez de deixá-los agir como bilhete passivo.
+7. ao consumir `prumo start --format json`, obedecer ao campo `kind`:
+   - `shell`: executar `shell_command`;
+   - `host-prompt`: usar `host_prompt` como próxima ação/fala do host.
 
 Um adapter fino não deve:
 
@@ -60,6 +63,7 @@ Um adapter fino não deve:
 3. inventar heurística paralela para repair/auth;
 4. chamar o briefing como porta universal se o runtime já sabe oferecer opções melhores;
 5. vender uma affordance curta que na prática cai em fluxo legado desconectado do runtime.
+6. interpretar prosa como se fosse comando só porque o JSON tinha cara de estrutura.
 
 ## Como cada host deve se comportar
 

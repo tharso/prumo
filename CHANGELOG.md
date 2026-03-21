@@ -4,6 +4,12 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.15.3] - 2026-03-20
+
+### Changed
+- `prumo start --format json` agora separa ação de shell e continuação conversacional com `kind`, `shell_command` e `host_prompt`, em vez de jogar tudo em `command` e esperar que o host seja vidente.
+- O contrato de invocação passou a dizer isso com todas as letras, para Codex, Cowork, Gemini e companhia pararem de tratar prosa como terminal.
+
 ## [4.15.2] - 2026-03-20
 
 ### Added

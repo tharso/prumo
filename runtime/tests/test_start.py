@@ -46,7 +46,7 @@ class StartCommandTests(unittest.TestCase):
             (workspace / "PAUTA.md").write_text("# Pauta\n", encoding="utf-8")
             (workspace / "AGENT.md").write_text("# AGENT\n", encoding="utf-8")
             (workspace / "CLAUDE.md").write_text("# wrapper\n", encoding="utf-8")
-            (workspace / "PRUMO-CORE.md").write_text("> **prumo_version: 4.15.2**\n", encoding="utf-8")
+            (workspace / "PRUMO-CORE.md").write_text("> **prumo_version: 4.15.3**\n", encoding="utf-8")
             (state_dir / "workspace-schema.json").write_text(
                 json.dumps(
                     {
@@ -164,7 +164,7 @@ class StartCommandTests(unittest.TestCase):
             (workspace / "AGENT.md").write_text("# AGENT\n", encoding="utf-8")
             (workspace / "CLAUDE.md").write_text("# wrapper\n", encoding="utf-8")
             (workspace / "AGENTS.md").write_text("# wrapper\n", encoding="utf-8")
-            (workspace / "PRUMO-CORE.md").write_text("> **prumo_version: 4.15.2**\n", encoding="utf-8")
+            (workspace / "PRUMO-CORE.md").write_text("> **prumo_version: 4.15.3**\n", encoding="utf-8")
             (workspace / "PAUTA.md").write_text("# Pauta\n", encoding="utf-8")
             (state_dir / "workspace-schema.json").write_text(
                 json.dumps(
@@ -196,7 +196,7 @@ class StartCommandTests(unittest.TestCase):
             state_dir = workspace / "_state"
             state_dir.mkdir(parents=True, exist_ok=True)
             (workspace / "AGENT.md").write_text("# AGENT\n", encoding="utf-8")
-            (workspace / "PRUMO-CORE.md").write_text("> **prumo_version: 4.15.2**\n", encoding="utf-8")
+            (workspace / "PRUMO-CORE.md").write_text("> **prumo_version: 4.15.3**\n", encoding="utf-8")
             (workspace / "PAUTA.md").write_text("# Pauta\n\n## Quente (precisa de atenção agora)\n\n- Incêndio no site\n", encoding="utf-8")
             (state_dir / "workspace-schema.json").write_text(
                 json.dumps(
@@ -240,7 +240,7 @@ class StartCommandTests(unittest.TestCase):
             secrets_file = Path(tmpdir) / "custom-google-oauth.json"
             secrets_file.write_text("{}", encoding="utf-8")
             (workspace / "AGENT.md").write_text("# AGENT\n", encoding="utf-8")
-            (workspace / "PRUMO-CORE.md").write_text("> **prumo_version: 4.15.2**\n", encoding="utf-8")
+            (workspace / "PRUMO-CORE.md").write_text("> **prumo_version: 4.15.3**\n", encoding="utf-8")
             (workspace / "PAUTA.md").write_text("# Pauta\n", encoding="utf-8")
             (state_dir / "workspace-schema.json").write_text(
                 json.dumps(
@@ -305,6 +305,12 @@ class StartCommandTests(unittest.TestCase):
             self.assertEqual(payload["user_name"], "Batata")
             self.assertTrue(payload["actions"])
             self.assertEqual(payload["actions"][0]["id"], "briefing")
+            self.assertEqual(payload["actions"][0]["kind"], "shell")
+            self.assertIn("shell_command", payload["actions"][0])
+            continue_action = next(action for action in payload["actions"] if action["id"] == "continue")
+            self.assertEqual(continue_action["kind"], "host-prompt")
+            self.assertIn("host_prompt", continue_action)
+            self.assertNotIn("shell_command", continue_action)
 
 
 if __name__ == "__main__":

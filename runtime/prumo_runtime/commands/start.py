@@ -20,6 +20,26 @@ DEFAULT_GOOGLE_CLIENT_SECRETS = Path("~/Documents/_secrets/prumo/google-oauth-cl
 DEFAULT_DISCOVERY_DEPTH = 8
 
 
+def _shell_action(action_id: str, label: str, shell_command: str) -> dict[str, str]:
+    return {
+        "id": action_id,
+        "label": label,
+        "kind": "shell",
+        "command": shell_command,
+        "shell_command": shell_command,
+    }
+
+
+def _host_prompt_action(action_id: str, label: str, host_prompt: str) -> dict[str, str]:
+    return {
+        "id": action_id,
+        "label": label,
+        "kind": "host-prompt",
+        "command": host_prompt,
+        "host_prompt": host_prompt,
+    }
+
+
 def _parse_iso(value: str | None) -> datetime | None:
     if not value:
         return None
@@ -98,31 +118,31 @@ def _suggest_google_auth_action(workspace: Path) -> dict[str, str]:
     if client_secrets_env:
         candidate = Path(client_secrets_env).expanduser()
         if candidate.exists():
-            return {
-                "id": "auth-google",
-                "label": "Conectar Google",
-                "command": f"prumo auth google --workspace {workspace_str} --client-secrets {candidate}",
-            }
+            return _shell_action(
+                "auth-google",
+                "Conectar Google",
+                f"prumo auth google --workspace {workspace_str} --client-secrets {candidate}",
+            )
     if DEFAULT_GOOGLE_CLIENT_SECRETS.exists():
-        return {
-            "id": "auth-google",
-            "label": "Conectar Google",
-            "command": f"prumo auth google --workspace {workspace_str} --client-secrets {DEFAULT_GOOGLE_CLIENT_SECRETS}",
-        }
+        return _shell_action(
+            "auth-google",
+            "Conectar Google",
+            f"prumo auth google --workspace {workspace_str} --client-secrets {DEFAULT_GOOGLE_CLIENT_SECRETS}",
+        )
     if client_id and client_secret:
-        return {
-            "id": "auth-google",
-            "label": "Conectar Google",
-            "command": (
+        return _shell_action(
+            "auth-google",
+            "Conectar Google",
+            (
                 f'prumo auth google --workspace {workspace_str} --client-id "{client_id}" '
                 f'--client-secret "{client_secret}"'
             ),
-        }
-    return {
-        "id": "auth-google-help",
-        "label": "Ver como conectar Google sem chute cego",
-        "command": f"prumo auth google --workspace {workspace_str} --help",
-    }
+        )
+    return _shell_action(
+        "auth-google-help",
+        "Ver como conectar Google sem chute cego",
+        f"prumo auth google --workspace {workspace_str} --help",
+    )
 
 
 def _build_actions(workspace: Path, overview: dict) -> list[dict[str, str]]:
@@ -138,36 +158,36 @@ def _build_actions(workspace: Path, overview: dict) -> list[dict[str, str]]:
     actions: list[dict[str, str]] = []
     if missing["generated"] or missing["derived"]:
         actions.append(
-            {
-                "id": "repair",
-                "label": "Consertar a estrutura antes de brincar de produtividade",
-                "command": f"prumo repair --workspace {workspace_str}",
-            }
+            _shell_action(
+                "repair",
+                "Consertar a estrutura antes de brincar de produtividade",
+                f"prumo repair --workspace {workspace_str}",
+            )
         )
 
     actions.append(
-        {
-            "id": "briefing",
-            "label": "Rodar o briefing agora" if not has_briefed_today else "Rodar o briefing de novo",
-            "command": f"prumo briefing --workspace {workspace_str} --refresh-snapshot",
-        }
+        _shell_action(
+            "briefing",
+            "Rodar o briefing agora" if not has_briefed_today else "Rodar o briefing de novo",
+            f"prumo briefing --workspace {workspace_str} --refresh-snapshot",
+        )
     )
 
     if continue_item:
         actions.append(
-            {
-                "id": "continue",
-                "label": f"Retomar o que já estava quente: {continue_item}",
-                "command": f"Continue pelo item da pauta: {continue_item}",
-            }
+            _host_prompt_action(
+                "continue",
+                f"Retomar o que já estava quente: {continue_item}",
+                f"Continue pelo item da pauta: {continue_item}",
+            )
         )
 
     actions.append(
-        {
-            "id": "context",
-            "label": "Ver o estado técnico sem poesia",
-            "command": f"prumo context-dump --workspace {workspace_str} --format json",
-        }
+        _shell_action(
+            "context",
+            "Ver o estado técnico sem poesia",
+            f"prumo context-dump --workspace {workspace_str} --format json",
+        )
     )
 
     if not google_connected:
@@ -175,11 +195,11 @@ def _build_actions(workspace: Path, overview: dict) -> list[dict[str, str]]:
 
     if not apple_connected:
         actions.append(
-            {
-                "id": "auth-apple-reminders",
-                "label": "Conectar Apple Reminders",
-                "command": f"prumo auth apple-reminders --workspace {workspace_str}",
-            }
+            _shell_action(
+                "auth-apple-reminders",
+                "Conectar Apple Reminders",
+                f"prumo auth apple-reminders --workspace {workspace_str}",
+            )
         )
 
     ordered: list[dict[str, str]] = []

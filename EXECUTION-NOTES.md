@@ -94,6 +94,23 @@ O adapter fino de host não nasce só no código do runtime. Ele também nasce n
 2. dizer explicitamente: "Prumo" -> `prumo`, briefing explícito -> `prumo briefing --workspace . --refresh-snapshot`;
 3. cercar isso com teste de geração, para o adapter não voltar a virar papel de parede.
 
+## 2026-03-20 — JSON arrumadinho ainda pode esconder uma gambiarra semântica
+
+### Descoberta
+
+`prumo start --format json` já devolvia ações estruturadas, mas a ação `continue` ainda vinha como frase travestida de `command`. Para humano, isso passa. Para adapter, isso é pedir que ele leia pensamento e depois finja que foi arquitetura.
+
+### Por que importa
+
+Se um host mais obediente tentar executar toda ação JSON como shell, ele vai tratar continuação conversacional como comando de terminal. É o tipo de bug que parece improvável até acontecer na frente do usuário e deixar todo mundo com cara de porteiro apertando interfone errado.
+
+### Decisao
+
+1. separar ação de shell e ação conversacional com `kind`;
+2. expor `shell_command` para o que for terminal de verdade;
+3. expor `host_prompt` para o que for continuação guiada pelo host;
+4. manter `command` como compat layer por enquanto, mas deixar claro na documentação que adapter novo não deveria depender de adivinhação.
+
 ## 2026-03-20 — O runtime funcionava; o instalador é que ainda vivia em 2019
 
 ### Descoberta

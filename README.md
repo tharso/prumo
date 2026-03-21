@@ -2,7 +2,7 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.15.2**
+Versão atual: **4.15.3**
 
 Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
 
@@ -98,6 +98,7 @@ Importante, para não vender andaime como se já fosse varanda:
 2. a UX final desejada do produto não é obrigar o usuário a decorar subcomandos;
 3. o destino é o usuário abrir Cowork, Claude Code, Codex, Gemini CLI, Antigravity ou host equivalente e chamar o Prumo por uma porta curta (`/prumo`, `@Prumo`, `bom dia, Prumo` ou affordance parecida);
 4. o host então deve encaminhar isso para o runtime local.
+5. se o host consumir `prumo start --format json`, deve tratar `shell_command` e `host_prompt` como coisas diferentes. Máquina que tenta executar conversa vira liquidificador sem tampa.
 
 Em português simples: agora estamos construindo o motor. A ignição universal vem logo depois.
 

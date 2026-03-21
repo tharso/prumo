@@ -15,6 +15,7 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 - Novo [CODEX-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/CODEX-ADAPTER-PLAYBOOK.md) fixando, sem misticismo, o que significa dizer que o Codex é o primeiro adapter implementado.
 - Novo [CLAUDE-CODE-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/CLAUDE-CODE-ADAPTER-PLAYBOOK.md), para o projeto parar de tratar `Claude Code` como "Cowork sem vitrine".
 - Novo [GEMINI-CLI-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/GEMINI-CLI-ADAPTER-PLAYBOOK.md), preparando o próximo host limpo para validação de campo.
+- Novo [ANTIGRAVITY-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ANTIGRAVITY-ADAPTER-PLAYBOOK.md), porque o fracasso do `Gemini CLI` não autoriza nem condenação automática nem ingenuidade automática no próximo host da família.
 
 ## [4.15.3] - 2026-03-20
 

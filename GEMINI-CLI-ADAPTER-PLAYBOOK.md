@@ -12,9 +12,25 @@ Hoje, a situação do `Gemini CLI` é esta:
 
 1. a base documental oficial é boa;
 2. o contrato do runtime já está pronto para ele;
-3. a validação de campo neste projeto ainda não foi feita.
+3. a validação de campo neste projeto já foi feita e mostrou desvio grave de comportamento.
 
-Traduzindo: aqui o problema ainda não é bug conhecido. É chão ainda não pisado.
+Traduzindo: aqui o problema deixou de ser abstrato. O host tentou improvisar o próprio runtime em vez de obedecer ao comando.
+
+## 1.1. Resultado da validação de campo (2026-03-21)
+
+O teste real no `Gemini CLI` mostrou um retrato pior do que o do `Claude Code`:
+
+1. `prumo` foi ignorado;
+2. o host leu `PRUMO-CORE.md`, `CLAUDE.md`, `PAUTA.md`, `INBOX.md` e outros arquivos por conta própria;
+3. ao pedir `prumo briefing --workspace . --refresh-snapshot`, o host não executou o comando e ainda escreveu `_state/briefing-state.json` na unha;
+4. ao pedir `prumo start --workspace . --format json`, o host fabricou um JSON próprio em vez de devolver a saída real do runtime.
+
+Conclusão prática:
+
+1. `Gemini CLI` está reprovado, por enquanto, em invocação curta;
+2. `Gemini CLI` está reprovado, por enquanto, em briefing explícito;
+3. `Gemini CLI` está reprovado, por enquanto, em consumo do `start --format json`;
+4. o risco real aqui é autonomia burra com confiança alta.
 
 ## 2. Fontes oficiais que importam
 
@@ -72,6 +88,9 @@ Em português curto:
 3. Não assumir paridade automática com `Codex` só porque ambos vivem bem no terminal.
 4. Não contaminar esse adapter com premissas de `Antigravity`.
 5. Tratar permissões locais por app. Se um dia formos usar integrações locais de macOS por este host, a autorização será do app/processo dele, não do vizinho.
+6. Nunca ler arquivos para "simular" `prumo` se o comando ainda não foi executado.
+7. Nunca escrever `_state/briefing-state.json` ou qualquer outro arquivo de estado fingindo ser o runtime.
+8. Nunca sintetizar JSON de `start`; ou roda `prumo start --format json`, ou assume que falhou.
 
 ## 7. Checklist de aceite
 
@@ -83,18 +102,25 @@ O adapter `Gemini CLI` passa quando:
 4. o host não improvisa briefing fora do runtime;
 5. o usuário não precisa decorar subcomando para começar.
 
+Status atual deste checklist:
+
+1. `Prumo` vira `prumo` -> `NAO`
+2. briefing explícito vira `prumo briefing --workspace . --refresh-snapshot` -> `NAO`
+3. `prumo start --format json` volta com estrutura íntegra e o host a respeita -> `NAO`
+4. o host não improvisa briefing fora do runtime -> `NAO`
+5. o usuário não precisa decorar subcomando para começar -> `NAO`
+
 ## 8. Risco principal
 
-O risco mais provável aqui não é TCC nem plugin store. É outro:
+O risco principal aqui já deixou de ser teórico:
 
-1. o projeto assumir que "terminal é terminal" e copiar o adapter do `Codex` sem validar o comportamento real do `Gemini CLI`.
-
-Isso seria rápido. E burro.
+1. o host agir como se "entender o espírito do Prumo" fosse licença para não executar `prumo`;
+2. o adapter textual do workspace ser lido como literatura motivacional, não como contrato operacional;
+3. o projeto subestimar o custo de conter autonomia ruim em host de terminal.
 
 ## 9. Próximo passo neste host
 
-1. rodar validação real em campo;
-2. testar invocação curta;
-3. testar briefing explícito;
-4. testar consumo de `start --format json`;
-5. registrar qualquer diferença concreta de shell, affordance e renderização em relação ao `Codex`.
+1. endurecer os wrappers do workspace contra improviso de briefing e escrita de estado;
+2. tratar `Gemini CLI` como host em falha real de adapter, não como host "quase validado";
+3. seguir para o próximo host sem deixar esse comportamento sequestrar o roadmap;
+4. voltar ao `Gemini CLI` só depois de decidir se vale construir contenção host-específica para esse grau de autonomia ruim.

@@ -22,6 +22,9 @@ INÍCIO DO TEMPLATE:
 3. Se o host souber renderizar ações, prefira `prumo start --format json`.
 4. Se usar JSON, leia `adapter_hints` e respeite `kind`, `shell_command` e `host_prompt`.
 5. Não invente setup, migrate, repair ou auth na unha. Deixe o runtime decidir o primeiro passo.
+6. Não leia arquivo para "simular" `prumo`, `briefing` ou `start`. Primeiro execute o comando.
+7. Não escreva `_state/briefing-state.json` nem qualquer outro arquivo de estado fingindo ser o runtime.
+8. Não fabrique JSON de `prumo start --format json`. Ou retorna a saída real, ou assume que falhou.
 
 ## Instruções primárias
 

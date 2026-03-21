@@ -241,6 +241,24 @@ Depois de `Codex` e do meio-acerto do `Claude Code`, insistir imediatamente em `
 2. tratar `Gemini CLI` como próximo host limpo para validação de campo;
 3. deixar `Cowork` para depois, no papel de adapter fino, sem reabrir o drama plugin-first.
 
+## 2026-03-21 — Gemini CLI não falhou por pouco; falhou por excesso de confiança
+
+### Descoberta
+
+O teste real do `Gemini CLI` foi o pior até agora em termos de disciplina de adapter:
+
+1. ignorou `prumo`;
+2. leu arquivos para improvisar um "Prumo alinhado";
+3. ao pedir `briefing`, escreveu `_state/briefing-state.json` por conta própria;
+4. ao pedir `start --format json`, inventou uma estrutura própria em vez de devolver a saída do runtime.
+
+### Decisao
+
+1. registrar `Gemini CLI` como host em falha real de adapter;
+2. endurecer os wrappers do workspace contra leitura para simular runtime, escrita de `_state/` e JSON fabricado;
+3. seguir para `Antigravity` como próximo host da família Gemini, sem fingir que o fracasso de um condena automaticamente o outro;
+4. não tratar "autonomia alta" como virtude quando ela pisa no contrato.
+
 ## 2026-03-20 — O runtime funcionava; o instalador é que ainda vivia em 2019
 
 ### Descoberta

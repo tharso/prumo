@@ -13,6 +13,8 @@ class TemplateAdapterTests(unittest.TestCase):
         self.assertIn("prumo briefing --workspace . --refresh-snapshot", rendered)
         self.assertIn("prumo start --format json", rendered)
         self.assertIn("adapter_hints", rendered)
+        self.assertIn("Não leia arquivo para simular", rendered)
+        self.assertIn("Não escreva `_state/`", rendered)
 
     def test_agent_md_mentions_host_invocation_rules(self) -> None:
         rendered = templates.render_agent_md(
@@ -25,3 +27,5 @@ class TemplateAdapterTests(unittest.TestCase):
         self.assertIn("host deve rodar `prumo`", rendered)
         self.assertIn("prumo briefing --workspace . --refresh-snapshot", rendered)
         self.assertIn("adapter_hints", rendered)
+        self.assertIn("Não leia arquivo para simular", rendered)
+        self.assertIn("Não escreva arquivos em `_state/`", rendered)

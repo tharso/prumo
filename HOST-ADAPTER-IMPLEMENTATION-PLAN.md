@@ -316,6 +316,13 @@ Playbook operacional:
 
 1. [GEMINI-CLI-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/GEMINI-CLI-ADAPTER-PLAYBOOK.md)
 
+Estado atual:
+
+1. invocação curta falhou;
+2. briefing explícito falhou;
+3. `start --format json` falhou;
+4. o host improvisou runtime e chegou a escrever estado sem passar pelo comando.
+
 ### 6.5. Slice 5: Antigravity
 
 Motivo:
@@ -327,6 +334,10 @@ Objetivo:
 
 1. validar o par `Gemini CLI` versus `Antigravity` como hosts distintos;
 2. garantir que a taxonomia deste plano não era só discurso bonito.
+
+Playbook operacional:
+
+1. [ANTIGRAVITY-ADAPTER-PLAYBOOK.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ANTIGRAVITY-ADAPTER-PLAYBOOK.md)
 
 ## 7. Critério de aceite por host
 

@@ -4,6 +4,19 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.16.1] - 2026-03-22
+
+### Added
+- Nova ação `process-inbox` no operador diário, para o runtime parar de agir como se fila encostada fosse detalhe cosmético.
+- Novo workflow de CI em [ci.yml](/Users/tharsovieira/Documents/DailyLife/Prumo/.github/workflows/ci.yml), com suíte e smoke em `ubuntu-latest` e `macos-latest`, além de smoke real de install/update e comandos do runtime em `windows-latest`.
+
+### Changed
+- As ações estruturadas do runtime agora carregam `documentation_targets` e `outcome`, o que dá ao host instrução melhor sobre o que atualizar e o que deve sair de cada passo.
+- `start` ganhou mais faro operacional: quando a fila está encostada, a sugestão deixa de bancar a paisagem e passa a mandar processar inbox.
+
+### Fixed
+- O core canônico do plugin e seus módulos voltaram a sincronizar com a versão do runtime. Release com placa torta é coisa de oficina desatenta.
+
 ## [4.16.0] - 2026-03-22
 
 ### Added

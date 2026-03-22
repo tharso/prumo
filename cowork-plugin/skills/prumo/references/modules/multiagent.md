@@ -1,6 +1,6 @@
 # Multiagent
 
-> **module_version: 4.15.5**
+> **module_version: 4.16.1**
 >
 > Fonte canônica da convivência entre agentes no Prumo.
 

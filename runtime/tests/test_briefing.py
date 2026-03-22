@@ -24,6 +24,7 @@ from prumo_runtime.commands.briefing import (
 )
 from prumo_runtime import __version__
 from prumo_runtime.google_api import is_actionworthy_triage_item
+from prumo_runtime.platform_support import platform_label
 
 
 class BriefingSnapshotTests(unittest.TestCase):
@@ -74,6 +75,7 @@ class BriefingSnapshotTests(unittest.TestCase):
             self.assertTrue(any(action["id"] == "workflow-scaffold" for action in payload["actions"]))
             self.assertEqual(payload["daily_operation"]["mode"], "daily-operator")
             self.assertTrue(payload["capabilities"]["daily_operation"]["documentation"])
+            self.assertIn("documentation_contract", payload["daily_operation"])
 
     def test_run_briefing_json_output_uses_structured_payload(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -122,8 +124,9 @@ class BriefingSnapshotTests(unittest.TestCase):
             self.assertEqual(payload["sections"][0]["label"], "Preflight")
             self.assertIn("proposal", payload)
             self.assertIn("actions", payload)
-            self.assertEqual(payload["platform"]["label"], "macOS")
+            self.assertEqual(payload["platform"]["label"], platform_label())
             self.assertTrue(any(section["id"] == "workflow_scaffolding" for section in payload["sections"]))
+            self.assertTrue(any("documentation_targets" in action for action in payload["actions"]))
 
     def test_write_and_load_snapshot_cache_preserves_notes(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

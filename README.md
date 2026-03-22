@@ -2,7 +2,7 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.16.0**
+Versão atual: **4.16.1**
 
 Prumo não é mais só “o briefing esperto daquele plugin”. O produto agora está sendo empurrado para o lugar certo: um runtime local-first que funciona como organizador diário, facilitador de trabalho e base para workflows futuros.
 
@@ -349,7 +349,7 @@ Se o painel do app disser que atualizou, mas o plugin continuar em versão velha
 
 ## Versão
 
-Versão atual: `4.16.0`
+Versão atual: `4.16.1`
 
 ## Licença
 

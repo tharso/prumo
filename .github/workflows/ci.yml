@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  unit-and-smoke:
+    name: Unit + Smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install runtime
+        run: python -m pip install -U pip && python -m pip install -e .
+
+      - name: Run unit tests
+        run: PYTHONPATH=runtime python -m unittest discover -s runtime/tests -v
+
+      - name: Run runtime smoke
+        run: bash cowork-plugin/scripts/tests/local_runtime_phase1_smoke.sh
+
+      - name: Run briefing smoke
+        run: bash cowork-plugin/scripts/tests/briefing_smoke.sh
+
+  windows-runtime-smoke:
+    name: Windows Runtime Smoke
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install runtime via PowerShell script
+        shell: pwsh
+        run: ./scripts/prumo_runtime_install.ps1
+
+      - name: Update runtime via PowerShell script
+        shell: pwsh
+        run: ./scripts/prumo_runtime_update.ps1
+
+      - name: Validate runtime commands on Windows
+        shell: pwsh
+        run: |
+          $workspace = Join-Path $env:RUNNER_TEMP "prumo-workspace"
+          prumo --version
+          prumo setup --workspace $workspace --user-name Batata --agent-name Prumo --timezone America/Sao_Paulo --briefing-time 09:00
+          prumo start --workspace $workspace --format json
+          prumo briefing --workspace $workspace --format json
+          prumo context-dump --workspace $workspace --format json
+          prumo repair --workspace $workspace --format json
+          Push-Location $workspace
+          prumo
+          Pop-Location

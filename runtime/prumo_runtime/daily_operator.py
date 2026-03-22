@@ -9,8 +9,16 @@ from prumo_runtime.workspace import extract_section, read_text, load_json
 DEFAULT_GOOGLE_CLIENT_SECRETS = Path("~/Documents/_secrets/prumo/google-oauth-client.json").expanduser()
 
 
-def shell_action(action_id: str, label: str, shell_command: str, *, category: str) -> dict[str, str]:
-    return {
+def shell_action(
+    action_id: str,
+    label: str,
+    shell_command: str,
+    *,
+    category: str,
+    documentation_targets: list[str] | None = None,
+    outcome: str | None = None,
+) -> dict[str, object]:
+    payload: dict[str, object] = {
         "id": action_id,
         "label": label,
         "kind": "shell",
@@ -18,10 +26,23 @@ def shell_action(action_id: str, label: str, shell_command: str, *, category: st
         "command": shell_command,
         "shell_command": shell_command,
     }
+    if documentation_targets:
+        payload["documentation_targets"] = documentation_targets
+    if outcome:
+        payload["outcome"] = outcome
+    return payload
 
 
-def host_prompt_action(action_id: str, label: str, host_prompt: str, *, category: str) -> dict[str, str]:
-    return {
+def host_prompt_action(
+    action_id: str,
+    label: str,
+    host_prompt: str,
+    *,
+    category: str,
+    documentation_targets: list[str] | None = None,
+    outcome: str | None = None,
+) -> dict[str, object]:
+    payload: dict[str, object] = {
         "id": action_id,
         "label": label,
         "kind": "host-prompt",
@@ -29,6 +50,11 @@ def host_prompt_action(action_id: str, label: str, host_prompt: str, *, category
         "command": host_prompt,
         "host_prompt": host_prompt,
     }
+    if documentation_targets:
+        payload["documentation_targets"] = documentation_targets
+    if outcome:
+        payload["outcome"] = outcome
+    return payload
 
 
 def pauta_candidates(workspace: Path) -> tuple[list[str], list[str]]:
@@ -54,6 +80,36 @@ def choose_continue_item(workspace: Path) -> str | None:
     if ongoing:
         return ongoing[0]
     return None
+
+
+def documentation_targets(workspace: Path) -> dict[str, str]:
+    return {
+        "pauta": str((workspace / "PAUTA.md").resolve()),
+        "inbox": str((workspace / "INBOX.md").resolve()),
+        "registro": str((workspace / "REGISTRO.md").resolve()),
+        "workflow_registry": str((workspace / "Referencias" / "WORKFLOWS.md").resolve()),
+    }
+
+
+def count_markdown_items(markdown: str) -> int:
+    count = 0
+    for raw_line in markdown.splitlines():
+        stripped = raw_line.strip()
+        if not stripped or stripped.startswith(">") or stripped.startswith("_"):
+            continue
+        if stripped.startswith(("- ", "* ")):
+            count += 1
+        elif len(stripped) >= 4 and stripped[:2].isdigit() and stripped[2:4] == ". ":
+            count += 1
+    return count
+
+
+def inbox_item_count(workspace: Path) -> int:
+    preview_payload = load_json(workspace / "Inbox4Mobile" / "_preview-index.json")
+    preview_items = preview_payload.get("items")
+    if isinstance(preview_items, list) and preview_items:
+        return len(preview_items)
+    return count_markdown_items(read_text(workspace / "INBOX.md"))
 
 
 def suggest_google_auth_action(workspace: Path) -> dict[str, str]:
@@ -96,21 +152,29 @@ def suggest_google_auth_action(workspace: Path) -> dict[str, str]:
 
 
 def daily_operation_payload(workspace: Path) -> dict[str, object]:
-    registry = workspace / "Referencias" / "WORKFLOWS.md"
+    docs = documentation_targets(workspace)
     return {
         "mode": "daily-operator",
         "supports": [
             "briefing",
             "continuation",
+            "inbox-triage",
             "documentation",
             "workflow-scaffolding",
         ],
-        "documentation_targets": [
-            str((workspace / "PAUTA.md").resolve()),
-            str((workspace / "INBOX.md").resolve()),
-            str((workspace / "REGISTRO.md").resolve()),
-        ],
-        "workflow_registry_path": str(registry.resolve()),
+        "documentation_targets": list(docs.values())[:3],
+        "workflow_registry_path": docs["workflow_registry"],
+        "documentation_contract": {
+            "update_pauta": docs["pauta"],
+            "update_inbox": docs["inbox"],
+            "append_registro": docs["registro"],
+            "register_workflows": docs["workflow_registry"],
+        },
+        "quality_bar": {
+            "briefing_is_not_enough": True,
+            "must_support_continuation": True,
+            "must_leave_useful_documentation": True,
+        },
     }
 
 
@@ -119,13 +183,15 @@ def build_daily_actions(
     overview: dict,
     *,
     has_briefed_today: bool,
-) -> list[dict[str, str]]:
+) -> list[dict[str, object]]:
     workspace_str = str(workspace)
     missing = overview["missing"]
     continue_item = clean_pauta_item(choose_continue_item(workspace))
     google_connected = overview["google_integration"]["active_profile_status"] == "connected"
+    docs = documentation_targets(workspace)
+    inbox_count = inbox_item_count(workspace)
 
-    actions: list[dict[str, str]] = []
+    actions: list[dict[str, object]] = []
     if missing["generated"] or missing["derived"]:
         actions.append(
             shell_action(
@@ -133,6 +199,8 @@ def build_daily_actions(
                 "Consertar a estrutura antes de brincar de produtividade",
                 f"prumo repair --workspace {workspace_str}",
                 category="repair",
+                documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
+                outcome="Workspace consistente o bastante para o Prumo não tropeçar na própria sandália.",
             )
         )
 
@@ -142,6 +210,8 @@ def build_daily_actions(
             "Rodar o briefing agora" if not has_briefed_today else "Rodar o briefing de novo",
             f"prumo briefing --workspace {workspace_str} --refresh-snapshot",
             category="briefing",
+            documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
+            outcome="Panorama atualizado com proposta do dia e contexto suficiente para seguir trabalhando.",
         )
     )
 
@@ -153,9 +223,28 @@ def build_daily_actions(
                 (
                     "Continue pelo item da pauta: "
                     f"{continue_item}. Enquanto avança, registre decisões, próximos passos e pendências "
-                    "na documentação viva do workspace sem inventar contexto."
+                    f"em `{docs['pauta']}` e `{docs['registro']}` sem inventar contexto."
                 ),
                 category="continuation",
+                documentation_targets=[docs["pauta"], docs["registro"]],
+                outcome="Trabalho retomado com próximos passos e decisão registrada em documentação viva.",
+            )
+        )
+
+    if inbox_count:
+        actions.append(
+            host_prompt_action(
+                "process-inbox",
+                f"Processar a fila que está encostada ({inbox_count} item(ns))",
+                (
+                    f"Processe a fila atual do workspace. Triague itens de `{docs['inbox']}` "
+                    "e, se houver preview de Inbox4Mobile, use isso para priorizar. "
+                    f"Atualize `{docs['pauta']}` com próximos passos, limpe o que for resolvido de `{docs['inbox']}` "
+                    f"e registre decisões em `{docs['registro']}`."
+                ),
+                category="inbox-triage",
+                documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
+                outcome="Inbox menor, pauta mais clara e rastro do que foi decidido.",
             )
         )
 
@@ -164,10 +253,12 @@ def build_daily_actions(
             "organize-day",
             "Organizar o dia e a documentação viva",
             (
-                "Organize o dia a partir de PAUTA.md, INBOX.md e REGISTRO.md. "
-                "Atualize a documentação viva com próximos passos, pendências e decisões, sem inventar contexto."
+                f"Organize o dia a partir de `{docs['pauta']}`, `{docs['inbox']}` e `{docs['registro']}`. "
+                "Atualize próximos passos, pendências, decisões e pontos de bloqueio sem inventar contexto."
             ),
             category="documentation",
+            documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
+            outcome="Workspace mais respirável, com pendências, decisões e foco do dia explicitados.",
         )
     )
 
@@ -179,11 +270,13 @@ def build_daily_actions(
             "workflow-scaffold",
             "Preparar candidatos a workflow sem fechar nada à força",
             (
-                "Revise o trabalho atual e registre em Referencias/WORKFLOWS.md padrões repetíveis, gatilhos, "
+                f"Revise o trabalho atual e registre em `{docs['workflow_registry']}` padrões repetíveis, gatilhos, "
                 "documentação necessária e pontos de proatividade que pareçam bons candidatos a workflow do Prumo. "
                 "Não transforme isso em workflow fechado ainda."
             ),
             category="workflow-scaffolding",
+            documentation_targets=[docs["workflow_registry"], docs["registro"]],
+            outcome="Candidatos a workflow registrados sem vender promessa de automação antes da hora.",
         )
     )
 
@@ -193,14 +286,16 @@ def build_daily_actions(
             "Ver o estado técnico sem poesia",
             f"prumo context-dump --workspace {workspace_str} --format json",
             category="diagnostics",
+            documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
+            outcome="Estado técnico explícito para host ou diagnóstico humano sem telepatia.",
         )
     )
 
-    ordered: list[dict[str, str]] = []
+    ordered: list[dict[str, object]] = []
     seen: set[str] = set()
     for action in actions:
         if action["id"] in seen:
             continue
         ordered.append(action)
         seen.add(action["id"])
-    return ordered[:7]
+    return ordered[:8]

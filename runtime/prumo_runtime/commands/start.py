@@ -9,6 +9,7 @@ from prumo_runtime.daily_operator import (
     build_daily_actions,
     choose_continue_item,
     daily_operation_payload,
+    inbox_item_count,
 )
 from prumo_runtime.workspace import (
     WorkspaceError,
@@ -157,6 +158,7 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
     last_briefing_clock = _short_clock(last_briefing_at, timezone_name)
     actions = build_daily_actions(workspace, overview, has_briefed_today=has_briefed_today)
     continue_item = choose_continue_item(workspace)
+    inbox_count = inbox_item_count(workspace)
     workflow_registry = capabilities["workflow_scaffolding"]["registry_path"]
 
     if missing["generated"] or missing["derived"]:
@@ -165,6 +167,8 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
         suggestion = "rodar o briefing agora."
     elif continue_item:
         suggestion = "retomar a frente mais quente em vez de pedir outro mapa da cidade."
+    elif inbox_count:
+        suggestion = "processar a fila encostada antes que ela vire geologia."
     else:
         suggestion = "organizar o dia, atualizar a documentação viva e preparar bons candidatos a workflow em vez de ficar girando no vazio."
 

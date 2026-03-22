@@ -11,6 +11,7 @@ from pathlib import Path
 
 from prumo_runtime import __version__
 from prumo_runtime.commands.start import run_start
+from prumo_runtime.platform_support import platform_label
 
 
 class StartCommandTests(unittest.TestCase):
@@ -231,7 +232,7 @@ class StartCommandTests(unittest.TestCase):
             self.assertNotIn("auth-apple-reminders", action_ids)
             commands = " ".join(action["command"] for action in payload["actions"])
             self.assertNotIn("/caminho/do/client_secret.json", commands)
-            self.assertLessEqual(len(payload["actions"]), 7)
+            self.assertLessEqual(len(payload["actions"]), 8)
 
     def test_google_auth_action_prefers_env_override_for_client_secrets(self) -> None:
         previous = os.environ.get("PRUMO_GOOGLE_CLIENT_SECRETS")
@@ -314,7 +315,7 @@ class StartCommandTests(unittest.TestCase):
                 f"prumo briefing --workspace {workspace.resolve()} --refresh-snapshot --format json",
             )
             self.assertIn("Prumo", payload["adapter_hints"]["short_invocations"])
-            self.assertEqual(payload["platform"]["label"], "macOS")
+            self.assertEqual(payload["platform"]["label"], platform_label())
             self.assertIn("daily_operation", payload)
             self.assertTrue(payload["daily_operation"]["supports"])
             self.assertIn("capabilities", payload)
@@ -325,10 +326,53 @@ class StartCommandTests(unittest.TestCase):
             self.assertIn("shell_command", payload["actions"][0])
             continue_action = next(action for action in payload["actions"] if action["id"] == "continue")
             self.assertEqual(continue_action["kind"], "host-prompt")
+            self.assertIn("documentation_targets", continue_action)
+            self.assertIn("outcome", continue_action)
             workflow_action = next(action for action in payload["actions"] if action["id"] == "workflow-scaffold")
             self.assertEqual(workflow_action["category"], "workflow-scaffolding")
-            self.assertIn("host_prompt", continue_action)
-            self.assertNotIn("shell_command", continue_action)
+
+    def test_json_output_surfaces_inbox_processing_when_queue_exists(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            state_dir = workspace / "_state"
+            inbox_dir = workspace / "Inbox4Mobile"
+            state_dir.mkdir(parents=True, exist_ok=True)
+            inbox_dir.mkdir(parents=True, exist_ok=True)
+            (workspace / "AGENT.md").write_text("# AGENT\n", encoding="utf-8")
+            (workspace / "PRUMO-CORE.md").write_text(f"> **prumo_version: {__version__}**\n", encoding="utf-8")
+            (workspace / "PAUTA.md").write_text("# Pauta\n", encoding="utf-8")
+            (workspace / "INBOX.md").write_text("# Inbox\n\n- Item solto\n", encoding="utf-8")
+            (inbox_dir / "_preview-index.json").write_text(
+                json.dumps({"items": [{"filename": "item1.txt"}, {"filename": "item2.txt"}]}),
+                encoding="utf-8",
+            )
+            (state_dir / "workspace-schema.json").write_text(
+                json.dumps(
+                    {
+                        "user_name": "Batata",
+                        "agent_name": "Prumo",
+                        "timezone": "America/Sao_Paulo",
+                        "briefing_time": "09:00",
+                        "files": {"generated": [], "authorial": [], "derived": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (state_dir / "briefing-state.json").write_text('{"last_briefing_at": "2026-03-22T09:00:00-03:00"}', encoding="utf-8")
+            (state_dir / "google-integration.json").write_text("{}", encoding="utf-8")
+            (state_dir / "apple-reminders-integration.json").write_text("{}", encoding="utf-8")
+            args = Namespace(workspace=str(workspace), format="json")
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                rc = run_start(args)
+            self.assertEqual(rc, 0)
+            payload = json.loads(buffer.getvalue())
+            process_inbox = next(action for action in payload["actions"] if action["id"] == "process-inbox")
+            self.assertEqual(process_inbox["category"], "inbox-triage")
+            self.assertIn("documentation_targets", process_inbox)
+            self.assertIn("fila encostada", payload["message"])
+            self.assertIn("host_prompt", process_inbox)
+            self.assertNotIn("shell_command", process_inbox)
 
     def test_json_output_marks_workspace_resolution_from_cwd(self) -> None:
         previous_cwd = Path.cwd()

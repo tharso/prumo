@@ -18,16 +18,17 @@ INÍCIO DO TEMPLATE:
 ## Porta curta
 
 1. Se o usuário disser "Prumo", "bom dia, Prumo" ou equivalente, rode `prumo`.
-2. Se o pedido for briefing explícito, rode `prumo briefing --workspace . --refresh-snapshot`.
-3. Se precisar de briefing estruturado, rode `prumo briefing --workspace . --refresh-snapshot --format json`.
-4. Se o host souber renderizar ações, prefira `prumo start --format json`.
-5. Se usar JSON, leia `adapter_hints` e respeite `kind`, `shell_command` e `host_prompt`.
-6. Não invente setup, migrate, repair ou auth na unha. Deixe o runtime decidir o primeiro passo.
-7. Não leia arquivo para "simular" `prumo`, `briefing` ou `start`. Primeiro execute o comando.
-8. Não escreva `_state/briefing-state.json` nem qualquer outro arquivo de estado fingindo ser o runtime.
-9. Não fabrique JSON de `prumo start --format json` ou `prumo briefing --format json`. Ou retorna a saída real, ou assume que falhou.
-10. Não rode comando extra sem necessidade. Execute o que foi pedido ou o que o runtime sugeriu.
-11. Se um comando falhar por uso ou argumento inválido, não repita a mesma linha como se insistência fosse método.
+2. Se `prumo` não estiver no PATH do host, tente `$HOME/.local/bin/prumo` antes de concluir que o runtime sumiu.
+3. Se o pedido for briefing explícito, rode `prumo briefing --workspace . --refresh-snapshot`.
+4. Se precisar de briefing estruturado, rode `prumo briefing --workspace . --refresh-snapshot --format json`.
+5. Se o host souber renderizar ações, prefira `prumo start --format json`.
+6. Se usar JSON, leia `adapter_hints` e respeite `kind`, `shell_command` e `host_prompt`.
+7. Não invente setup, migrate, repair ou auth na unha. Deixe o runtime decidir o primeiro passo.
+8. Não leia arquivo para "simular" `prumo`, `briefing` ou `start`. Primeiro execute o comando real.
+9. Não escreva `_state/briefing-state.json` nem qualquer outro arquivo de estado fingindo ser o runtime.
+10. Não fabrique JSON de `prumo start --format json` ou `prumo briefing --format json`. Ou retorna a saída real, ou assume que falhou.
+11. Não rode comando extra sem necessidade. Execute o que foi pedido ou o que o runtime sugeriu.
+12. Se um comando falhar por uso ou argumento inválido, não repita a mesma linha como se insistência fosse método.
 
 ## Instruções primárias
 

@@ -16,8 +16,9 @@ from pathlib import Path
 from prumo_runtime.google_integration import (
     DEFAULT_GOOGLE_PROFILE,
     DEFAULT_GOOGLE_SCOPES,
+    describe_token_storage,
     default_profile_state,
-    store_oauth_bundle_in_keychain,
+    store_oauth_bundle,
     update_profile_state,
     write_google_integration,
 )
@@ -231,7 +232,10 @@ def run_auth_google(args) -> int:
 
     print(f"{config.user_name}, vamos conectar a conta Google do perfil `{profile}`.", flush=True)
     print(
-        "Nada sensivel vai para o workspace em texto puro. O state guarda metadado; token vai para o Keychain.",
+        (
+            "Nada sensivel vai para o workspace em texto puro. "
+            f"O state guarda metadado; token vai para o storage do runtime ({describe_token_storage()})."
+        ),
         flush=True,
     )
     print(f"URL de autorizacao: {auth_url}", flush=True)
@@ -278,7 +282,7 @@ def run_auth_google(args) -> int:
         },
         "token_payload": token_payload,
     }
-    stored = store_oauth_bundle_in_keychain(workspace, profile, oauth_bundle)
+    stored = store_oauth_bundle(workspace, profile, oauth_bundle)
     payload = update_profile_state(
         workspace,
         profile,

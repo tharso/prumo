@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "prumo-runtime"
-version = "4.15.5"
+version = "4.16.0"
 description = "Runtime local do Prumo"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -27,5 +27,7 @@ include = [
   "/CHANGELOG.md",
   "/VERSION",
   "/scripts/prumo_runtime_install.sh",
-  "/scripts/prumo_runtime_update.sh"
+  "/scripts/prumo_runtime_update.sh",
+  "/scripts/prumo_runtime_install.ps1",
+  "/scripts/prumo_runtime_update.ps1"
 ]

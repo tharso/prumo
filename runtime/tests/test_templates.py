@@ -33,3 +33,9 @@ class TemplateAdapterTests(unittest.TestCase):
         self.assertIn("Não leia arquivo para simular", rendered)
         self.assertIn("Não escreva arquivos em `_state/`", rendered)
         self.assertIn("Não rode comando extra só porque ficou curioso", rendered)
+
+    def test_workflows_template_exposes_structure_only_phase(self) -> None:
+        rendered = templates.render_workflows_md("22/03/2026")
+        self.assertIn("structure-only", rendered)
+        self.assertIn("candidatos", rendered.lower())
+        self.assertIn("22/03/2026", rendered)

@@ -1,44 +1,24 @@
 from __future__ import annotations
 
 import json
-import os
-import string
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from prumo_runtime.daily_operator import (
+    build_daily_actions,
+    choose_continue_item,
+    daily_operation_payload,
+)
 from prumo_runtime.workspace import (
     WorkspaceError,
-    extract_section,
     load_json,
-    read_text,
     workspace_overview,
 )
 
 LEGACY_MARKERS = ("CLAUDE.md", "PRUMO-CORE.md", "PAUTA.md", "INBOX.md", "REGISTRO.md")
-DEFAULT_GOOGLE_CLIENT_SECRETS = Path("~/Documents/_secrets/prumo/google-oauth-client.json").expanduser()
 DEFAULT_DISCOVERY_DEPTH = 8
 ADAPTER_CONTRACT_VERSION = "2026-03-21"
-
-
-def _shell_action(action_id: str, label: str, shell_command: str) -> dict[str, str]:
-    return {
-        "id": action_id,
-        "label": label,
-        "kind": "shell",
-        "command": shell_command,
-        "shell_command": shell_command,
-    }
-
-
-def _host_prompt_action(action_id: str, label: str, host_prompt: str) -> dict[str, str]:
-    return {
-        "id": action_id,
-        "label": label,
-        "kind": "host-prompt",
-        "command": host_prompt,
-        "host_prompt": host_prompt,
-    }
 
 
 def _parse_iso(value: str | None) -> datetime | None:
@@ -92,133 +72,6 @@ def _workspace_resolution_source(explicit_workspace: str | None, workspace: Path
     if workspace == Path.cwd().resolve():
         return "cwd"
     return "parent-discovery"
-
-
-def _pauta_candidates(workspace: Path) -> tuple[list[str], list[str]]:
-    pauta = read_text(workspace / "PAUTA.md")
-    hot = extract_section(pauta, "Quente (precisa de atenção agora)")
-    ongoing = extract_section(pauta, "Em andamento")
-    clean_hot = [item for item in hot if "_Nada ainda._" not in item and "Nada ainda." not in item]
-    clean_ongoing = [item for item in ongoing if "_Nada ainda._" not in item and "Nada ainda." not in item]
-    return clean_hot, clean_ongoing
-
-
-def _clean_pauta_item(value: str | None) -> str:
-    text = str(value or "").strip()
-    if text.startswith("- "):
-        text = text[2:].strip()
-    return text
-
-
-def _choose_continue_item(workspace: Path) -> str | None:
-    hot, ongoing = _pauta_candidates(workspace)
-    if hot:
-        return hot[0]
-    if ongoing:
-        return ongoing[0]
-    return None
-
-
-def _suggest_google_auth_action(workspace: Path) -> dict[str, str]:
-    workspace_str = str(workspace)
-    client_secrets_env = str(os.environ.get("PRUMO_GOOGLE_CLIENT_SECRETS") or "").strip()
-    client_id = str(os.environ.get("PRUMO_GOOGLE_CLIENT_ID") or "").strip()
-    client_secret = str(os.environ.get("PRUMO_GOOGLE_CLIENT_SECRET") or "").strip()
-    if client_secrets_env:
-        candidate = Path(client_secrets_env).expanduser()
-        if candidate.exists():
-            return _shell_action(
-                "auth-google",
-                "Conectar Google",
-                f"prumo auth google --workspace {workspace_str} --client-secrets {candidate}",
-            )
-    if DEFAULT_GOOGLE_CLIENT_SECRETS.exists():
-        return _shell_action(
-            "auth-google",
-            "Conectar Google",
-            f"prumo auth google --workspace {workspace_str} --client-secrets {DEFAULT_GOOGLE_CLIENT_SECRETS}",
-        )
-    if client_id and client_secret:
-        return _shell_action(
-            "auth-google",
-            "Conectar Google",
-            (
-                f'prumo auth google --workspace {workspace_str} --client-id "{client_id}" '
-                f'--client-secret "{client_secret}"'
-            ),
-        )
-    return _shell_action(
-        "auth-google-help",
-        "Ver como conectar Google sem chute cego",
-        f"prumo auth google --workspace {workspace_str} --help",
-    )
-
-
-def _build_actions(workspace: Path, overview: dict) -> list[dict[str, str]]:
-    workspace_str = str(workspace)
-    missing = overview["missing"]
-    briefing_state = load_json(workspace / "_state" / "briefing-state.json")
-    last_briefing_at = str(briefing_state.get("last_briefing_at") or "").strip()
-    has_briefed_today = _same_local_day(last_briefing_at, overview["timezone"])
-    continue_item = _clean_pauta_item(_choose_continue_item(workspace))
-    google_connected = overview["google_integration"]["active_profile_status"] == "connected"
-    apple_connected = overview["apple_reminders"]["status"] == "connected"
-
-    actions: list[dict[str, str]] = []
-    if missing["generated"] or missing["derived"]:
-        actions.append(
-            _shell_action(
-                "repair",
-                "Consertar a estrutura antes de brincar de produtividade",
-                f"prumo repair --workspace {workspace_str}",
-            )
-        )
-
-    actions.append(
-        _shell_action(
-            "briefing",
-            "Rodar o briefing agora" if not has_briefed_today else "Rodar o briefing de novo",
-            f"prumo briefing --workspace {workspace_str} --refresh-snapshot",
-        )
-    )
-
-    if continue_item:
-        actions.append(
-            _host_prompt_action(
-                "continue",
-                f"Retomar o que já estava quente: {continue_item}",
-                f"Continue pelo item da pauta: {continue_item}",
-            )
-        )
-
-    actions.append(
-        _shell_action(
-            "context",
-            "Ver o estado técnico sem poesia",
-            f"prumo context-dump --workspace {workspace_str} --format json",
-        )
-    )
-
-    if not google_connected:
-        actions.append(_suggest_google_auth_action(workspace))
-
-    if not apple_connected:
-        actions.append(
-            _shell_action(
-                "auth-apple-reminders",
-                "Conectar Apple Reminders",
-                f"prumo auth apple-reminders --workspace {workspace_str}",
-            )
-        )
-
-    ordered: list[dict[str, str]] = []
-    seen: set[str] = set()
-    for action in actions:
-        if action["id"] in seen:
-            continue
-        ordered.append(action)
-        seen.add(action["id"])
-    return ordered[:6]
 
 
 def _build_adapter_hints(workspace: Path) -> dict[str, object]:
@@ -296,20 +149,24 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
     missing = overview["missing"]
     google = overview["google_integration"]
     apple = overview["apple_reminders"]
+    platform = overview["platform"]
+    capabilities = overview["capabilities"]
     briefing_state = load_json(workspace / "_state" / "briefing-state.json")
     last_briefing_at = str(briefing_state.get("last_briefing_at") or "").strip()
     has_briefed_today = _same_local_day(last_briefing_at, timezone_name)
     last_briefing_clock = _short_clock(last_briefing_at, timezone_name)
-    actions = _build_actions(workspace, overview)
+    actions = build_daily_actions(workspace, overview, has_briefed_today=has_briefed_today)
+    continue_item = choose_continue_item(workspace)
+    workflow_registry = capabilities["workflow_scaffolding"]["registry_path"]
 
     if missing["generated"] or missing["derived"]:
         suggestion = "consertar a estrutura antes de brincar de produtividade."
     elif not has_briefed_today:
         suggestion = "rodar o briefing agora."
-    elif _choose_continue_item(workspace):
+    elif continue_item:
         suggestion = "retomar a frente mais quente em vez de pedir outro mapa da cidade."
     else:
-        suggestion = "rodar o briefing de novo ou abrir o contexto técnico, porque o terreno parece relativamente calmo."
+        suggestion = "organizar o dia, atualizar a documentação viva e preparar bons candidatos a workflow em vez de ficar girando no vazio."
 
     lines = [
         f"1. {overview['user_name']}, o Prumo está de pé no workspace `{workspace}`.",
@@ -318,6 +175,11 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
             f"Google `{google['active_profile_status']}`, "
             f"Apple Reminders `{apple['status']}`, "
             f"core `{overview['core_version'] or 'ausente'}`."
+        ),
+        (
+            "3. Plataforma e escopo desta fase: "
+            f"`{platform['label']}` com operador diário ligado, documentação viva em jogo "
+            "e estrutura pronta para workflows."
         ),
     ]
 
@@ -329,18 +191,35 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
             )
         if missing["authorial"]:
             missing_parts.append(f"faltam arquivos autorais ({len(missing['authorial'])})")
-        lines.append("3. O workspace não está 100% inteiro: " + "; ".join(missing_parts) + ".")
-        suggestion_index = 4
+        lines.append("4. O workspace não está 100% inteiro: " + "; ".join(missing_parts) + ".")
+        suggestion_index = 5
     else:
         if has_briefed_today and last_briefing_clock:
-            lines.append(f"3. Você já passou pelo briefing hoje, às {last_briefing_clock}.")
+            lines.append(f"4. Você já passou pelo briefing hoje, às {last_briefing_clock}.")
         else:
-            lines.append("3. Ainda não há briefing registrado hoje neste workspace.")
-        suggestion_index = 4
+            lines.append("4. Ainda não há briefing registrado hoje neste workspace.")
+        suggestion_index = 5
 
-    lines.append(f"{suggestion_index}. Minha sugestão: {suggestion}")
+    lines.append(
+        "5. Valor mínimo esperado agora: briefing com qualidade, continuação de trabalho, "
+        "organização do dia e documentação útil. Se o produto parar no panorama, virou GPS que não dirige."
+    )
+    suggestion_index = 6
 
-    option_labels = list(string.ascii_lowercase)
+    if not capabilities["providers"]["apple_reminders"]["supported"]:
+        lines.append("6. Apple Reminders não existe nesta plataforma e, honestamente, não vai mandar nesta fase.")
+        suggestion_index = 7
+    elif apple["status"] != "connected":
+        lines.append("6. Apple Reminders ficou fora do foco desta fase. Se estiver negado, tratamos como degradação aceitável, não como desculpa para o produto mancar.")
+        suggestion_index = 7
+
+    lines.append(
+        f"{suggestion_index}. Minha sugestão: {suggestion}"
+    )
+    lines.append(
+        f"{suggestion_index + 1}. Se aparecer padrão repetitivo de trabalho, registre o candidato em `{workflow_registry}`. Não force workflow de laboratório como se fosse contrato assinado."
+    )
+    option_labels = list("abcdefghi")
     for label, action in zip(option_labels, actions):
         lines.append(f"{label}) {action['label']}")
         lines.append(f"   `{action['command']}`")
@@ -381,11 +260,21 @@ def run_start(args) -> int:
         "user_name": overview["user_name"],
         "runtime_version": overview["runtime_version"],
         "core_version": overview["core_version"],
+        "platform": overview["platform"],
+        "capabilities": overview["capabilities"],
+        "daily_operation": daily_operation_payload(workspace),
         "google_status": overview["google_integration"]["active_profile_status"],
         "apple_reminders_status": overview["apple_reminders"]["status"],
         "missing": overview["missing"],
         "adapter_hints": _build_adapter_hints(workspace),
-        "actions": _build_actions(workspace, overview),
+        "actions": build_daily_actions(
+            workspace,
+            overview,
+            has_briefed_today=_same_local_day(
+                str(load_json(workspace / "_state" / "briefing-state.json").get("last_briefing_at") or "").strip(),
+                overview["timezone"],
+            ),
+        ),
         "message": _render_start_text(workspace, overview),
     }
 

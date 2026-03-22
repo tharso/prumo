@@ -11,8 +11,10 @@ from prumo_runtime.google_integration import (
     DEFAULT_GOOGLE_SCOPES,
     default_google_integration_payload,
     google_integration_summary,
+    load_secret,
     load_google_integration,
     resolve_token_storage,
+    store_token,
     update_profile_state,
 )
 
@@ -118,6 +120,36 @@ class GoogleIntegrationTests(unittest.TestCase):
             storage = resolve_token_storage(workspace, "pessoal")
             self.assertEqual(storage["service"], "svc.custom")
             self.assertEqual(storage["account"], "acc.custom")
+
+    @patch("prumo_runtime.google_integration.keychain_supported", return_value=False)
+    @patch("prumo_runtime.google_integration.runtime_app_dir")
+    def test_resolve_token_storage_falls_back_to_runtime_file_on_non_macos(
+        self,
+        mock_runtime_app_dir,
+        _mock_supported,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            mock_runtime_app_dir.return_value = Path(tmpdir) / "runtime-state"
+            storage = resolve_token_storage(workspace, "pessoal")
+            self.assertEqual(storage["type"], "runtime-local-file")
+            self.assertIn("path", storage)
+            self.assertTrue(str(storage["path"]).endswith(".json"))
+
+    @patch("prumo_runtime.google_integration.keychain_supported", return_value=False)
+    @patch("prumo_runtime.google_integration.runtime_app_dir")
+    def test_runtime_file_storage_roundtrip_works_off_keychain(
+        self,
+        mock_runtime_app_dir,
+        _mock_supported,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            mock_runtime_app_dir.return_value = Path(tmpdir) / "runtime-state"
+            storage = resolve_token_storage(workspace, "pessoal")
+            self.assertEqual(storage["type"], "runtime-local-file")
+            store_token(workspace, "pessoal", "segredo")
+            self.assertEqual(load_secret(workspace, "pessoal"), "segredo")
 
 
 if __name__ == "__main__":

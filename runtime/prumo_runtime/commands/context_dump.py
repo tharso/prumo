@@ -9,6 +9,8 @@ from prumo_runtime.workspace import workspace_overview
 def render_markdown(payload: dict) -> str:
     google = payload["google_integration"]
     apple = payload["apple_reminders"]
+    platform = payload["platform"]
+    capabilities = payload["capabilities"]
     connected = ", ".join(google["connected_profiles"]) or "nenhum"
     observed = ", ".join(apple.get("observed_lists") or []) or "todas"
     lines = [
@@ -21,11 +23,21 @@ def render_markdown(payload: dict) -> str:
         f"- Core do workspace: `{payload['core_version'] or 'ausente'}`",
         f"- Schema: `{payload['schema_version']}`",
         f"- Core defasado: `{'sim' if payload['core_outdated'] else 'nao'}`",
+        f"- Plataforma: `{platform['label']}` ({platform['system']} {platform['release']})",
+        f"- Runtime app dir: `{platform['runtime_app_dir']}`",
         f"- Google: `{google['status']}`",
         f"- Perfil Google ativo: `{google['active_profile']}`",
         f"- Perfis Google conectados: `{connected}`",
+        f"- Google token storage: `{google.get('token_storage_backend', 'desconhecido')}`",
         f"- Apple Reminders: `{apple['status']}`",
         f"- Apple listas observadas: `{observed}`",
+        "",
+        "## Capacidades",
+        "",
+        f"- operador diário: `{'sim' if capabilities['daily_operation']['continuation'] else 'nao'}`",
+        f"- documentação viva: `{'sim' if capabilities['daily_operation']['documentation'] else 'nao'}`",
+        f"- estrutura para workflows: `{capabilities['workflow_scaffolding']['delivery']}`",
+        f"- registro de workflows: `{capabilities['workflow_scaffolding']['registry_path']}`",
         "",
         "## Missing",
         "",

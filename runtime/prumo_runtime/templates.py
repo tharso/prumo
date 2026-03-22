@@ -54,7 +54,7 @@ def render_agent_md(
 2. `CLAUDE.md` e `AGENTS.md` são wrappers de compatibilidade, não a fonte de verdade.
 3. Se um arquivo modular faltar, usar `prumo repair` antes de inventar realidade.
 4. Se o usuário chamar "Prumo", "bom dia, Prumo" ou equivalente, o host deve rodar `prumo` no diretório do workspace.
-5. Se `prumo` não estiver no PATH do host, tente `$HOME/.local/bin/prumo` antes de concluir que o runtime sumiu.
+5. Se `prumo` não estiver no PATH do host, tente o caminho absoluto de instalação do runtime neste sistema antes de concluir que ele sumiu.
 6. Se o pedido for briefing explícito, o host pode rodar `prumo briefing --workspace . --refresh-snapshot`.
 7. Se precisar de briefing estruturado, pode rodar `prumo briefing --workspace . --refresh-snapshot --format json`.
 8. Se o host conseguir renderizar ações próprias, preferir `prumo start --format json` em vez de reinventar onboarding na unha.
@@ -76,7 +76,7 @@ def render_claude_wrapper(user_name: str, agent_name: str) -> str:
 ## Porta curta
 
 1. Se o usuário disser "Prumo", "bom dia, Prumo" ou equivalente, rode `prumo`.
-2. Se `prumo` não estiver no PATH do host, tente `$HOME/.local/bin/prumo` antes de concluir que o runtime sumiu.
+2. Se `prumo` não estiver no PATH do host, tente o caminho absoluto de instalação do runtime neste sistema antes de concluir que ele sumiu.
 3. Se o pedido for briefing explícito, rode `prumo briefing --workspace . --refresh-snapshot`.
 4. Se precisar de briefing estruturado, rode `prumo briefing --workspace . --refresh-snapshot --format json`.
 5. Se o host souber trabalhar com JSON, prefira `prumo start --format json`.
@@ -106,7 +106,7 @@ def render_agents_wrapper(user_name: str, agent_name: str) -> str:
 ## Porta curta
 
 1. Se o usuário disser "Prumo", "bom dia, Prumo" ou equivalente, rode `prumo`.
-2. Se `prumo` não estiver no PATH do host, tente `$HOME/.local/bin/prumo` antes de concluir que o runtime sumiu.
+2. Se `prumo` não estiver no PATH do host, tente o caminho absoluto de instalação do runtime neste sistema antes de concluir que ele sumiu.
 3. Se o pedido for briefing explícito, rode `prumo briefing --workspace . --refresh-snapshot`.
 4. Se precisar de briefing estruturado, rode `prumo briefing --workspace . --refresh-snapshot --format json`.
 5. Se o host souber renderizar ações, prefira `prumo start --format json`.
@@ -295,6 +295,38 @@ def render_referencias_md(setup_date: str) -> str:
 
 | # | Título | Arquivo | Data | Descrição | Keywords |
 |---|--------|---------|------|-----------|----------|
+
+_Última atualização: {setup_date}_
+"""
+
+
+def render_workflows_md(setup_date: str) -> str:
+    return f"""# Workflows do Prumo
+
+> Registro dos padrões de trabalho que podem virar workflows do Prumo.
+> Nesta fase, a entrega é **structure-only**: a casa fica pronta. Os workflows concretos entram depois.
+
+## Como usar este arquivo
+
+Registre aqui:
+
+1. tarefas repetíveis
+2. gatilhos claros
+3. documentação necessária
+4. pontos em que proatividade do Prumo geraria valor
+
+## Candidatos
+
+_Nenhum candidato registrado ainda._
+
+## Critérios de admissão
+
+Um workflow bom para o Prumo tende a ter:
+
+1. repetibilidade
+2. valor real para trabalho ou organização
+3. necessidade de contexto/documentação
+4. ganho claro com proatividade
 
 _Última atualização: {setup_date}_
 """

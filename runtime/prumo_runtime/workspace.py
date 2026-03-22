@@ -24,6 +24,7 @@ from prumo_runtime.apple_reminders import (
     render_apple_reminders_json,
     render_apple_reminders_snapshot_json,
 )
+from prumo_runtime.capabilities import runtime_capabilities
 from prumo_runtime import templates
 from prumo_runtime.google_integration import google_integration_summary, render_google_integration_json
 
@@ -107,6 +108,7 @@ def render_files(config: WorkspaceConfig) -> dict[str, str]:
         "REGISTRO.md": templates.render_registro_md(),
         "IDEIAS.md": templates.render_ideias_md(),
         "Referencias/INDICE.md": templates.render_referencias_md(setup_date),
+        "Referencias/WORKFLOWS.md": templates.render_workflows_md(setup_date),
         "_state/briefing-state.json": templates.render_briefing_state_json(),
         "_state/google-integration.json": render_google_integration_json(config.workspace),
         "_state/apple-reminders-integration.json": render_apple_reminders_json(),
@@ -416,6 +418,9 @@ def workspace_overview(workspace: Path) -> dict:
     core_version = parse_core_version(workspace)
     runtime_key = semantic_version_key(RUNTIME_VERSION)
     core_key = semantic_version_key(core_version or "0")
+    google_summary = google_integration_summary(workspace)
+    apple_summary = apple_reminders_summary(workspace)
+    capabilities = runtime_capabilities(workspace, google_summary, apple_summary)
     return {
         "workspace_path": str(workspace.resolve()),
         "user_name": config.user_name,
@@ -427,8 +432,10 @@ def workspace_overview(workspace: Path) -> dict:
         "workspace_created_at": schema.get("created_at", ""),
         "core_version": core_version or "",
         "core_outdated": bool(core_version and core_key < runtime_key),
-        "google_integration": google_integration_summary(workspace),
-        "apple_reminders": apple_reminders_summary(workspace),
+        "platform": capabilities["platform"],
+        "capabilities": capabilities,
+        "google_integration": google_summary,
+        "apple_reminders": apple_summary,
         "missing": missing,
         "pauta_exists": (workspace / "PAUTA.md").exists(),
         "inbox_exists": (workspace / "INBOX.md").exists(),

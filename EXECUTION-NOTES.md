@@ -9,6 +9,28 @@ Este arquivo guarda descobertas tecnicas que mudam a direcao do trabalho. Nao e 
 3. Microtestes, comandos triviais e tentativas sem valor duravel nao entram.
 4. Toda nota daqui deve ter espelho em issue relevante quando afetar roadmap ou execucao.
 
+## 2026-03-22 — A nova fase exigiu separar produto, plataforma e integracoes
+
+### Descoberta
+
+Até aqui, o runtime ainda carregava um vício de infância: parecia produto, mas continuava organizado como briefing + integrações locais + adapter. Quando a conversa ficou mais séria (piloto comercial, Antigravity na frente, Windows no escopo), esse desenho começou a cobrar pedágio. Faltava um núcleo explícito de plataforma e capacidades, faltava uma linguagem de operador diário no runtime, e a integração Google ainda cheirava a macOS por tabela.
+
+### Por que importa
+
+Sem essa separação, a fase seguinte corria três riscos bem feios:
+
+1. vender compatibilidade cross-platform enquanto o storage sensível ainda dependia mentalmente do Keychain;
+2. reduzir o Prumo a "briefing com JSON", quando a proposta real já exige continuação, documentação e scaffolding para workflows;
+3. deixar Apple Reminders sequestrar prioridade de produto só porque ele faz barulho técnico bonito.
+
+### Decisao
+
+1. introduzir `platform_support.py` e `capabilities.py` como parte explícita do núcleo;
+2. formalizar `daily_operator.py` para que `start` e `briefing` deixem de ser só relatórios e passem a carregar operação diária, documentação viva e scaffolding de workflow;
+3. tirar Apple Reminders do centro da fase e tratá-lo como provider opcional/backlog;
+4. abrir fallback real de storage Google fora do macOS, mantendo segredo fora do workspace;
+5. adicionar scripts PowerShell de instalação/update e assumir Windows como parte real da fase, não promessa decorativa.
+
 ## 2026-03-20 — O runtime já existe; a invocação universal ainda não
 
 ### Descoberta

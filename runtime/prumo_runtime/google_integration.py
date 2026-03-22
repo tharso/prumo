@@ -3,10 +3,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import platform
 import subprocess
 from pathlib import Path
 from typing import Any
+
+from prumo_runtime.platform_support import is_macos, platform_label, runtime_app_dir
 
 GOOGLE_INTEGRATION_RELATIVE = "_state/google-integration.json"
 DEFAULT_GOOGLE_PROFILE = "pessoal"
@@ -22,7 +23,15 @@ UNSET = object()
 
 
 def keychain_supported() -> bool:
-    return platform.system() == "Darwin"
+    return is_macos()
+
+
+def token_storage_backend_type() -> str:
+    return "macos-keychain" if keychain_supported() else "runtime-local-file"
+
+
+def token_storage_secure() -> bool:
+    return keychain_supported()
 
 
 def keychain_service_name() -> str:
@@ -35,31 +44,46 @@ def keychain_account_name(workspace: Path, profile: str) -> str:
     return f"{digest}:{profile}"
 
 
-def resolve_token_storage(workspace: Path, profile: str) -> dict:
-    payload = load_google_integration(workspace)
-    profiles = payload.get("profiles") or {}
-    profile_payload = profiles.get(profile)
-    if isinstance(profile_payload, dict):
-        storage = profile_payload.get("token_storage")
-        if isinstance(storage, dict) and storage.get("service") and storage.get("account"):
-            return {
-                "type": str(storage.get("type") or ("macos-keychain" if keychain_supported() else "unsupported")),
-                "service": str(storage["service"]),
-                "account": str(storage["account"]),
-            }
-    return {
-        "type": "macos-keychain" if keychain_supported() else "unsupported",
+def default_token_storage(workspace: Path, profile: str) -> dict:
+    storage = {
+        "type": token_storage_backend_type(),
         "service": keychain_service_name(),
         "account": keychain_account_name(workspace, profile),
     }
+    if storage["type"] == "runtime-local-file":
+        service = str(storage["service"])
+        account = str(storage["account"])
+        digest = hashlib.sha256(f"{service}:{account}".encode("utf-8")).hexdigest()[:24]
+        storage["path"] = str(runtime_app_dir() / "secrets" / "google" / f"{digest}.json")
+    return storage
+
+
+def resolve_token_storage(workspace: Path, profile: str) -> dict:
+    target = workspace / GOOGLE_INTEGRATION_RELATIVE
+    if target.exists():
+        try:
+            payload = json.loads(target.read_text(encoding="utf-8"))
+        except Exception:
+            payload = {}
+        profiles = payload.get("profiles") if isinstance(payload.get("profiles"), dict) else {}
+        profile_payload = profiles.get(profile)
+        if isinstance(profile_payload, dict):
+            storage = profile_payload.get("token_storage")
+            if isinstance(storage, dict) and storage.get("service") and storage.get("account"):
+                merged = {
+                    **default_token_storage(workspace, profile),
+                    "type": str(storage.get("type") or token_storage_backend_type()),
+                    "service": str(storage["service"]),
+                    "account": str(storage["account"]),
+                }
+                if storage.get("path"):
+                    merged["path"] = str(storage["path"])
+                return merged
+    return default_token_storage(workspace, profile)
 
 
 def default_profile_state(workspace: Path, profile: str = DEFAULT_GOOGLE_PROFILE) -> dict:
-    storage = {
-        "type": "macos-keychain" if keychain_supported() else "unsupported",
-        "service": keychain_service_name(),
-        "account": keychain_account_name(workspace, profile),
-    }
+    storage = resolve_token_storage(workspace, profile)
     return {
         "label": "Conta pessoal" if profile == "pessoal" else f"Conta {profile}",
         "status": "disconnected",
@@ -180,13 +204,23 @@ def google_integration_summary(workspace: Path) -> dict:
         "active_last_error": str(active_payload.get("last_error") or ""),
         "connected_profiles": connected_profiles,
         "profiles": profiles,
-        "token_storage_supported": keychain_supported(),
+        "token_storage_supported": True,
+        "token_storage_secure": token_storage_secure(),
+        "token_storage_backend": token_storage_backend_type(),
     }
+
+
+def runtime_secret_store_path(workspace: Path, profile: str, storage: dict | None = None) -> Path:
+    chosen = storage or resolve_token_storage(workspace, profile)
+    service = str(chosen.get("service") or keychain_service_name())
+    account = str(chosen.get("account") or keychain_account_name(workspace, profile))
+    digest = hashlib.sha256(f"{service}:{account}".encode("utf-8")).hexdigest()[:24]
+    return runtime_app_dir() / "secrets" / "google" / f"{digest}.json"
 
 
 def store_token_in_keychain(workspace: Path, profile: str, secret: str) -> dict:
     if not keychain_supported():
-        raise RuntimeError("token storage seguro no runtime ainda so esta implementado no macOS")
+        raise RuntimeError("Keychain do macOS indisponivel neste sistema")
     service = keychain_service_name()
     account = keychain_account_name(workspace, profile)
     command = [
@@ -210,9 +244,26 @@ def store_token_in_keychain(workspace: Path, profile: str, secret: str) -> dict:
     return {"type": "macos-keychain", "service": service, "account": account}
 
 
+def store_token_in_runtime_file(workspace: Path, profile: str, secret: str) -> dict:
+    storage = resolve_token_storage(workspace, profile)
+    path = runtime_secret_store_path(workspace, profile, storage=storage)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(secret, encoding="utf-8")
+    try:
+        os.chmod(path, 0o600)
+    except OSError:
+        pass
+    return {
+        "type": "runtime-local-file",
+        "service": storage["service"],
+        "account": storage["account"],
+        "path": str(path),
+    }
+
+
 def load_secret_from_keychain(workspace: Path, profile: str) -> str:
     if not keychain_supported():
-        raise RuntimeError("token storage seguro no runtime ainda so esta implementado no macOS")
+        raise RuntimeError("Keychain do macOS indisponivel neste sistema")
     storage = resolve_token_storage(workspace, profile)
     service = storage["service"]
     account = storage["account"]
@@ -235,16 +286,56 @@ def load_secret_from_keychain(workspace: Path, profile: str) -> str:
     return completed.stdout.strip()
 
 
+def load_secret_from_runtime_file(workspace: Path, profile: str) -> str:
+    storage = resolve_token_storage(workspace, profile)
+    raw_path = str(storage.get("path") or "")
+    path = Path(raw_path) if raw_path else runtime_secret_store_path(workspace, profile, storage=storage)
+    if not path.exists():
+        raise RuntimeError(
+            f"credencial Google ausente no storage local do runtime ({path}). Sem isso o refresh nao tem nem de onde sair."
+        )
+    return path.read_text(encoding="utf-8")
+
+
+def store_token(workspace: Path, profile: str, secret: str) -> dict:
+    if keychain_supported():
+        return store_token_in_keychain(workspace, profile, secret)
+    return store_token_in_runtime_file(workspace, profile, secret)
+
+
+def load_secret(workspace: Path, profile: str) -> str:
+    storage = resolve_token_storage(workspace, profile)
+    if storage["type"] == "macos-keychain":
+        return load_secret_from_keychain(workspace, profile)
+    if storage["type"] == "runtime-local-file":
+        return load_secret_from_runtime_file(workspace, profile)
+    raise RuntimeError(f"storage de token `{storage['type']}` ainda nao foi implementado com juizo")
+
+
+def describe_token_storage() -> str:
+    if keychain_supported():
+        return "Keychain do macOS"
+    return f"storage local do runtime em {platform_label()} (fora do workspace)"
+
+
+def store_oauth_bundle(workspace: Path, profile: str, bundle: dict[str, Any]) -> dict:
+    return store_token(workspace, profile, json.dumps(bundle, ensure_ascii=True))
+
+
 def store_oauth_bundle_in_keychain(workspace: Path, profile: str, bundle: dict[str, Any]) -> dict:
-    return store_token_in_keychain(workspace, profile, json.dumps(bundle, ensure_ascii=True))
+    return store_oauth_bundle(workspace, profile, bundle)
 
 
 def load_oauth_bundle_from_keychain(workspace: Path, profile: str) -> dict[str, Any]:
-    raw = load_secret_from_keychain(workspace, profile)
+    raw = load_secret(workspace, profile)
     try:
         payload = json.loads(raw)
     except json.JSONDecodeError as exc:
-        raise RuntimeError("token no Keychain esta ilegivel; alguem guardou um tijolo onde devia haver JSON") from exc
+        raise RuntimeError("token no storage do runtime esta ilegivel; alguem guardou um tijolo onde devia haver JSON") from exc
     if not isinstance(payload, dict):
-        raise RuntimeError("token no Keychain nao tem formato valido")
+        raise RuntimeError("token no storage do runtime nao tem formato valido")
     return payload
+
+
+def load_oauth_bundle(workspace: Path, profile: str) -> dict[str, Any]:
+    return load_oauth_bundle_from_keychain(workspace, profile)

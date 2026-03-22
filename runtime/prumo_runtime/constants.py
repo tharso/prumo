@@ -30,6 +30,7 @@ AUTHORIAL_FILES = (
     "REGISTRO.md",
     "IDEIAS.md",
     "Referencias/INDICE.md",
+    "Referencias/WORKFLOWS.md",
 )
 
 DERIVED_FILES = (

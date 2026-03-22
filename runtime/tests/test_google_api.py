@@ -307,7 +307,7 @@ class GoogleApiParsingTests(unittest.TestCase):
 
     @patch("prumo_runtime.google_api.update_profile_state")
     @patch("prumo_runtime.google_api.load_google_integration")
-    @patch("prumo_runtime.google_api.load_oauth_bundle_from_keychain")
+    @patch("prumo_runtime.google_api.load_oauth_bundle")
     @patch("urllib.request.urlopen")
     def test_refresh_google_access_token_marks_profile_needs_reauth_on_invalid_grant(
         self,

@@ -15,12 +15,14 @@ from prumo_runtime.apple_reminders import (
     fetch_apple_reminders_today,
 )
 from prumo_runtime.constants import RUNTIME_VERSION, repo_root_from
+from prumo_runtime.daily_operator import build_daily_actions, daily_operation_payload
 from prumo_runtime.google_api import (
     connected_google_profile,
     fetch_google_workspace_snapshot,
     is_actionworthy_triage_item,
 )
 from prumo_runtime.google_integration import google_integration_summary
+from prumo_runtime.platform_support import is_macos, platform_label
 from prumo_runtime.workspace import (
     build_config_from_existing,
     extract_section,
@@ -29,6 +31,7 @@ from prumo_runtime.workspace import (
     read_text,
     semantic_version_key,
     update_briefing_state,
+    workspace_overview,
     write_json,
 )
 
@@ -142,6 +145,14 @@ def short_clock(value: str | None, timezone_name: str) -> str | None:
     if dt_value is None:
         return None
     return dt_value.astimezone(ZoneInfo(timezone_name)).strftime("%H:%M")
+
+
+def same_local_day(value: str | None, timezone_name: str) -> bool:
+    dt_value = parse_iso_datetime(value)
+    if dt_value is None:
+        return False
+    now = datetime.now(ZoneInfo(timezone_name))
+    return dt_value.astimezone(ZoneInfo(timezone_name)).date() == now.date()
 
 
 def infer_domain(url: str | None) -> str | None:
@@ -642,23 +653,26 @@ def summarize_apple_reminders_status(workspace: Path, timezone_name: str) -> str
         if last_refresh:
             age_text = humanize_age_minutes(last_refresh_age)
             if age_text:
-                return f"conectado{suffix}, ultimo refresh {last_refresh} ({age_text})"
-            return f"conectado{suffix}, ultimo refresh {last_refresh}"
-        return f"conectado{suffix}"
+                return f"conectado{suffix}, ultimo refresh {last_refresh} ({age_text}). fora do foco desta fase, mas não está atrapalhando."
+            return f"conectado{suffix}, ultimo refresh {last_refresh}. fora do foco desta fase, mas de pé."
+        return f"conectado{suffix}. fora do foco desta fase, mas de pé."
 
-    if status in {"denied", "disconnected"}:
+    if not is_macos():
+        return f"indisponível em {platform_label()}. Apple Reminders ficou fora desta fase e não bloqueia o produto."
+
+    if status in {"denied", "disconnected", "unsupported"}:
         base = "desconectado"
         if auth_status in {"denied", "restricted"}:
             base = f"{base}; a Apple negou acesso"
-        message = f"{base}. Rode `prumo auth apple-reminders --workspace ...` se quiser puxar lembretes locais."
+        message = f"{base}. Apple Reminders ficou no backlog desta fase e não deve sequestrar a conversa."
         if last_error:
             return f"{message} {last_error}"
         return message
 
     if status == "error":
         if last_error:
-            return f"erro lendo Apple Reminders. {last_error}"
-        return "erro lendo Apple Reminders. Rode `prumo auth apple-reminders --workspace ...` e tente de novo."
+            return f"erro lendo Apple Reminders. {last_error} Como isso ficou fora desta fase, trate como degradação tolerável."
+        return "erro lendo Apple Reminders. Como isso ficou fora desta fase, trate como degradação tolerável."
 
     if status == "ok":
         return "ok. Isso ficou com cheiro de estado intermediário demais, mas pelo menos não caiu."
@@ -761,6 +775,7 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
     workspace = workspace.expanduser().resolve()
     config = build_config_from_existing(workspace)
     repo_root = repo_root_from(Path(__file__))
+    overview = workspace_overview(workspace)
 
     pauta_text = read_text(workspace / "PAUTA.md")
     inbox_text = read_text(workspace / "INBOX.md")
@@ -778,6 +793,7 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
     update_briefing_state(workspace, config.timezone_name)
     briefing_state = load_json(workspace / "_state" / "briefing-state.json")
     last_briefing_at = str(briefing_state.get("last_briefing_at") or "").strip()
+    has_briefed_today = same_local_day(last_briefing_at, config.timezone_name)
 
     core_version = parse_core_version(workspace)
     core_outdated = bool(core_version and semantic_version_key(core_version) < semantic_version_key(RUNTIME_VERSION))
@@ -805,6 +821,9 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
         f"Agendado {pauta_counts['agendado']}. {hottest}"
     )
     proposal = choose_proposal(quente, agendado, andamento, snapshot)
+    actions = build_daily_actions(workspace, overview, has_briefed_today=has_briefed_today)
+    daily_operation = daily_operation_payload(workspace)
+    workflow_registry = overview["capabilities"]["workflow_scaffolding"]["registry_path"]
 
     sections = [
         {"id": "preflight", "label": "Preflight", "text": preflight_text},
@@ -815,6 +834,22 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
         {"id": "emails", "label": "Emails", "text": emails_text},
         {"id": "panorama_local", "label": "Panorama local", "text": panorama_text},
         {"id": "proposta_do_dia", "label": "Proposta do dia", "text": f"atacar primeiro `{proposal}`."},
+        {
+            "id": "operacao_do_dia",
+            "label": "Operação do dia",
+            "text": (
+                "O briefing é só a porta. O trabalho de verdade é continuar, organizar e registrar "
+                "o que muda no workspace sem depender de memória de peixe."
+            ),
+        },
+        {
+            "id": "workflow_scaffolding",
+            "label": "Workflows",
+            "text": (
+                "Esta fase ainda não fecha workflows específicos. O combinado é identificar padrões "
+                f"repetíveis e registrar candidatos em `{workflow_registry}`."
+            ),
+        },
     ]
 
     lines: list[str] = []
@@ -830,7 +865,11 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
         "runtime_version": RUNTIME_VERSION,
         "core_version": core_version or "",
         "core_outdated": core_outdated,
+        "platform": overview["platform"],
+        "capabilities": overview["capabilities"],
+        "daily_operation": daily_operation,
         "last_briefing_at": last_briefing_at,
+        "actions": actions,
         "sections": sections,
         "proposal": {
             "text": proposal,

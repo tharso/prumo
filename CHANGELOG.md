@@ -4,6 +4,23 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.16.0] - 2026-03-22
+
+### Added
+- Novo núcleo explícito de plataforma em `platform_support.py` e `capabilities.py`, para o runtime parar de agir como se “macOS por osmose” fosse arquitetura.
+- Nova camada `daily_operator.py`, que formaliza o Prumo como operador diário: briefing, continuação, documentação viva e scaffolding de workflows.
+- Novo arquivo autoral `Referencias/WORKFLOWS.md` criado pelo runtime, porque a próxima fase precisa de fundação para workflows sem fingir que eles já nasceram prontos.
+- Novos scripts PowerShell `scripts/prumo_runtime_install.ps1` e `scripts/prumo_runtime_update.ps1`, abrindo a porta mínima funcional para Windows sem depender de rezas e screenshots.
+
+### Changed
+- `workspace_overview`, `context-dump`, `prumo start --format json` e `prumo briefing --format json` agora expõem `platform`, `capabilities` e `daily_operation`. O runtime finalmente passou a falar como produto, não só como checklist de integração.
+- A saída de `start` e `briefing` agora carrega ações mais adultas: continuidade de trabalho, organização do dia, documentação viva e registro de candidatos a workflow.
+- A integração Google deixou de depender implicitamente do Keychain do macOS. Fora do macOS, o runtime passa a usar storage local próprio, fora do workspace.
+- `Apple Reminders` saiu do centro da fase atual. Continua existindo como provider e estado do runtime, mas agora aparece como backlog/degradação tolerável, não como bengala conceitual do produto.
+
+### Docs
+- `README.md` foi alinhado à fase nova: `Antigravity` como trilho principal do piloto, `Codex` como referência técnica, `Cowork` em backlog preparado e Windows oficialmente dentro do escopo.
+
 ## [4.15.5] - 2026-03-22
 
 ### Changed

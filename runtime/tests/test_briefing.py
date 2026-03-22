@@ -70,6 +70,10 @@ class BriefingSnapshotTests(unittest.TestCase):
             self.assertEqual(payload["sections"][0]["id"], "preflight")
             self.assertEqual(payload["proposal"]["options"][0]["id"], "accept")
             self.assertIn("Proposta do dia", payload["message"])
+            self.assertIn("actions", payload)
+            self.assertTrue(any(action["id"] == "workflow-scaffold" for action in payload["actions"]))
+            self.assertEqual(payload["daily_operation"]["mode"], "daily-operator")
+            self.assertTrue(payload["capabilities"]["daily_operation"]["documentation"])
 
     def test_run_briefing_json_output_uses_structured_payload(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -117,6 +121,9 @@ class BriefingSnapshotTests(unittest.TestCase):
             self.assertIn("sections", payload)
             self.assertEqual(payload["sections"][0]["label"], "Preflight")
             self.assertIn("proposal", payload)
+            self.assertIn("actions", payload)
+            self.assertEqual(payload["platform"]["label"], "macOS")
+            self.assertTrue(any(section["id"] == "workflow_scaffolding" for section in payload["sections"]))
 
     def test_write_and_load_snapshot_cache_preserves_notes(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -322,6 +329,7 @@ class BriefingSnapshotTests(unittest.TestCase):
             self.assertIn("conectado", rendered)
             self.assertIn("2 lista(s)", rendered)
             self.assertIn("15:13", rendered)
+            self.assertIn("fora do foco desta fase", rendered)
 
             (state_dir / "apple-reminders-integration.json").write_text(
                 json.dumps(
@@ -336,7 +344,7 @@ class BriefingSnapshotTests(unittest.TestCase):
             )
             rendered = summarize_apple_reminders_status(workspace, "America/Sao_Paulo")
             self.assertIn("desconectado", rendered)
-            self.assertIn("prumo auth apple-reminders", rendered)
+            self.assertIn("backlog desta fase", rendered)
             self.assertIn("Apple negou acesso", rendered)
 
     @patch(

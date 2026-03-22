@@ -13,9 +13,9 @@ from zoneinfo import ZoneInfo
 
 from prumo_runtime.google_integration import (
     DEFAULT_GOOGLE_PROFILE,
+    load_oauth_bundle,
     load_google_integration,
-    load_oauth_bundle_from_keychain,
-    store_oauth_bundle_in_keychain,
+    store_oauth_bundle,
     update_profile_state,
 )
 from prumo_runtime.workspace import WorkspaceError, load_json, now_iso
@@ -63,7 +63,7 @@ def connected_google_profile(workspace: Path, preferred_profile: str | None = No
 
 def refresh_google_access_token(workspace: Path, profile: str, timezone_name: str) -> tuple[str, dict]:
     try:
-        bundle = load_oauth_bundle_from_keychain(workspace, profile)
+        bundle = load_oauth_bundle(workspace, profile)
     except RuntimeError as exc:
         raise WorkspaceError(str(exc)) from exc
 
@@ -130,7 +130,7 @@ def refresh_google_access_token(workspace: Path, profile: str, timezone_name: st
     if "refresh_token" not in refreshed:
         updated_token["refresh_token"] = refresh_token
     bundle["token_payload"] = updated_token
-    store_oauth_bundle_in_keychain(workspace, profile, bundle)
+    store_oauth_bundle(workspace, profile, bundle)
 
     integration = load_google_integration(workspace)
     profile_payload = integration["profiles"].get(profile, {})

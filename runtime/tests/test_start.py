@@ -227,9 +227,11 @@ class StartCommandTests(unittest.TestCase):
             action_ids = [action["id"] for action in payload["actions"]]
             self.assertIn("context", action_ids)
             self.assertTrue(any(action_id.startswith("auth-google") for action_id in action_ids))
+            self.assertIn("workflow-scaffold", action_ids)
+            self.assertNotIn("auth-apple-reminders", action_ids)
             commands = " ".join(action["command"] for action in payload["actions"])
             self.assertNotIn("/caminho/do/client_secret.json", commands)
-            self.assertLessEqual(len(payload["actions"]), 6)
+            self.assertLessEqual(len(payload["actions"]), 7)
 
     def test_google_auth_action_prefers_env_override_for_client_secrets(self) -> None:
         previous = os.environ.get("PRUMO_GOOGLE_CLIENT_SECRETS")
@@ -312,12 +314,19 @@ class StartCommandTests(unittest.TestCase):
                 f"prumo briefing --workspace {workspace.resolve()} --refresh-snapshot --format json",
             )
             self.assertIn("Prumo", payload["adapter_hints"]["short_invocations"])
+            self.assertEqual(payload["platform"]["label"], "macOS")
+            self.assertIn("daily_operation", payload)
+            self.assertTrue(payload["daily_operation"]["supports"])
+            self.assertIn("capabilities", payload)
+            self.assertTrue(payload["capabilities"]["daily_operation"]["workflow_scaffolding"])
             self.assertTrue(payload["actions"])
             self.assertEqual(payload["actions"][0]["id"], "briefing")
             self.assertEqual(payload["actions"][0]["kind"], "shell")
             self.assertIn("shell_command", payload["actions"][0])
             continue_action = next(action for action in payload["actions"] if action["id"] == "continue")
             self.assertEqual(continue_action["kind"], "host-prompt")
+            workflow_action = next(action for action in payload["actions"] if action["id"] == "workflow-scaffold")
+            self.assertEqual(workflow_action["category"], "workflow-scaffolding")
             self.assertIn("host_prompt", continue_action)
             self.assertNotIn("shell_command", continue_action)
 

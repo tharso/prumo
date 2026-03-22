@@ -2,11 +2,11 @@
 
 **Sistema de organização de vida pessoal com IA.**
 
-Versão atual: **4.15.5**
+Versão atual: **4.16.0**
 
-Prumo é um plugin de IA que transforma o Claude, Codex ou Gemini em interface única para capturar, processar, lembrar e cobrar tudo que acontece na sua vida. Trabalho, filhos, contas, saúde, ideias — tudo entra pelo mesmo lugar.
+Prumo não é mais só “o briefing esperto daquele plugin”. O produto agora está sendo empurrado para o lugar certo: um runtime local-first que funciona como organizador diário, facilitador de trabalho e base para workflows futuros.
 
-O detalhe novo, e importante, é que o produto começou a sair da jaula `plugin-first`. Agora existe um trilho experimental de runtime local, para o Prumo parar de depender emocionalmente do humor do marketplace do host.
+Em português simples: briefing continua importante, mas não pode continuar sendo o apartamento inteiro. O valor do Prumo está em entender o estado do dia, propor a próxima jogada sensata, sustentar continuidade, atualizar documentação viva e deixar o trabalho menos pegajoso.
 
 A direcao estrutural para Google no runtime agora esta formalizada em [ADR-001-GOOGLE-INTEGRATION.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ADR-001-GOOGLE-INTEGRATION.md): Google APIs diretas como destino, snapshots como ponte.
 
@@ -15,7 +15,7 @@ O contrato de invocação do produto agora também está explícito em [INVOCATI
 O próximo bloco operacional também já foi explicitado em [HOST-ADAPTER-IMPLEMENTATION-PLAN.md](/Users/tharsovieira/Documents/DailyLife/Prumo/HOST-ADAPTER-IMPLEMENTATION-PLAN.md). O ponto central ali é simples: mesma família de modelo não significa mesmo host. `Cowork` e `Claude Code` são adapters diferentes. `Gemini CLI` e `Antigravity` também.
 
 O quadro de campo, hoje, está menos nebuloso e menos romântico:
-`Codex` passou, `Claude Code` funciona bem no modo shell explícito mas ainda deve explicações na invocação curta, `Cowork` segue confiável só como `shell-thin`, `Gemini CLI` reprovou sem apelação, e `Antigravity` melhorou bastante quando o runtime ganhou briefing estruturado oficial.
+`Antigravity` virou o trilho principal do primeiro piloto comercial, `Codex` é o host de referência técnica, `Claude Code` segue suportado no modo shell explícito, `Cowork` foi empurrado para backlog preparado e `Gemini CLI` saiu do foco ativo.
 
 Esse plano agora também inclui um mapa de documentação oficial por host, porque desenhar adapter sem saber onde a documentação é sólida e onde ela é rala é um jeito elegante de construir ponte em neblina.
 
@@ -37,11 +37,11 @@ Como o `Gemini CLI` resolveu improvisar runtime em vez de obedecer comando, o pr
 
 O retrato de campo dos hosts, hoje, ficou assim:
 
-1. `Codex` já passou como primeiro adapter implementado.
-2. `Claude Code` passou no shell explícito, mas ainda tropeça na invocação curta e no TCC de `Apple Reminders`.
-3. `Cowork` funciona como casca fina quando você manda rodar `prumo`, mas ainda falha na rota curta/nativa e continua vulnerável ao teatrinho plugin-first.
-4. `Gemini CLI` foi reprovado como adapter porque tentou improvisar runtime e até mexeu em `_state/`.
-5. `Antigravity` foi melhor que o `Gemini CLI`: usou o runtime de verdade, mas ainda tropeça em disciplina de execução e continua pendente em `Apple Reminders`.
+1. `Antigravity` é o host principal do piloto e já respeita melhor o runtime do que a maior parte dos parentes.
+2. `Codex` já passou como host de referência técnica.
+3. `Claude Code` passou no shell explícito, mas ainda tropeça na invocação curta.
+4. `Cowork` fica em backlog preparado. Em modo atual, ele mora numa sandbox/VM que não enxerga o runtime local do host. Insistir nisso agora seria hobby caro.
+5. `Gemini CLI` foi reprovado como adapter porque tentou improvisar runtime e até mexeu em `_state/`.
 
 Para email e agenda multi-conta, o fluxo preferencial agora usa snapshots privados no Google Drive gerados por Google Apps Script e gravados como Google Docs com JSON texto. O motor do Prumo também saiu do formato armário de acumulador: o core agora é índice + guardrails, com procedimento detalhado em módulos canônicos. E a sanitização deixou de ser só “compactar handover”: o sistema agora já consegue arquivar frio seguro com índice global, sem brincar de sumiço.
 
@@ -98,12 +98,20 @@ Se quiser um instalador sóbrio, sem copiar comando em duas etapas:
 bash <(curl -fsSL https://raw.githubusercontent.com/tharso/prumo/main/scripts/prumo_plugin_install.sh)
 ```
 
-### Runtime local experimental
+### Runtime local
 
-O novo trilho do produto nasce aqui. Ainda não substitui o fluxo atual do plugin, mas já permite instalar o runtime local e rodar os primeiros comandos fora da barriga do host:
+É aqui que o produto realmente está sendo construído agora. O runtime já sustenta a porta curta (`prumo`), briefing estruturado, continuação de trabalho, documentação viva e estrutura pronta para workflows futuros.
+
+No macOS ou Linux:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/tharso/prumo/main/scripts/prumo_runtime_install.sh)
+```
+
+No Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/tharso/prumo/main/scripts/prumo_runtime_install.ps1 | iex
 ```
 
 Depois:
@@ -134,7 +142,7 @@ Importante, para não vender andaime como se já fosse varanda:
 7. host bom também não sai rodando comando extra por tédio ou por confiança demais.
 8. se quiser briefing estruturado, agora existe rota oficial. Inventar JSON na unha virou preguiça sem desculpa.
 
-Em português simples: agora estamos construindo o motor. A ignição universal vem logo depois.
+Em português simples: agora temos motor com porta de entrada decente e mais cara de produto diário. A ignição universal ainda depende dos hosts se comportarem como adultos.
 
 O primeiro passo concreto nessa direção já existe:
 
@@ -159,14 +167,16 @@ Esses wrappers já não são só placa de "veja o balcão ao lado". Agora també
 3. se precisar de briefing estruturado, o host pode rodar `prumo briefing --workspace . --refresh-snapshot --format json`;
 4. se souber renderizar ações, melhor ainda: `prumo start --format json`.
 
-E agora também deixa uma fundação decente para integrações:
+E agora também deixa uma fundação decente para integrações e plataforma:
 
 1. `_state/google-integration.json` guarda estado e metadado da conexão;
 2. `_state/apple-reminders-integration.json` faz o mesmo para Apple Reminders;
-3. token sensível fica fora do workspace, em storage seguro local;
-4. no macOS, o runtime usa o Keychain em vez de largar refresh token no chão.
+3. token sensível fica fora do workspace;
+4. no macOS, o runtime usa o Keychain;
+5. fora do macOS, o runtime cai para storage local próprio do runtime, fora do workspace;
+6. `context-dump` e `start --format json` agora expõem plataforma e capacidades de forma explícita.
 
-Apple Reminders entrou como trilho experimental de laboratório:
+Apple Reminders continua existindo no runtime, mas saiu do foco desta fase. Não é critério de sucesso do produto agora:
 
 ```bash
 prumo auth apple-reminders --workspace /caminho/do/workspace
@@ -192,11 +202,11 @@ prumo config apple-reminders --workspace /caminho/do/workspace --list "A vida...
 prumo config apple-reminders --workspace /caminho/do/workspace --all
 ```
 
-O que ainda não está pronto o bastante para posar de produto acabado:
+O ponto importante é outro:
 
-1. a cobertura de Apple Reminders continua experimental;
-2. o runtime agora prefere `EventKit` para o fetch e deixa AppleScript como fallback, mas isso ainda não significa cobertura total da fauna Apple;
-3. então, por enquanto, trate isso como fonte experimental, não como cobertura definitiva do briefing.
+1. Apple Reminders não bloqueia esta fase;
+2. se estiver ausente, negado ou fora da plataforma, o produto deve degradar com clareza e seguir em frente;
+3. o foco agora é briefing bom, continuação útil, documentação viva e estrutura para workflows.
 
 E deixa uma coisa explícita, porque software adora esconder isso em rodapé: se você desinstalar o Prumo, seus arquivos continuam seus, legíveis e no mesmo lugar.
 
@@ -233,7 +243,7 @@ prumo auth google --workspace /caminho/do/workspace --client-secrets /caminho/do
 prumo auth google --workspace /caminho/do/workspace --client-id SEU_CLIENT_ID --client-secret SEU_CLIENT_SECRET
 ```
 
-Esse fluxo abre o navegador, pede consentimento e grava só metadado no workspace. Credencial sensível vai para o Keychain. Não porque o Prumo seja dono do segredo, mas porque guardar refresh token em Markdown seria a forma mais criativa de chamar imprudência de transparência.
+Esse fluxo abre o navegador, pede consentimento e grava só metadado no workspace. Credencial sensível vai para storage local do runtime fora do workspace. No macOS, isso significa Keychain. Nas outras plataformas, significa storage próprio do runtime. Guardar refresh token em Markdown continuaria sendo uma ideia de jerico com crachá.
 
 Se o Google Console resolver esconder o download do JSON como se fosse herança de família, o runtime também aceita `--client-id` e `--client-secret` diretamente. Produto bom não devia depender do humor de uma UI barroca.
 
@@ -317,7 +327,7 @@ No Cowork, os slash commands do Prumo aparecem sem prefixo do plugin. Use `/setu
 ```
 ├── plugin.json              # Manifest do plugin
 ├── marketplace.json         # Manifest do marketplace
-├── runtime/                 # Runtime local experimental
+├── runtime/                 # Runtime local-first do produto
 ├── commands/                # Slash commands (/setup, /briefing, etc.)
 ├── cowork-plugin/           # Pacote de runtime (skills, scripts, referências)
 ├── CHANGELOG.md             # Histórico de mudanças
@@ -339,7 +349,7 @@ Se o painel do app disser que atualizou, mas o plugin continuar em versão velha
 
 ## Versão
 
-Versão atual: `4.15.5`
+Versão atual: `4.16.0`
 
 ## Licença
 

@@ -17,6 +17,7 @@ def shell_action(
     category: str,
     documentation_targets: list[str] | None = None,
     outcome: str | None = None,
+    why_now: str | None = None,
 ) -> dict[str, object]:
     payload: dict[str, object] = {
         "id": action_id,
@@ -30,6 +31,8 @@ def shell_action(
         payload["documentation_targets"] = documentation_targets
     if outcome:
         payload["outcome"] = outcome
+    if why_now:
+        payload["why_now"] = why_now
     return payload
 
 
@@ -41,6 +44,7 @@ def host_prompt_action(
     category: str,
     documentation_targets: list[str] | None = None,
     outcome: str | None = None,
+    why_now: str | None = None,
 ) -> dict[str, object]:
     payload: dict[str, object] = {
         "id": action_id,
@@ -54,6 +58,31 @@ def host_prompt_action(
         payload["documentation_targets"] = documentation_targets
     if outcome:
         payload["outcome"] = outcome
+    if why_now:
+        payload["why_now"] = why_now
+    return payload
+
+
+def next_move_payload(actions: list[dict[str, object]]) -> dict[str, object] | None:
+    if not actions:
+        return None
+    action = actions[0]
+    payload = {
+        "id": action["id"],
+        "label": action["label"],
+        "kind": action["kind"],
+        "command": action["command"],
+    }
+    if "shell_command" in action:
+        payload["shell_command"] = action["shell_command"]
+    if "host_prompt" in action:
+        payload["host_prompt"] = action["host_prompt"]
+    if "documentation_targets" in action:
+        payload["documentation_targets"] = action["documentation_targets"]
+    if "outcome" in action:
+        payload["outcome"] = action["outcome"]
+    if "why_now" in action:
+        payload["why_now"] = action["why_now"]
     return payload
 
 
@@ -175,6 +204,18 @@ def daily_operation_payload(workspace: Path) -> dict[str, object]:
             "must_support_continuation": True,
             "must_leave_useful_documentation": True,
         },
+        "documentation_rules": {
+            "touch_lightly": True,
+            "do_not_rewrite_whole_files_without_need": True,
+            "separate_source_from_decision": True,
+            "log_decisions_in_registro": True,
+            "keep_workflow_registry_structure": True,
+        },
+        "conversation_rules": {
+            "lead_with_next_move_when_obvious": True,
+            "avoid_menu_dump_when_one_path_is_clearly_hotter": True,
+            "prefer_execution_plus_documentation_over_commentary": True,
+        },
     }
 
 
@@ -191,9 +232,15 @@ def build_daily_actions(
     docs = documentation_targets(workspace)
     inbox_count = inbox_item_count(workspace)
 
-    actions: list[dict[str, object]] = []
+    actions_by_id: dict[str, dict[str, object]] = {}
+
+    def register(action: dict[str, object] | None) -> None:
+        if action is None:
+            return
+        actions_by_id[str(action["id"])] = action
+
     if missing["generated"] or missing["derived"]:
-        actions.append(
+        register(
             shell_action(
                 "repair",
                 "Consertar a estrutura antes de brincar de produtividade",
@@ -201,10 +248,11 @@ def build_daily_actions(
                 category="repair",
                 documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
                 outcome="Workspace consistente o bastante para o Prumo não tropeçar na própria sandália.",
+                why_now="Sem estrutura minimamente inteira, qualquer produtividade aqui vira teatro com cenário caindo.",
             )
         )
 
-    actions.append(
+    register(
         shell_action(
             "briefing",
             "Rodar o briefing agora" if not has_briefed_today else "Rodar o briefing de novo",
@@ -212,11 +260,16 @@ def build_daily_actions(
             category="briefing",
             documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
             outcome="Panorama atualizado com proposta do dia e contexto suficiente para seguir trabalhando.",
+            why_now=(
+                "Ainda não houve briefing hoje; antes de acelerar, convém olhar o painel do carro."
+                if not has_briefed_today
+                else "Vale reabrir o radar quando o contexto já esquentou ou mudou desde o último briefing."
+            ),
         )
     )
 
     if continue_item:
-        actions.append(
+        register(
             host_prompt_action(
                 "continue",
                 f"Retomar o que já estava quente: {continue_item}",
@@ -228,11 +281,12 @@ def build_daily_actions(
                 category="continuation",
                 documentation_targets=[docs["pauta"], docs["registro"]],
                 outcome="Trabalho retomado com próximos passos e decisão registrada em documentação viva.",
+                why_now="O custo de retomar algo já quente costuma ser menor do que abrir uma nova gaveta por esporte.",
             )
         )
 
     if inbox_count:
-        actions.append(
+        register(
             host_prompt_action(
                 "process-inbox",
                 f"Processar a fila que está encostada ({inbox_count} item(ns))",
@@ -245,10 +299,11 @@ def build_daily_actions(
                 category="inbox-triage",
                 documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
                 outcome="Inbox menor, pauta mais clara e rastro do que foi decidido.",
+                why_now="Fila encostada tende a apodrecer rápido e depois cobra juros em contexto perdido.",
             )
         )
 
-    actions.append(
+    register(
         host_prompt_action(
             "organize-day",
             "Organizar o dia e a documentação viva",
@@ -259,13 +314,14 @@ def build_daily_actions(
             category="documentation",
             documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
             outcome="Workspace mais respirável, com pendências, decisões e foco do dia explicitados.",
+            why_now="Se o workspace continuar bagunçado, o resto do dia vira caça ao contexto com lanterna fraca.",
         )
     )
 
     if not google_connected:
-        actions.append(suggest_google_auth_action(workspace))
+        register(suggest_google_auth_action(workspace))
 
-    actions.append(
+    register(
         host_prompt_action(
             "workflow-scaffold",
             "Preparar candidatos a workflow sem fechar nada à força",
@@ -277,10 +333,11 @@ def build_daily_actions(
             category="workflow-scaffolding",
             documentation_targets=[docs["workflow_registry"], docs["registro"]],
             outcome="Candidatos a workflow registrados sem vender promessa de automação antes da hora.",
+            why_now="Padrão repetido sem registro é só deja vu desperdiçado.",
         )
     )
 
-    actions.append(
+    register(
         shell_action(
             "context",
             "Ver o estado técnico sem poesia",
@@ -288,14 +345,36 @@ def build_daily_actions(
             category="diagnostics",
             documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
             outcome="Estado técnico explícito para host ou diagnóstico humano sem telepatia.",
+            why_now="Diagnóstico é útil quando há dúvida real, não como aquecimento obrigatório antes de agir.",
         )
     )
 
+    order: list[str] = []
+    if "repair" in actions_by_id:
+        order.append("repair")
+    if not has_briefed_today:
+        order.extend(["briefing", "continue", "process-inbox", "organize-day"])
+    elif continue_item:
+        order.extend(["continue", "process-inbox", "organize-day", "briefing"])
+    elif inbox_count:
+        order.extend(["process-inbox", "organize-day", "briefing"])
+    else:
+        order.extend(["organize-day", "briefing"])
+    if not google_connected:
+        order.extend(["auth-google", "auth-google-help"])
+    order.extend(["workflow-scaffold", "context"])
+
     ordered: list[dict[str, object]] = []
     seen: set[str] = set()
-    for action in actions:
-        if action["id"] in seen:
+    for action_id in order:
+        action = actions_by_id.get(action_id)
+        if action is None or action_id in seen:
             continue
         ordered.append(action)
-        seen.add(action["id"])
+        seen.add(action_id)
+
+    for index, action in enumerate(ordered, start=1):
+        action["priority"] = max(1, 100 - (index * 10))
+        action["recommended"] = index == 1
+
     return ordered[:8]

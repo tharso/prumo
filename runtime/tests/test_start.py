@@ -317,6 +317,7 @@ class StartCommandTests(unittest.TestCase):
             self.assertIn("Prumo", payload["adapter_hints"]["short_invocations"])
             self.assertEqual(payload["platform"]["label"], platform_label())
             self.assertIn("daily_operation", payload)
+            self.assertIn("next_move", payload)
             self.assertTrue(payload["daily_operation"]["supports"])
             self.assertIn("capabilities", payload)
             self.assertTrue(payload["capabilities"]["daily_operation"]["workflow_scaffolding"])
@@ -330,6 +331,7 @@ class StartCommandTests(unittest.TestCase):
             self.assertIn("outcome", continue_action)
             workflow_action = next(action for action in payload["actions"] if action["id"] == "workflow-scaffold")
             self.assertEqual(workflow_action["category"], "workflow-scaffolding")
+            self.assertEqual(payload["next_move"]["id"], "briefing")
 
     def test_json_output_surfaces_inbox_processing_when_queue_exists(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -373,6 +375,43 @@ class StartCommandTests(unittest.TestCase):
             self.assertIn("fila que está encostada", process_inbox["label"])
             self.assertIn("host_prompt", process_inbox)
             self.assertNotIn("shell_command", process_inbox)
+
+    def test_json_output_prefers_continue_when_day_already_started_and_item_is_hot(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            state_dir = workspace / "_state"
+            state_dir.mkdir(parents=True, exist_ok=True)
+            (workspace / "AGENT.md").write_text("# AGENT\n", encoding="utf-8")
+            (workspace / "PRUMO-CORE.md").write_text(f"> **prumo_version: {__version__}**\n", encoding="utf-8")
+            (workspace / "PAUTA.md").write_text(
+                "# Pauta\n\n## Quente (precisa de atenção agora)\n\n- Fechar decisão do plano PME\n",
+                encoding="utf-8",
+            )
+            (workspace / "INBOX.md").write_text("# Inbox\n\n_Inbox limpo._\n", encoding="utf-8")
+            (state_dir / "workspace-schema.json").write_text(
+                json.dumps(
+                    {
+                        "user_name": "Batata",
+                        "agent_name": "Prumo",
+                        "timezone": "America/Sao_Paulo",
+                        "briefing_time": "09:00",
+                        "files": {"generated": [], "authorial": [], "derived": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (state_dir / "briefing-state.json").write_text('{"last_briefing_at": "2026-03-25T09:12:00-03:00"}', encoding="utf-8")
+            (state_dir / "google-integration.json").write_text("{}", encoding="utf-8")
+            (state_dir / "apple-reminders-integration.json").write_text("{}", encoding="utf-8")
+            args = Namespace(workspace=str(workspace), format="json")
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                rc = run_start(args)
+            self.assertEqual(rc, 0)
+            payload = json.loads(buffer.getvalue())
+            self.assertEqual(payload["actions"][0]["id"], "continue")
+            self.assertTrue(payload["actions"][0]["recommended"])
+            self.assertEqual(payload["next_move"]["id"], "continue")
 
     def test_json_output_marks_workspace_resolution_from_cwd(self) -> None:
         previous_cwd = Path.cwd()

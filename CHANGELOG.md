@@ -4,6 +4,16 @@ Este arquivo registra mudanças públicas do produto Prumo.
 
 O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamento semântico.
 
+## [4.16.3] - 2026-03-25
+
+### Changed
+- `start` e `briefing` passaram a expor `next_move` explicitamente. O runtime parou de sugerir uma coisa e entregar outra escondida na fila de ações.
+- A ordenação de `actions[]` agora acompanha melhor o estado do dia: se já houve briefing e existe frente quente, a continuação sobe; se a fila está encostada, a triagem sobe; se o dia ainda não abriu, briefing continua primeiro.
+- `daily_operation` agora declara regras de conversa e de documentação viva, porque host sem cerca tende a confundir ajuda com reforma.
+
+### Fixed
+- O Prumo ficou menos “menu de restaurante” e mais operador diário: menos opções genéricas, mais condução para a próxima jogada plausível.
+
 ## [4.16.2] - 2026-03-23
 
 ### Added

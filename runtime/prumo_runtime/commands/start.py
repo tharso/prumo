@@ -10,6 +10,7 @@ from prumo_runtime.daily_operator import (
     choose_continue_item,
     daily_operation_payload,
     inbox_item_count,
+    next_move_payload,
 )
 from prumo_runtime.workspace import (
     WorkspaceError,
@@ -162,6 +163,7 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
     has_briefed_today = _same_local_day(last_briefing_at, timezone_name)
     last_briefing_clock = _short_clock(last_briefing_at, timezone_name)
     actions = build_daily_actions(workspace, overview, has_briefed_today=has_briefed_today)
+    next_move = next_move_payload(actions)
     continue_item = choose_continue_item(workspace)
     inbox_count = inbox_item_count(workspace)
     workflow_registry = capabilities["workflow_scaffolding"]["registry_path"]
@@ -222,9 +224,13 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
         lines.append("6. Apple Reminders ficou fora do foco desta fase. Se estiver negado, tratamos como degradação aceitável, não como desculpa para o produto mancar.")
         suggestion_index = 7
 
-    lines.append(
-        f"{suggestion_index}. Minha sugestão: {suggestion}"
-    )
+    lines.append(f"{suggestion_index}. Minha sugestão: {suggestion}")
+    if next_move:
+        lines.append(f"{suggestion_index + 1}. Próximo movimento recomendado: {next_move['label']}")
+        lines.append(f"   `{next_move['command']}`")
+        if next_move.get("why_now"):
+            lines.append(f"   Motivo: {next_move['why_now']}")
+        suggestion_index += 1
     lines.append(
         f"{suggestion_index + 1}. Se aparecer padrão repetitivo de trabalho, registre o candidato em `{workflow_registry}`. Não force workflow de laboratório como se fosse contrato assinado."
     )
@@ -259,6 +265,16 @@ def run_start(args) -> int:
             return 0
         raise
 
+    has_briefed_today = _same_local_day(
+        str(load_json(workspace / "_state" / "briefing-state.json").get("last_briefing_at") or "").strip(),
+        overview["timezone"],
+    )
+    actions = build_daily_actions(
+        workspace,
+        overview,
+        has_briefed_today=has_briefed_today,
+    )
+
     payload = {
         "adapter_contract_version": ADAPTER_CONTRACT_VERSION,
         "workspace_path": str(workspace),
@@ -272,18 +288,12 @@ def run_start(args) -> int:
         "platform": overview["platform"],
         "capabilities": overview["capabilities"],
         "daily_operation": daily_operation_payload(workspace),
+        "next_move": next_move_payload(actions),
         "google_status": overview["google_integration"]["active_profile_status"],
         "apple_reminders_status": overview["apple_reminders"]["status"],
         "missing": overview["missing"],
         "adapter_hints": _build_adapter_hints(workspace),
-        "actions": build_daily_actions(
-            workspace,
-            overview,
-            has_briefed_today=_same_local_day(
-                str(load_json(workspace / "_state" / "briefing-state.json").get("last_briefing_at") or "").strip(),
-                overview["timezone"],
-            ),
-        ),
+        "actions": actions,
         "message": _render_start_text(workspace, overview),
     }
 

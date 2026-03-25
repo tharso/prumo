@@ -69,13 +69,14 @@ class BriefingSnapshotTests(unittest.TestCase):
             self.assertEqual(payload["workspace_path"], str(workspace.resolve()))
             self.assertTrue(payload["sections"])
             self.assertEqual(payload["sections"][0]["id"], "preflight")
-            self.assertEqual(payload["proposal"]["options"][0]["id"], "accept")
+            self.assertEqual(payload["proposal"]["options"][0]["id"], "continue")
             self.assertIn("Proposta do dia", payload["message"])
             self.assertIn("actions", payload)
             self.assertTrue(any(action["id"] == "workflow-scaffold" for action in payload["actions"]))
             self.assertEqual(payload["daily_operation"]["mode"], "daily-operator")
             self.assertTrue(payload["capabilities"]["daily_operation"]["documentation"])
             self.assertIn("documentation_contract", payload["daily_operation"])
+            self.assertEqual(payload["next_move"]["id"], "continue")
 
     def test_run_briefing_json_output_uses_structured_payload(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -124,6 +125,7 @@ class BriefingSnapshotTests(unittest.TestCase):
             self.assertEqual(payload["sections"][0]["label"], "Preflight")
             self.assertIn("proposal", payload)
             self.assertIn("actions", payload)
+            self.assertIn("next_move", payload)
             self.assertEqual(payload["platform"]["label"], platform_label())
             self.assertTrue(any(section["id"] == "workflow_scaffolding" for section in payload["sections"]))
             self.assertTrue(any("documentation_targets" in action for action in payload["actions"]))

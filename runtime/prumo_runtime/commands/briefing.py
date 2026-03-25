@@ -14,7 +14,7 @@ from prumo_runtime.apple_reminders import (
     fetch_apple_reminders_today,
 )
 from prumo_runtime.constants import RUNTIME_VERSION, repo_root_from
-from prumo_runtime.daily_operator import build_daily_actions, daily_operation_payload
+from prumo_runtime.daily_operator import build_daily_actions, daily_operation_payload, next_move_payload
 from prumo_runtime.google_api import (
     connected_google_profile,
     fetch_google_workspace_snapshot,
@@ -681,8 +681,9 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
         f"Quente {pauta_counts['quente']} | Em andamento {pauta_counts['em_andamento']} | "
         f"Agendado {pauta_counts['agendado']}. {hottest}"
     )
-    proposal = choose_proposal(quente, agendado, andamento, snapshot)
     actions = build_daily_actions(workspace, overview, has_briefed_today=has_briefed_today)
+    next_move = next_move_payload(actions)
+    proposal = choose_proposal(quente, agendado, andamento, snapshot)
     daily_operation = daily_operation_payload(workspace)
     workflow_registry = overview["capabilities"]["workflow_scaffolding"]["registry_path"]
 
@@ -694,13 +695,21 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
         {"id": "inbox_mobile", "label": "Inbox mobile", "text": inbox_mobile_text},
         {"id": "emails", "label": "Emails", "text": emails_text},
         {"id": "panorama_local", "label": "Panorama local", "text": panorama_text},
-        {"id": "proposta_do_dia", "label": "Proposta do dia", "text": f"atacar primeiro `{proposal}`."},
+        {
+            "id": "proposta_do_dia",
+            "label": "Proposta do dia",
+            "text": (
+                f"seguir por `{next_move['label']}`."
+                if next_move
+                else f"atacar primeiro `{proposal}`."
+            ),
+        },
         {
             "id": "operacao_do_dia",
             "label": "Operação do dia",
             "text": (
                 "O briefing é só a porta. O trabalho de verdade é continuar, organizar e registrar "
-                "o que muda no workspace sem depender de memória de peixe."
+                "o que muda no workspace sem transformar o host em comentarista de si mesmo."
             ),
         },
         {
@@ -716,6 +725,15 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
     lines: list[str] = []
     for index, section in enumerate(sections, start=1):
         lines.append(f"{index}. {section['label']}: {section['text']}")
+    if next_move:
+        lines.append(f"{len(sections) + 1}. Próximo movimento recomendado: {next_move['label']}")
+        lines.append(f"   `{next_move['command']}`")
+        if next_move.get("why_now"):
+            lines.append(f"   Motivo: {next_move['why_now']}")
+    option_labels = list("abcdef")
+    for label, action in zip(option_labels, actions[:4]):
+        lines.append(f"{label}) {action['label']}")
+        lines.append(f"   `{action['command']}`")
     lines.append("a) Aceitar e seguir")
     lines.append("b) Ajustar")
     lines.append("c) Ver lista completa")
@@ -729,16 +747,21 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
         "platform": overview["platform"],
         "capabilities": overview["capabilities"],
         "daily_operation": daily_operation,
+        "next_move": next_move,
         "last_briefing_at": last_briefing_at,
         "actions": actions,
         "sections": sections,
         "proposal": {
             "text": proposal,
+            "next_move": next_move,
             "options": [
-                {"id": "accept", "label": "Aceitar e seguir"},
-                {"id": "adjust", "label": "Ajustar"},
-                {"id": "list", "label": "Ver lista completa"},
-                {"id": "enough", "label": "Tá bom por hoje"},
+                {
+                    "id": action["id"],
+                    "label": action["label"],
+                    "kind": action["kind"],
+                    "command": action["command"],
+                }
+                for action in actions[:4]
             ],
         },
         "snapshot": {

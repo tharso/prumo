@@ -96,6 +96,7 @@ O risco aqui é simples:
 2. manter vigilância sobre disciplina de execução em conversas mais longas;
 3. consolidar consumo disciplinado do contrato estruturado em sessões mais longas.
 4. quando houver conector oficial de Gmail, Google Calendar ou Google Drive no host, usar isso como trilha primária de contexto externo antes de pedir socorro ao runtime.
+5. normalizar esse contexto antes de usá-lo no briefing, ou o host troca autonomia por espalhafato.
 
 ## 6.1. Como consumir o JSON sem virar procissão de tool-call
 

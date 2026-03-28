@@ -87,6 +87,7 @@ Se começar pelo textão, o host vira leitor de bula tentando pilotar avião.
 4. Não sugerir `setup`, `migrate`, `repair` ou `auth` por conta própria se o runtime já devolveu ação explícita.
 5. Tratar integrações opcionais e permissões locais como detalhe do host, não como critério do MVP.
 6. Se `Codex` tiver conector oficial para Gmail, Google Calendar ou Google Drive, use isso como fonte primária de contexto externo antes de inventar coleta paralela no runtime.
+7. Se trouxer contexto externo, normalize minimamente antes de jogar isso no briefing. Não faça o Prumo mastigar payload cru de conector.
 
 ## 6. Checklist de aceite
 

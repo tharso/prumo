@@ -45,6 +45,10 @@ O que nao faz sentido:
 
 O host nao precisa despejar o universo inteiro. Precisa trazer o suficiente para o Prumo operar.
 
+O formato minimo disso fica detalhado em:
+
+1. [host-context-normalization.md](/Users/tharsovieira/Documents/DailyLife/Prumo/canon/contracts/host-context-normalization.md)
+
 ### Gmail
 
 Trazer, no minimo:
@@ -123,6 +127,8 @@ No briefing:
 1. contexto externo entra para iluminar o dia;
 2. nao entra para sequestrar a conversa;
 3. a proposta do dia continua vindo da combinacao entre contexto externo e memoria local.
+
+Antes de entrar no briefing, o ideal e que esse contexto ja esteja minimamente normalizado.
 
 Sem memoria local, o Prumo vira leitor de caixa de entrada.
 Sem contexto externo, o Prumo vira monge de clausura.

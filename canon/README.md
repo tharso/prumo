@@ -40,15 +40,16 @@ Se alguem cair aqui sem mapa, a ordem util de leitura e:
 1. `contracts/invocation.md`
 2. `contracts/interaction-format.md`
 3. `contracts/host-external-context.md`
-4. `contracts/persona-portability.md`
-5. `contracts/error-fallback.md`
-6. `contracts/capability-granularity.md`
-7. `orchestration/shared-contract.md`
-8. `orchestration/briefing.md`
-9. `governance/file-governance.md`
-10. `governance/load-policy.md`
-11. `governance/memory-hygiene.md`
-12. `adapters/host-boundaries.md`
+4. `contracts/host-context-normalization.md`
+5. `contracts/persona-portability.md`
+6. `contracts/error-fallback.md`
+7. `contracts/capability-granularity.md`
+8. `orchestration/shared-contract.md`
+9. `orchestration/briefing.md`
+10. `governance/file-governance.md`
+11. `governance/load-policy.md`
+12. `governance/memory-hygiene.md`
+13. `adapters/host-boundaries.md`
 
 ## Relacao com o resto do repo
 

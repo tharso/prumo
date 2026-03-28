@@ -81,6 +81,7 @@ Quando houver contexto externo vindo do host:
 1. usar isso para iluminar agenda, email e documentos do dia;
 2. nao despejar dado bruto no palco principal;
 3. marcar origem e freshness de forma curta quando isso afetar confianca.
+4. preferir contexto ja normalizado segundo `contracts/host-context-normalization.md`.
 
 No panorama:
 

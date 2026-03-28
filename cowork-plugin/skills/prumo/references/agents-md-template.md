@@ -4,8 +4,10 @@
 > `CLAUDE.md` nativamente (ex: Codex CLI).
 >
 > Princípio: **não duplicar conteúdo**. O AGENTS.md aponta para os arquivos
-> fonte (`CLAUDE.md` + `PRUMO-CORE.md`) e adiciona só regras específicas
+> fonte (`AGENT.md` + `PRUMO-CORE.md`) e adiciona só regras específicas
 > de coexistência operacional.
+>
+> A partir de 2026-03-28, o contrato compartilhado de invocação e interface passou a morar em `Prumo/canon/contracts/`. Este template segue como adapter legado do bundle, não como sede do governo.
 
 ---
 
@@ -34,10 +36,11 @@ INÍCIO DO TEMPLATE:
 
 Antes de qualquer operação, leia nesta ordem:
 
-1. `CLAUDE.md` (configuração pessoal: áreas, tom, tags, lembretes)
+1. `AGENT.md` (índice canônico e porta principal)
 2. `PRUMO-CORE.md` (motor e regras operacionais)
-3. `PAUTA.md` e `INBOX.md` (estado atual)
-4. `_state/HANDOVER.md` (se existir)
+3. `CLAUDE.md` (wrapper de compatibilidade, quando existir)
+4. `PAUTA.md` e `INBOX.md` (estado atual)
+5. `_state/HANDOVER.md` (se existir)
 
 ## Comando canônico
 
@@ -49,11 +52,12 @@ Antes de qualquer operação, leia nesta ordem:
 ## Regras específicas para agentes não-Cowork
 
 1. Não editar `CLAUDE.md` nem `PRUMO-CORE.md` sem instrução explícita do usuário.
-2. Em arquivos críticos (`PAUTA.md`, `INBOX.md`, `REGISTRO.md`), preferir append e preservar histórico.
-3. Seguir lock por escopo em `_state/agent-lock.json` antes de escrever.
-4. Para mudanças estruturais, abrir handover em `_state/HANDOVER.md` e pedir validação cruzada do Cowork.
-5. Em handovers, manter tom respeitoso e cooperativo.
-6. Em `/prumo:briefing`, checar handovers `PENDING_VALIDATION`/`REJECTED` e incluir no resumo.
+2. Não tratar `CLAUDE.md` como fonte principal quando `AGENT.md` estiver presente.
+3. Em arquivos críticos (`PAUTA.md`, `INBOX.md`, `REGISTRO.md`), preferir append e preservar histórico.
+4. Seguir lock por escopo em `_state/agent-lock.json` antes de escrever.
+5. Para mudanças estruturais, abrir handover em `_state/HANDOVER.md` e pedir validação cruzada do Cowork.
+6. Em handovers, manter tom respeitoso e cooperativo.
+7. Em `/prumo:briefing`, checar handovers `PENDING_VALIDATION`/`REJECTED` e incluir no resumo.
 
 ## Escopo recomendado
 

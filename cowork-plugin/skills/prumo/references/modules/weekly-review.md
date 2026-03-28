@@ -20,7 +20,7 @@ Revisar a pauta inteira sem a miopia do briefing diário.
 5. Revisar `IDEIAS.md`:
    - ideia amadureceu -> vira ação;
    - ideia ainda é só ideia -> fica onde está.
-6. Revisar `Pessoal/PESSOAS.md` quando existir:
+6. Revisar `Agente/PESSOAS.md` quando existir:
    - follow-ups;
    - quem sumiu;
    - pendências de relacionamento.

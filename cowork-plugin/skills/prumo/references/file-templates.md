@@ -99,7 +99,7 @@ _Nenhuma ideia registrada ainda._
 
 ---
 
-## Pessoal/PESSOAS.md
+## Agente/PESSOAS.md
 
 --- INÍCIO ---
 
@@ -118,6 +118,26 @@ _Adicione pessoas conforme forem aparecendo nas interações._
 ## Follow-ups pendentes
 
 _Quem precisa de resposta, retorno, ou atenção._
+
+--- FIM ---
+
+---
+
+## Agente/INDEX.md
+
+--- INÍCIO ---
+
+# Índice de contexto
+
+> Porta modular do contexto vivo do usuário.
+> Este diretório concentra o que muda comportamento. Não é almoxarifado de entulho narrativo.
+
+## Onde procurar o quê
+
+1. `Agente/PESSOAS.md`: pessoas-chave e pendências de relacionamento
+2. `PAUTA.md`: pendência viva
+3. `INBOX.md`: captura ainda não processada
+4. `REGISTRO.md`: trilha do que já aconteceu
 
 --- FIM ---
 

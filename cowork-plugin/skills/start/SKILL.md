@@ -320,7 +320,7 @@ estão organizados:
 
 **5.4 — Popular PESSOAS.md**
 
-Se o dump mencionou pessoas, adicionar em `Pessoal/PESSOAS.md` com
+Se o dump mencionou pessoas, adicionar em `Agente/PESSOAS.md` com
 contexto mínimo e pendências.
 
 ### Fase 6: Fechamento

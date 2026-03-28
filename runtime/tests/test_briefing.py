@@ -67,8 +67,10 @@ class BriefingSnapshotTests(unittest.TestCase):
                 else:
                     os.environ["PRUMO_RUNTIME_DISABLE_SNAPSHOT"] = previous
             self.assertEqual(payload["workspace_path"], str(workspace.resolve()))
+            self.assertEqual(payload["adapter_contract_version"], "2026-03-28")
             self.assertTrue(payload["sections"])
             self.assertEqual(payload["sections"][0]["id"], "preflight")
+            self.assertTrue(payload["canonical_refs"]["briefing_orchestration"].endswith("canon/orchestration/briefing.md"))
             self.assertEqual(payload["proposal"]["options"][0]["id"], "continue")
             self.assertIn("Proposta do dia", payload["message"])
             self.assertIn("actions", payload)
@@ -121,8 +123,10 @@ class BriefingSnapshotTests(unittest.TestCase):
             self.assertEqual(rc, 0)
             payload = json.loads(buffer.getvalue())
             self.assertEqual(payload["workspace_path"], str(workspace.resolve()))
+            self.assertEqual(payload["adapter_contract_version"], "2026-03-28")
             self.assertIn("sections", payload)
             self.assertEqual(payload["sections"][0]["label"], "Preflight")
+            self.assertTrue(payload["canonical_refs"]["inbox_processing"].endswith("canon/operations/inbox-processing.md"))
             self.assertIn("proposal", payload)
             self.assertIn("actions", payload)
             self.assertIn("next_move", payload)

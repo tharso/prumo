@@ -6,6 +6,7 @@ from prumo_runtime import __version__
 
 RUNTIME_VERSION = __version__
 SCHEMA_VERSION = "1.0"
+ADAPTER_CONTRACT_VERSION = "2026-03-28"
 DEFAULT_AGENT_NAME = "Prumo"
 DEFAULT_TIMEZONE = "America/Sao_Paulo"
 DEFAULT_BRIEFING_TIME = "09:00"
@@ -57,3 +58,19 @@ def repo_root_from(start: Path) -> Path | None:
         if (candidate / "VERSION").exists() and (candidate / "cowork-plugin").exists():
             return candidate
     return None
+
+
+def canonical_refs_from(start: Path) -> dict[str, str]:
+    repo_root = repo_root_from(start)
+    if repo_root is None:
+        return {}
+    return {
+        "canon_root": str(repo_root / "canon"),
+        "invocation_contract": str(repo_root / "canon" / "contracts" / "invocation.md"),
+        "interaction_contract": str(repo_root / "canon" / "contracts" / "interaction-format.md"),
+        "file_governance": str(repo_root / "canon" / "governance" / "file-governance.md"),
+        "load_policy": str(repo_root / "canon" / "governance" / "load-policy.md"),
+        "briefing_orchestration": str(repo_root / "canon" / "orchestration" / "briefing.md"),
+        "inbox_processing": str(repo_root / "canon" / "operations" / "inbox-processing.md"),
+        "host_boundaries": str(repo_root / "canon" / "adapters" / "host-boundaries.md"),
+    }

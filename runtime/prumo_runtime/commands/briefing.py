@@ -14,6 +14,7 @@ from prumo_runtime.apple_reminders import (
     fetch_apple_reminders_today,
 )
 from prumo_runtime.constants import RUNTIME_VERSION, repo_root_from
+from prumo_runtime.constants import ADAPTER_CONTRACT_VERSION, canonical_refs_from
 from prumo_runtime.daily_operator import (
     build_daily_actions,
     daily_operation_payload,
@@ -748,6 +749,7 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
         lines.append("d) Tá bom por hoje")
 
     return {
+        "adapter_contract_version": ADAPTER_CONTRACT_VERSION,
         "workspace_path": str(workspace),
         "runtime_version": RUNTIME_VERSION,
         "core_version": core_version or "",
@@ -781,6 +783,7 @@ def build_briefing_payload(workspace: Path, refresh_snapshot: bool = False) -> d
             "email_note": str(snapshot.get("email_note") or ""),
             "email_display": str(snapshot.get("email_display") or ""),
         },
+        "canonical_refs": canonical_refs_from(Path(__file__)),
         "message": "\n".join(lines),
     }
 

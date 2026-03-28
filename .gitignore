@@ -25,8 +25,8 @@ Old/
 experiments/
 trab/
 
-# Estado runtime local (handover, lock e telemetria de manutenção)
-_state/
+# Oficina interna de desenvolvimento (handover, reviews e aprendizado local)
+.workbench/
 
 # Artefatos internos de desenvolvimento (fora da distribuição pública)
 .github/

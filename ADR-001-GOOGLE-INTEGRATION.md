@@ -1,8 +1,9 @@
 # ADR-001 — Integracao Google no runtime via Google APIs diretas
 
-Status: aceito
+Status: superado para o MVP atual
 
 Data: 2026-03-19
+Atualizado em: 2026-03-28
 
 Relacionado:
 
@@ -11,7 +12,7 @@ Relacionado:
 3. [LOCAL-RUNTIME-PHASE1-PLAN.md](/Users/tharsovieira/Documents/DailyLife/Prumo/LOCAL-RUNTIME-PHASE1-PLAN.md)
 4. [Use Google Workspace connectors | Claude Help Center](https://support.claude.com/en/articles/10166901-use-google-workspace-connectors)
 
-## Contexto
+## Contexto original
 
 O runtime local do Prumo precisa de uma fonte previsivel para agenda e email.
 
@@ -23,7 +24,7 @@ Ja vimos tambem o custo politico dessa abordagem:
 2. timeout e comportamento do host parecem problema do Prumo;
 3. briefing fica acoplado a uma cadeia mais temperamental do que deveria.
 
-## Decisao
+## Decisao original
 
 O Prumo passa a tratar **Google APIs diretas** como direcao estrutural da integracao Google no runtime local.
 
@@ -73,11 +74,43 @@ Motivo:
 3. combina com o desenho local-first;
 4. torna Claude, Codex, Gemini e IDEs apenas interfaces para um motor proprio.
 
+## Revisao de escopo do MVP
+
+Depois da evolucao dos hosts principais, o quadro mudou.
+
+Hoje, `Codex`, `Claude Code` e outros hosts relevantes ja oferecem conectores oficiais/MCP para Gmail, Google Calendar e Google Drive. Para o MVP, isso muda a pergunta.
+
+A pergunta deixa de ser:
+
+1. "como o runtime vira dono da coleta Google?"
+
+E passa a ser:
+
+1. "como o Prumo consome bem o que o host ja coleta?"
+
+Por isso, esta ADR fica **superada para o MVP atual**.
+
+O corte pragmatico agora e:
+
+1. conectores oficiais do host como trilha preferencial de aquisicao;
+2. Prumo como camada de briefing, triagem, continuidade e memoria local;
+3. integracao Google direta no runtime rebaixada para fallback, automacao futura ou suporte a host sem conector.
+
+Em portugues simples: para o MVP, o Prumo consome Google via host. Nao precisa virar provedor de Google.
+
 ## Consequencias
+
+### Para o MVP atual
+
+1. o runtime deixa de ser o caminho preferencial para Gmail, Calendar e Drive;
+2. backlog e documentacao devem refletir conectores do host como linha principal;
+3. qualquer codigo de integracao Google no runtime passa a ser considerado fallback/infra futura, nao eixo do produto.
 
 ### Positivas
 
-1. arquitetura mais coerente com a tese do produto;
+1. menos engenharia duplicada;
+2. menos setup no produto;
+3. mais foco naquilo que so o Prumo entrega: briefing, acao, memoria e continuidade.
 2. menor dependencia de plugin, marketplace e MCP do host;
 3. caminho mais claro para uma interface local de configuracao de contas/fontes;
 4. maior previsibilidade para cache, healthcheck e diagnostico.

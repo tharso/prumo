@@ -8,7 +8,7 @@ Prumo não é mais só “o briefing esperto daquele plugin”. O produto agora 
 
 Em português simples: briefing continua importante, mas não pode continuar sendo o apartamento inteiro. O valor do Prumo está em entender o estado do dia, propor a próxima jogada sensata, sustentar continuidade, atualizar documentação viva e deixar o trabalho menos pegajoso.
 
-A direcao estrutural para Google no runtime agora esta formalizada em [ADR-001-GOOGLE-INTEGRATION.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ADR-001-GOOGLE-INTEGRATION.md): Google APIs diretas como destino, snapshots como ponte.
+A decisao de MVP para Google agora e mais seca: os hosts usam seus conectores oficiais/MCP quando isso existir, e o Prumo consome esse material para briefing, acao e memoria local. A antiga trilha de Google APIs diretas no runtime ficou rebaixada para fallback/infra futura em [ADR-001-GOOGLE-INTEGRATION.md](/Users/tharsovieira/Documents/DailyLife/Prumo/ADR-001-GOOGLE-INTEGRATION.md).
 
 O contrato de invocação do produto agora também está explícito em [INVOCATION-UX-CONTRACT.md](/Users/tharsovieira/Documents/DailyLife/Prumo/INVOCATION-UX-CONTRACT.md). E a nova casa do canon compartilhado começou a sair do papel em [canon/](/Users/tharsovieira/Documents/DailyLife/Prumo/canon). Já era hora de parar de usar README como cartório improvisado.
 
@@ -45,7 +45,7 @@ O retrato de campo dos hosts, hoje, ficou assim:
 4. `Cowork` fica em backlog preparado. Em modo atual, ele mora numa sandbox/VM que não enxerga o runtime local do host. Insistir nisso agora seria hobby caro.
 5. `Gemini CLI` foi reprovado como adapter porque tentou improvisar runtime e até mexeu em `_state/`.
 
-Para o MVP, a aposta honesta é mais estreita: uma conta Google bem integrada já resolve muito do valor do produto sem transformar setup em burocracia. O motor do Prumo também saiu do formato armário de acumulador: o core agora é índice + guardrails, com procedimento detalhado em módulos canônicos. E a sanitização deixou de ser só “compactar handover”: o sistema agora já consegue arquivar frio seguro com índice global, sem brincar de sumiço.
+Para o MVP, a aposta honesta é mais estreita: uma conta Google bem integrada via conector oficial do host já resolve muito do valor do produto sem transformar o Prumo em encanador de API alheia. O motor do Prumo também saiu do formato armário de acumulador: o core agora é índice + guardrails, com procedimento detalhado em módulos canônicos. E a sanitização deixou de ser só “compactar handover”: o sistema agora já consegue arquivar frio seguro com índice global, sem brincar de sumiço.
 
 Seus dados ficam em arquivos Markdown no seu computador. Sem cloud, sem conta, sem lock-in.
 E, a partir de agora, com um pouco mais de governo: o Prumo começou a explicitar o que pertence a `CLAUDE.md`, `PAUTA.md`, `REGISTRO.md` e histórico, em vez de fingir que tudo cabe no mesmo armário.
@@ -131,8 +131,6 @@ prumo setup --workspace /caminho/do/workspace
 cd /caminho/do/workspace
 prumo start
 prumo migrate --workspace /caminho/do/workspace
-prumo auth google --workspace /caminho/do/workspace --client-secrets /caminho/do/client_secret.json
-prumo auth google --workspace /caminho/do/workspace --client-id SEU_CLIENT_ID --client-secret SEU_CLIENT_SECRET
 prumo snapshot-refresh --workspace /caminho/do/workspace
 prumo snapshot-refresh --workspace /caminho/do/workspace --profile pessoal
 prumo context-dump --workspace /caminho/do/workspace --format json
@@ -205,32 +203,14 @@ Se quiser abastecer agenda/email sem obrigar o briefing a esperar coleta ao vivo
 prumo snapshot-refresh --workspace /caminho/do/workspace
 ```
 
-Esse comando tenta atualizar o cache local de snapshot dual. O briefing passa a preferir esse cache por padrão, em vez de bancar o herói toda vez que a integração externa decide atrasar.
+Esse comando tenta atualizar o cache local sem obrigar o briefing a ficar pendurado em coleta ao vivo. No MVP, a fonte preferencial de Google vem dos conectores oficiais do host. O runtime pode continuar existindo como trilha de fallback ou infra futura, mas deixou de ser a espinha dorsal dessa parte do produto.
 
-Se houver conta Google conectada via `prumo auth google`, o `snapshot-refresh` passa a preferir Calendar API e Gmail API diretas antes de cair para snapshots antigos. Em outras palavras: o runtime finalmente parou de pedir ao Gemini para fazer papel de encanador.
+Em português menos cerimonial:
 
-Agora ele também sabe quando `Tasks API` ainda não entrou na festa. Se faltarem os escopos novos, o briefing avisa que alguns lembretes do Google podem ficar de fora, em vez de jurar completude com a serenidade de um impostor bem vestido.
-
-Na Fase 1, o runtime assume um perfil Google principal (`pessoal`) por padrão. Antes de querer dois fogões, convém fazer um acender sem drama.
-
-Para conectar Google direto no runtime:
-
-```bash
-prumo auth google --workspace /caminho/do/workspace --client-secrets /caminho/do/client_secret.json
-prumo auth google --workspace /caminho/do/workspace --client-id SEU_CLIENT_ID --client-secret SEU_CLIENT_SECRET
-```
-
-Esse fluxo abre o navegador, pede consentimento e grava só metadado no workspace. Credencial sensível vai para storage local do runtime fora do workspace. No macOS, isso significa Keychain. Nas outras plataformas, significa storage próprio do runtime. Guardar refresh token em Markdown continuaria sendo uma ideia de jerico com crachá.
-
-Se o Google Console resolver esconder o download do JSON como se fosse herança de família, o runtime também aceita `--client-id` e `--client-secret` diretamente. Produto bom não devia depender do humor de uma UI barroca.
-
-Depois de conectado, o `briefing` mostra explicitamente:
-
-1. status da integração Google;
-2. conta ativa;
-3. último refresh útil (com idade relativa);
-4. caminho de reauth quando o token morrer;
-5. aviso claro quando `Tasks API` ainda nao estiver coberta pelo perfil autenticado.
+1. host coleta Gmail, Calendar e Drive quando tiver conector oficial para isso;
+2. Prumo consome o que vier dessa coleta;
+3. briefing, triagem, continuidade e memória continuam sendo responsabilidade do Prumo;
+4. integração Google dentro do runtime saiu do centro e foi para a reserva.
 
 Descobertas tecnicas que mudam direcao agora ficam registradas em `EXECUTION-NOTES.md`. O objetivo e simples: nao repetir a mesma escavacao toda vez que um host resolver brincar de labirinto.
 

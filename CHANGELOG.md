@@ -8,6 +8,7 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 
 ### Scope
 - MVP limpo de fumaça: multi-conta e Apple Reminders saem do horizonte ativo do produto. Continuam como história e código legado onde já existirem, mas deixam de aparecer no contrato principal, nos playbooks e na conversa do dia.
+- Gmail, Google Calendar e Google Drive passam a entrar no MVP preferencialmente via conectores oficiais/MCP do host. A integração Google direta no runtime fica rebaixada para fallback/infra futura.
 
 ### Changed
 - O `start --format json` ficou mais seco para adapters: `state_flags` agora carrega só o que move decisão do MVP, sem puxar Apple Reminders de volta para a mesa.

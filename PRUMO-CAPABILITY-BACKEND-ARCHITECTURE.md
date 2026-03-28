@@ -79,6 +79,18 @@ Traduzindo:
 5. nenhum host deve inventar seu proprio Prumo;
 6. organizacao, catalogacao e limpeza nao sao detalhe. Sao parte do produto.
 
+### 3.1. Corte pratico para Google no MVP
+
+Para Gmail, Calendar e Drive, o MVP nao precisa que o runtime vire dono da coleta quando os hosts principais ja oferecem conectores oficiais/MCP decentes.
+
+A regra pratica fica assim:
+
+1. o host coleta;
+2. o Prumo interpreta, organiza e registra;
+3. o runtime so entra quando houver motivo real de fallback, automacao sem sessao ou host sem conector.
+
+Em outras palavras: no MVP, o Prumo consome Google. Nao precisa possuir Google.
+
 ## 4. O que significa “runtime como backend de capacidades”
 
 Significa que o runtime para de tentar ser:

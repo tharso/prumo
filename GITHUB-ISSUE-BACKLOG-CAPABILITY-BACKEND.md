@@ -16,6 +16,10 @@ Observacao:
 
 Artefatos de oficina como handover e revisoes cruzadas vivem na `.workbench/` do repo e seguem fora do material versionado do produto. Eles informam este backlog, mas nao sao parte dele.
 
+Observacao de escopo:
+
+Para o MVP atual, Gmail, Google Calendar e Google Drive entram preferencialmente via conectores oficiais/MCP do host. Integracao Google direta dentro do runtime saiu do centro do backlog e fica rebaixada para fallback/infra futura.
+
 ## 1. Como usar este backlog
 
 Este arquivo nao e o backlog do usuario final. E um rascunho de execucao para abrir issues no GitHub com escopo claro.

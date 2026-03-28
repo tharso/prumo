@@ -15,6 +15,7 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 - Novo [HOST-CONSUMPTION-VALIDATION.md](/Users/tharsovieira/Documents/DailyLife/Prumo/HOST-CONSUMPTION-VALIDATION.md), transformando “validação real de host” em protocolo curto em vez de mito oral de corredor.
 - O protocolo de consumo por host agora cobre também o pré-cenário de `migrate` para workspaces legados, porque ignorar a primeira pedra real do caminho seria um bom jeito de chamar teatro de validação de campo.
 - Relatórios de validação do `Claude Code` e do `Antigravity` ficaram registrados em [validation/host-consumption/claude-code-2026-03-28.md](/Users/tharsovieira/Documents/DailyLife/Prumo/validation/host-consumption/claude-code-2026-03-28.md) e [validation/host-consumption/antigravity-2026-03-28.md](/Users/tharsovieira/Documents/DailyLife/Prumo/validation/host-consumption/antigravity-2026-03-28.md).
+- O README e a bridge de Apps Script foram alinhados a uma decisão menos histérica: multi-conta fica documentado como ponte futura, mas sai do MVP. Uma conta Google bem integrada basta para a primeira entrega.
 
 ## [4.16.6] - 2026-03-27
 

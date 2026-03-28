@@ -45,7 +45,7 @@ O retrato de campo dos hosts, hoje, ficou assim:
 4. `Cowork` fica em backlog preparado. Em modo atual, ele mora numa sandbox/VM que não enxerga o runtime local do host. Insistir nisso agora seria hobby caro.
 5. `Gemini CLI` foi reprovado como adapter porque tentou improvisar runtime e até mexeu em `_state/`.
 
-Para email e agenda multi-conta, o fluxo preferencial agora usa snapshots privados no Google Drive gerados por Google Apps Script e gravados como Google Docs com JSON texto. O motor do Prumo também saiu do formato armário de acumulador: o core agora é índice + guardrails, com procedimento detalhado em módulos canônicos. E a sanitização deixou de ser só “compactar handover”: o sistema agora já consegue arquivar frio seguro com índice global, sem brincar de sumiço.
+Para o MVP, a aposta honesta é mais estreita: uma conta Google bem integrada já resolve muito do valor do produto sem transformar setup em burocracia. A ponte multi-conta via Google Apps Script continua documentada, mas fica fora da primeira entrega. O motor do Prumo também saiu do formato armário de acumulador: o core agora é índice + guardrails, com procedimento detalhado em módulos canônicos. E a sanitização deixou de ser só “compactar handover”: o sistema agora já consegue arquivar frio seguro com índice global, sem brincar de sumiço.
 
 Seus dados ficam em arquivos Markdown no seu computador. Sem cloud, sem conta, sem lock-in.
 E, a partir de agora, com um pouco mais de governo: o Prumo começou a explicitar o que pertence a `CLAUDE.md`, `PAUTA.md`, `REGISTRO.md` e histórico, em vez de fingir que tudo cabe no mesmo armário.

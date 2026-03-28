@@ -14,6 +14,16 @@ Não vale tratá-lo como:
 2. desculpa para manter briefing acoplado ao Cowork;
 3. camada “provisória” que mora em pasta ignorada e ninguém mais consegue auditar.
 
+## Status de produto
+
+Para o MVP atual, esta ponte fica fora da primeira entrega.
+
+Em português direto:
+
+1. uma conta Google bem integrada já compra valor suficiente para o piloto;
+2. multi-conta continua documentada e rastreável;
+3. mas não entra agora como requisito do MVP, porque seria um ótimo jeito de trocar foco por cobertura ornamental.
+
 ## Artefatos rastreáveis
 
 1. [apps-script-setup.md](/Users/tharsovieira/Documents/DailyLife/Prumo/bridges/google-apps-script/apps-script-setup.md)

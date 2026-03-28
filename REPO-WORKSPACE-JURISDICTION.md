@@ -219,8 +219,8 @@ Tudo que esta na raiz de `DailyLife/` e faz o Prumo funcionar como sistema vivo 
 
 Hoje [docs](/Users/tharsovieira/Documents/DailyLife/Prumo/docs) contem pelo menos:
 
-1. [docs/apps-script-setup.md](/Users/tharsovieira/Documents/DailyLife/Prumo/docs/apps-script-setup.md)
-2. [docs/apps-script](/Users/tharsovieira/Documents/DailyLife/Prumo/docs/apps-script)
+1. [bridges/google-apps-script/apps-script-setup.md](/Users/tharsovieira/Documents/DailyLife/Prumo/bridges/google-apps-script/apps-script-setup.md)
+2. [bridges/google-apps-script](/Users/tharsovieira/Documents/DailyLife/Prumo/bridges/google-apps-script)
 3. [docs/stories/us-001-antigravity-adapter.md](/Users/tharsovieira/Documents/DailyLife/Prumo/docs/stories/us-001-antigravity-adapter.md)
 
 Ou seja: `docs/` esta funcionando como gaveta chamada "diversos".

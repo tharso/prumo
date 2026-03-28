@@ -589,8 +589,8 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 ## [4.2.4] - 2026-03-16
 
 ### Added
-- Briefing passa a priorizar snapshots privados `Prumo/snapshots/email-snapshot.json` no Google Drive como fonte multi-conta para agenda e emails.
-- Guia operacional em `docs/apps-script-setup.md` atualizado com o contrato de consumo do briefing.
+- Briefing passa a priorizar snapshots privados `Prumo/snapshots/email-snapshot` em Google Docs como fonte multi-conta para agenda e emails.
+- Guia operacional movido para [bridges/google-apps-script/apps-script-setup.md](/Users/tharsovieira/Documents/DailyLife/Prumo/bridges/google-apps-script/apps-script-setup.md), em vez de seguir apodrecendo em `docs/` ignorado.
 
 ### Changed
 - Setup do Prumo passa a recomendar Google Apps Script + Google Drive como caminho preferencial para email/calendar multi-conta, deixando Gemini dual como fallback avançado.

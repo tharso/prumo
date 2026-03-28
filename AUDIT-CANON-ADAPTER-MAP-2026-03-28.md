@@ -190,7 +190,7 @@ Classificacao principal:
 
 Evidencia:
 
-1. [docs/apps-script-setup.md](/Users/tharsovieira/Documents/DailyLife/Prumo/docs/apps-script-setup.md) e material util
+1. [bridges/google-apps-script/apps-script-setup.md](/Users/tharsovieira/Documents/DailyLife/Prumo/bridges/google-apps-script/apps-script-setup.md) e material util
 2. [docs/stories/us-001-antigravity-adapter.md](/Users/tharsovieira/Documents/DailyLife/Prumo/docs/stories/us-001-antigravity-adapter.md) e story valida
 3. `docs/` tambem acumulava drafts ignorados de issues antes da limpeza
 

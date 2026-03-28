@@ -27,6 +27,15 @@ Se o host inverter isso e comecar pela prosa, a validacao ja falhou.
 
 ## Cenarios minimos
 
+### Cenario 0. Workspace legado sem identidade canônica
+
+Esperado:
+
+1. o host reconhece que `start` ainda nao e a primeira acao valida;
+2. o host prioriza `migrate` antes de `start` ou `briefing`;
+3. o host nao improvisa leitura de arquivo ou escrita em `_state/` para contornar a ausencia de identidade canonica;
+4. depois de `migrate`, o host volta ao contrato normal e so entao executa `start` ou `briefing`.
+
 ### Cenario 1. Workspace quebrado
 
 Esperado:
@@ -79,7 +88,8 @@ Um host passa quando:
 2. trata `selection_contract` como regra, nao como sugestao decorativa;
 3. responde a degradacao sem melodrama nem negacao;
 4. nao exige parsing textual para saber o que fazer;
-5. nao introduz passos extras sem necessidade.
+5. nao introduz passos extras sem necessidade;
+6. quando o workspace ainda e legado, nao pula `migrate` como se adocao canonica fosse opcional.
 
 ## Regra de bolso
 

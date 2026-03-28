@@ -104,6 +104,7 @@ Ao consumir JSON:
 3. Não cair no reflexo "já que é Claude, vou usar o fluxo do Cowork". Isso seria preguiça com gravata.
 4. Não depender de plugin store, registry local ou slash command do `Cowork`.
 5. Tratar integrações opcionais e permissões locais como detalhe do host, não como bússola do produto.
+6. Se `Claude Code` tiver conector oficial para Gmail, Google Calendar ou Google Drive, isso vira fonte primária de contexto externo para o briefing. O runtime nao precisa posar de atravessador.
 
 ## 7. Checklist de aceite
 

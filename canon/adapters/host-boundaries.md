@@ -22,7 +22,8 @@ Este arquivo separa o que e regra de produto do que e detalhe de host. Sem essa 
 4. marketplace e manifestos;
 5. permissao local e detalhes de integracao opcional por app;
 6. affordance visual e politica de autonomia de cada host;
-7. detalhes de transporte seguro de update.
+7. detalhes de transporte seguro de update;
+8. aquisicao de contexto externo via MCP ou conector oficial do host.
 
 ## Caso especial: update de versao
 

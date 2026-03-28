@@ -97,6 +97,7 @@ Em português curto:
 6. Nunca ler arquivos para "simular" `prumo` se o comando ainda não foi executado.
 7. Nunca escrever `_state/briefing-state.json` ou qualquer outro arquivo de estado fingindo ser o runtime.
 8. Nunca sintetizar JSON de `start`; ou roda `prumo start --format json`, ou assume que falhou.
+9. Se houver conector oficial para Gmail, Google Calendar ou Google Drive neste host, ele é a fonte primária de contexto externo do MVP. Não force o runtime a catar o que o host já trouxe.
 
 ## 6.1. Ordem obrigatória de leitura
 

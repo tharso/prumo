@@ -16,6 +16,7 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 
 ### Docs
 - Os playbooks de `Codex`, `Claude Code`, `Antigravity` e `Gemini CLI` agora registram, sem charada, como consumir `start/briefing` estruturados sem voltar ao vício de pescar string.
+- O canon agora ganhou um contrato explícito para contexto externo via host em [canon/contracts/host-external-context.md](/Users/tharsovieira/Documents/DailyLife/Prumo/canon/contracts/host-external-context.md). Em português menos solene: Gmail, Calendar e Drive entram preferencialmente pelo conector oficial do host, e o Prumo continua dono do sentido do dia.
 - Novo [HOST-CONSUMPTION-VALIDATION.md](/Users/tharsovieira/Documents/DailyLife/Prumo/HOST-CONSUMPTION-VALIDATION.md), transformando “validação real de host” em protocolo curto em vez de mito oral de corredor.
 - O protocolo de consumo por host agora cobre também o pré-cenário de `migrate` para workspaces legados, porque ignorar a primeira pedra real do caminho seria um bom jeito de chamar teatro de validação de campo.
 - Relatórios de validação do `Claude Code` e do `Antigravity` ficaram registrados em [validation/host-consumption/claude-code-2026-03-28.md](/Users/tharsovieira/Documents/DailyLife/Prumo/validation/host-consumption/claude-code-2026-03-28.md) e [validation/host-consumption/antigravity-2026-03-28.md](/Users/tharsovieira/Documents/DailyLife/Prumo/validation/host-consumption/antigravity-2026-03-28.md).

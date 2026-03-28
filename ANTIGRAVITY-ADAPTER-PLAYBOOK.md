@@ -95,6 +95,7 @@ O risco aqui é simples:
 1. tratar `Antigravity` como host validado para rota curta e uso do runtime;
 2. manter vigilância sobre disciplina de execução em conversas mais longas;
 3. consolidar consumo disciplinado do contrato estruturado em sessões mais longas.
+4. quando houver conector oficial de Gmail, Google Calendar ou Google Drive no host, usar isso como trilha primária de contexto externo antes de pedir socorro ao runtime.
 
 ## 6.1. Como consumir o JSON sem virar procissão de tool-call
 

@@ -46,9 +46,9 @@ Ler, no minimo:
 
 Usar a melhor fonte disponivel na ordem certa:
 
-1. snapshots estruturados e caches confiaveis;
-2. fallback tecnico do runtime;
-3. integracao direta, quando nao houver fonte melhor.
+1. conector oficial/MCP do host, quando ele existir e estiver saudavel;
+2. snapshots estruturados e caches confiaveis;
+3. fallback tecnico do runtime, quando realmente precisar.
 
 Se uma fonte falhar:
 
@@ -75,6 +75,12 @@ Entregar automaticamente:
 3. estado resumido da inbox;
 4. alertas operacionais que realmente importam;
 5. numeração contínua.
+
+Quando houver contexto externo vindo do host:
+
+1. usar isso para iluminar agenda, email e documentos do dia;
+2. nao despejar dado bruto no palco principal;
+3. marcar origem e freshness de forma curta quando isso afetar confianca.
 
 No panorama:
 

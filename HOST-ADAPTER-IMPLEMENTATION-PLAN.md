@@ -67,7 +67,8 @@ Porque adapter precisa saber:
 1. como o usuário chama o Prumo;
 2. como o host executa `prumo`;
 3. como o host consome `prumo start --format json`;
-4. como permissões locais se comportam naquele app.
+4. como permissões locais se comportam naquele app;
+5. como o host fornece contexto externo via conector oficial/MCP sem despejar bruto no briefing.
 
 ## 3. Premissas de trabalho
 

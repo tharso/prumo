@@ -117,11 +117,14 @@ def kickoff_contract_payload(workspace: Path) -> dict[str, object]:
     docs = documentation_targets(workspace)
     return {
         "mode": "new-workspace",
+        "conversation_style": "dump-first",
         "ask_one_question_at_a_time": True,
         "show_value_before_menu": True,
         "avoid_empty_briefing": True,
-        "initial_question": (
-            "Qual frente da sua vida ou do trabalho mais merece ficar visivel primeiro neste workspace?"
+        "initial_invitation": (
+            "Me conta as coisas que estao ocupando sua cabeca agora. Pode ser compromisso, projeto, pendencia, ideia, "
+            "email que precisa resposta ou qualquer outra coisa puxando sua atencao. Nao precisa organizar nem explicar "
+            "tudo direito. Vai despejando que eu vou te ajudando a separar isso no caminho."
         ),
         "capture_targets": {
             "pauta": docs["pauta"],
@@ -130,13 +133,14 @@ def kickoff_contract_payload(workspace: Path) -> dict[str, object]:
         },
         "suggested_flow": [
             "abrir explicando em uma linha que o workspace ainda esta cru, mas a sessao vai montar o primeiro mapa util",
-            "descobrir a frente principal sem despejar formulario",
-            "reduzir para prioridades iniciais e restricoes relevantes",
+            "convidar o usuario a fazer um despejo mental curto, sem exigir classificacao previa",
+            "organizar o material em blocos ou frentes e refletir isso de volta de forma curta",
+            "fazer uma pergunta de afunilamento so depois da primeira devolucao",
             "registrar o minimo util em documentacao viva",
             "encerrar com um proximo movimento plausivel",
         ],
         "success_definition": (
-            "deixar o workspace com alguma frente, prioridade ou nota inicial registrada, em vez de devolver menu em cima do vazio"
+            "deixar o workspace com alguma frente, prioridade ou nota inicial registrada, mostrando que o Prumo consegue organizar o caos antes de pedir formulario"
         ),
     }
 
@@ -364,13 +368,13 @@ def build_daily_actions(
         register(
             host_prompt_action(
                 "kickoff",
-                "Abrir sessão de arranque e montar o primeiro mapa útil",
+                "Abrir sessão de arranque por despejo assistido",
                 (
                     "O workspace acabou de nascer e ainda nao tem tracao real. "
                     f"Conduza uma sessao curta de arranque usando `{docs['pauta']}`, `{docs['inbox']}` e "
-                    f"`{docs['registro']}` como destino. Pergunte uma coisa por vez. Comece por: "
-                    f"\"{kickoff_contract['initial_question']}\". Capture frentes, prioridades, rotina e "
-                    "deixe algum valor registrado antes de oferecer cardapio."
+                    f"`{docs['registro']}` como destino. Nao comece pedindo classificacao. Comece por: "
+                    f"\"{kickoff_contract['initial_invitation']}\". Organize o material em blocos curtos, "
+                    "devolva o que entendeu e so depois afunile com uma pergunta por vez."
                 ),
                 category="onboarding",
                 documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
@@ -379,7 +383,7 @@ def build_daily_actions(
             )
         )
         actions_by_id["kickoff"]["kickoff_contract"] = kickoff_contract
-        actions_by_id["kickoff"]["initial_question"] = kickoff_contract["initial_question"]
+        actions_by_id["kickoff"]["initial_question"] = kickoff_contract["initial_invitation"]
     else:
         register(
             shell_action(

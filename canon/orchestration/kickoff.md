@@ -8,8 +8,8 @@ Este arquivo define a primeira sessao do Prumo quando o workspace ainda nao tem 
 
 O kickoff deve:
 
-1. descobrir o minimo de contexto util;
-2. capturar frentes, prioridades e ritmo de trabalho;
+1. receber um primeiro despejo mental sem exigir taxonomia precoce;
+2. organizar esse material progressivamente;
 3. mostrar valor antes de despejar menu ou arquivo;
 4. deixar o workspace melhor do que encontrou;
 5. preparar o terreno para briefings de verdade depois.
@@ -34,21 +34,23 @@ Nao usar kickoff quando:
 
 O kickoff nao deve despejar formulario. Deve conduzir em passos curtos.
 
-### 2. Menos menu, mais descoberta
+### 2. Menos menu, mais despejo assistido
 
 No kickoff:
 
 1. evitar cardapio `a/b/c/d` antes de existir contexto;
-2. abrir com pergunta concreta;
-3. so oferecer escolha quando houver bifurcacao real.
+2. abrir convidando o usuario a despejar o que esta ocupando a mente;
+3. deixar a classificacao inicial com o Prumo, nao com o usuario;
+4. so oferecer escolha quando houver bifurcacao real.
 
 ### 3. Valor cedo
 
 Antes de falar de estrutura demais, a sessao precisa:
 
-1. identificar uma frente viva;
-2. registrar isso em lugar util;
-3. devolver ao usuario uma sensacao de mapa, nao de instalador.
+1. receber material bruto suficiente para trabalhar;
+2. refletir de volta o que entendeu em blocos uteis;
+3. registrar isso em lugar util;
+4. devolver ao usuario uma sensacao de mapa, nao de instalador.
 
 ### 4. Persistencia util
 
@@ -56,7 +58,8 @@ O kickoff deve deixar pelo menos um destes ganhos:
 
 1. frente principal registrada em `PAUTA.md`;
 2. prioridades ou entradas iniciais registradas em `INBOX.md`;
-3. uma nota curta de arranque em `REGISTRO.md`.
+3. uma nota curta de arranque em `REGISTRO.md`;
+4. um pequeno espelho organizado do caos inicial, para o usuario ver valor logo.
 
 ### 5. Nada de fingir contexto
 
@@ -76,22 +79,36 @@ Explicar em uma linha:
 2. que a sessao vai montar o primeiro mapa util;
 3. que a conversa sera curta.
 
-### 2. Primeira pergunta
+### 2. Primeiro despejo
 
-Comecar por algo que puxe realidade viva, por exemplo:
+Comecar convidando o usuario a jogar material bruto na mesa, por exemplo:
 
-1. qual frente da vida ou do trabalho mais merece ficar visivel primeiro;
-2. o que esta pegando agora;
-3. o que nao pode passar batido nesta semana.
+1. compromissos;
+2. projetos;
+3. pendencias;
+4. ideias;
+5. emails ou respostas travadas;
+6. qualquer coisa que esteja puxando atencao.
 
-### 3. Prioridades
+O usuario nao deve precisar decidir a taxonomia antes de confiar no sistema.
 
-Depois da primeira resposta:
+### 3. Primeira devolucao
+
+Depois do primeiro despejo:
+
+1. o Prumo agrupa o material em frentes ou blocos uteis;
+2. devolve esse espelho em linguagem curta;
+3. mostra que esta organizando em vez de so coletar.
+
+### 4. Afunilamento
+
+So depois da primeira devolucao:
 
 1. reduzir para uma ou duas prioridades iniciais;
-2. distinguir foco de hoje vs foco da semana quando isso importar.
+2. distinguir foco de hoje vs foco da semana quando isso importar;
+3. perguntar o minimo necessario para seguir.
 
-### 4. Ritmo
+### 5. Ritmo
 
 Entender minimamente:
 
@@ -100,11 +117,11 @@ Entender minimamente:
 3. estilo de trabalho;
 4. preferencias que afetem briefing futuro.
 
-### 5. Primeiro fechamento
+### 6. Primeiro fechamento
 
 Encerrar deixando:
 
-1. um resumo curto do que passa a importar;
+1. um resumo curto do que passou a importar;
 2. o proximo movimento plausivel;
 3. o workspace menos vazio e mais util.
 

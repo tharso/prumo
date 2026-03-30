@@ -208,11 +208,13 @@ class StartCommandTests(unittest.TestCase):
             self.assertTrue(any(action["id"] == "kickoff" for action in payload["actions"]))
             self.assertIn("kickoff_contract", payload["next_move"])
             self.assertEqual(payload["next_move"]["kickoff_contract"]["mode"], "new-workspace")
+            self.assertEqual(payload["next_move"]["kickoff_contract"]["conversation_style"], "dump-first")
             self.assertTrue(payload["next_move"]["kickoff_contract"]["ask_one_question_at_a_time"])
-            self.assertIn("Qual frente da sua vida ou do trabalho", payload["next_move"]["initial_question"])
+            self.assertIn("Me conta as coisas que estao ocupando sua cabeca agora", payload["next_move"]["initial_question"])
             kickoff_action = next(action for action in payload["actions"] if action["id"] == "kickoff")
             self.assertIn("kickoff_contract", kickoff_action)
             self.assertIn("capture_targets", kickoff_action["kickoff_contract"])
+            self.assertIn("despejo mental curto", " ".join(kickoff_action["kickoff_contract"]["suggested_flow"]))
             self.assertEqual(
                 kickoff_action["kickoff_contract"]["capture_targets"]["pauta"],
                 str((workspace / "Prumo" / "PAUTA.md").resolve()),

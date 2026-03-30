@@ -46,10 +46,11 @@ Se alguem cair aqui sem mapa, a ordem util de leitura e:
 7. `contracts/capability-granularity.md`
 8. `orchestration/shared-contract.md`
 9. `orchestration/briefing.md`
-10. `governance/file-governance.md`
-11. `governance/load-policy.md`
-12. `governance/memory-hygiene.md`
-13. `adapters/host-boundaries.md`
+10. `orchestration/kickoff.md`
+11. `governance/file-governance.md`
+12. `governance/load-policy.md`
+13. `governance/memory-hygiene.md`
+14. `adapters/host-boundaries.md`
 
 ## Relacao com o resto do repo
 

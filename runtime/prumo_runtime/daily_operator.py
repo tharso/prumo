@@ -90,6 +90,10 @@ def next_move_payload(actions: list[dict[str, object]]) -> dict[str, object] | N
         payload["priority"] = action["priority"]
     if "recommended" in action:
         payload["recommended"] = action["recommended"]
+    if "kickoff_contract" in action:
+        payload["kickoff_contract"] = action["kickoff_contract"]
+    if "initial_question" in action:
+        payload["initial_question"] = action["initial_question"]
     return payload
 
 
@@ -107,6 +111,34 @@ def selection_contract_payload(next_move: dict[str, object] | None) -> dict[str,
     if next_move:
         payload["accepts_next_move"] = next_move["id"]
     return payload
+
+
+def kickoff_contract_payload(workspace: Path) -> dict[str, object]:
+    docs = documentation_targets(workspace)
+    return {
+        "mode": "new-workspace",
+        "ask_one_question_at_a_time": True,
+        "show_value_before_menu": True,
+        "avoid_empty_briefing": True,
+        "initial_question": (
+            "Qual frente da sua vida ou do trabalho mais merece ficar visivel primeiro neste workspace?"
+        ),
+        "capture_targets": {
+            "pauta": docs["pauta"],
+            "inbox": docs["inbox"],
+            "registro": docs["registro"],
+        },
+        "suggested_flow": [
+            "abrir explicando em uma linha que o workspace ainda esta cru, mas a sessao vai montar o primeiro mapa util",
+            "descobrir a frente principal sem despejar formulario",
+            "reduzir para prioridades iniciais e restricoes relevantes",
+            "registrar o minimo util em documentacao viva",
+            "encerrar com um proximo movimento plausivel",
+        ],
+        "success_definition": (
+            "deixar o workspace com alguma frente, prioridade ou nota inicial registrada, em vez de devolver menu em cima do vazio"
+        ),
+    }
 
 
 def pauta_candidates(workspace: Path) -> tuple[list[str], list[str]]:
@@ -328,15 +360,17 @@ def build_daily_actions(
         register(suggest_core_alignment_action(workspace, overview))
 
     if not has_briefed_today and fresh_workspace:
+        kickoff_contract = kickoff_contract_payload(workspace)
         register(
             host_prompt_action(
                 "kickoff",
-                "Abrir sessão de arranque em vez de briefing vazio",
+                "Abrir sessão de arranque e montar o primeiro mapa útil",
                 (
                     "O workspace acabou de nascer e ainda nao tem tracao real. "
                     f"Conduza uma sessao curta de arranque usando `{docs['pauta']}`, `{docs['inbox']}` e "
-                    f"`{docs['registro']}` como destino. Pergunte uma coisa por vez, capture frentes, "
-                    "prioridades, rotina e o que mereceria aparecer primeiro num briefing útil."
+                    f"`{docs['registro']}` como destino. Pergunte uma coisa por vez. Comece por: "
+                    f"\"{kickoff_contract['initial_question']}\". Capture frentes, prioridades, rotina e "
+                    "deixe algum valor registrado antes de oferecer cardapio."
                 ),
                 category="onboarding",
                 documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
@@ -344,6 +378,8 @@ def build_daily_actions(
                 why_now="Briefing de apartamento vazio so prova que ainda nao ha moveis. Sessao de arranque pelo menos compra utilidade.",
             )
         )
+        actions_by_id["kickoff"]["kickoff_contract"] = kickoff_contract
+        actions_by_id["kickoff"]["initial_question"] = kickoff_contract["initial_question"]
     else:
         register(
             shell_action(

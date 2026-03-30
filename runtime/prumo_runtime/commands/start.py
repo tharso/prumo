@@ -216,15 +216,17 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
             lines.append(f"4. Você já passou pelo briefing hoje, às {last_briefing_clock}.")
         elif next_move and next_move.get("id") == "kickoff":
             lines.append("4. Este workspace acabou de nascer. Ainda não faz sentido posar de briefing diário.")
+            if next_move.get("initial_question"):
+                lines.append(f"5. Primeira pergunta sugerida: {next_move['initial_question']}")
         else:
             lines.append("4. Ainda não há briefing registrado hoje neste workspace.")
-        suggestion_index = 5
+        suggestion_index = 6 if next_move and next_move.get("id") == "kickoff" and next_move.get("initial_question") else 5
 
     lines.append(
-        "5. Valor mínimo esperado agora: briefing com qualidade, continuação de trabalho, "
+        f"{suggestion_index}. Valor mínimo esperado agora: briefing com qualidade, continuação de trabalho, "
         "organização do dia e documentação útil. Se o produto parar no panorama, virou GPS que não dirige."
     )
-    suggestion_index = 6
+    suggestion_index += 1
 
     lines.append(f"{suggestion_index}. Minha sugestão: {suggestion}")
     if next_move:

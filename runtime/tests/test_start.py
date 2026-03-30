@@ -206,6 +206,17 @@ class StartCommandTests(unittest.TestCase):
             payload = json.loads(buffer.getvalue())
             self.assertEqual(payload["next_move"]["id"], "kickoff")
             self.assertTrue(any(action["id"] == "kickoff" for action in payload["actions"]))
+            self.assertIn("kickoff_contract", payload["next_move"])
+            self.assertEqual(payload["next_move"]["kickoff_contract"]["mode"], "new-workspace")
+            self.assertTrue(payload["next_move"]["kickoff_contract"]["ask_one_question_at_a_time"])
+            self.assertIn("Qual frente da sua vida ou do trabalho", payload["next_move"]["initial_question"])
+            kickoff_action = next(action for action in payload["actions"] if action["id"] == "kickoff")
+            self.assertIn("kickoff_contract", kickoff_action)
+            self.assertIn("capture_targets", kickoff_action["kickoff_contract"])
+            self.assertEqual(
+                kickoff_action["kickoff_contract"]["capture_targets"]["pauta"],
+                str((workspace / "Prumo" / "PAUTA.md").resolve()),
+            )
 
     def test_canonical_workspace_with_wrappers_is_not_misclassified_as_legacy(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -371,6 +382,7 @@ class StartCommandTests(unittest.TestCase):
             self.assertIn("canonical_refs", payload["adapter_hints"])
             self.assertTrue(payload["adapter_hints"]["canonical_refs"]["invocation_contract"].endswith("canon/contracts/invocation.md"))
             self.assertTrue(payload["adapter_hints"]["canonical_refs"]["briefing_orchestration"].endswith("canon/orchestration/briefing.md"))
+            self.assertTrue(payload["adapter_hints"]["canonical_refs"]["kickoff_orchestration"].endswith("canon/orchestration/kickoff.md"))
             self.assertIn("Prumo", payload["adapter_hints"]["short_invocations"])
             self.assertIn("short_acceptance", payload["adapter_hints"]["behavior"])
             self.assertEqual(payload["platform"]["label"], platform_label())

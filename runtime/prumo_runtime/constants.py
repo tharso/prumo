@@ -73,6 +73,7 @@ def canonical_refs_from(start: Path) -> dict[str, str]:
         "file_governance": str(repo_root / "canon" / "governance" / "file-governance.md"),
         "load_policy": str(repo_root / "canon" / "governance" / "load-policy.md"),
         "briefing_orchestration": str(repo_root / "canon" / "orchestration" / "briefing.md"),
+        "kickoff_orchestration": str(repo_root / "canon" / "orchestration" / "kickoff.md"),
         "inbox_processing": str(repo_root / "canon" / "operations" / "inbox-processing.md"),
         "host_boundaries": str(repo_root / "canon" / "adapters" / "host-boundaries.md"),
     }

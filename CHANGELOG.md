@@ -14,6 +14,7 @@ O formato segue, de forma pragmática, a ideia de Keep a Changelog e versionamen
 - O `start --format json` ficou mais seco para adapters: `state_flags` agora carrega só o que move decisão do MVP, sem puxar Apple Reminders de volta para a mesa.
 - Os templates do workspace ficaram mais explícitos sobre a ordem correta de consumo do JSON: primeiro `degradation`, `next_move`, `selection_contract` e `state_flags`; a prosa vem depois.
 - `prumo setup` parou de agir como despejador de arquivos. Agora ele roda em etapas curtas, pode pedir o caminho do workspace quando ele não vier por flag e cria workspaces novos no layout alvo: wrappers leves na raiz, memória viva em `Prumo/` e infraestrutura local em `/.prumo/`.
+- `prumo migrate` deixou de ser maquiagem de workspace legado. Agora ele faz o transplante flat→nested, move memória viva para `Prumo/`, estado técnico para `/.prumo/`, recria wrappers mínimos na raiz e guarda backup antes de trocar as placas de lugar.
 - `prumo` em workspace recém-nascido deixou de sugerir briefing de apartamento vazio. Quando ainda não existe tração real, a primeira ação passa a ser uma sessão de arranque guiada em vez de panorama ornamental do nada.
 
 ### Docs

@@ -58,3 +58,13 @@ class TemplateAdapterTests(unittest.TestCase):
         self.assertIn("structure-only", rendered)
         self.assertIn("candidatos", rendered.lower())
         self.assertIn("22/03/2026", rendered)
+
+    def test_agente_index_can_point_to_nested_core_path(self) -> None:
+        rendered = templates.render_agente_index(
+            "Batata",
+            "America/Sao_Paulo",
+            "09:00",
+            "30/03/2026",
+            core_path=".prumo/system/PRUMO-CORE.md",
+        )
+        self.assertIn("`.prumo/system/PRUMO-CORE.md`", rendered)

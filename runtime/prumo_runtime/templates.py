@@ -185,6 +185,8 @@ def render_agente_index(
     timezone_name: str,
     briefing_time: str,
     setup_date: str,
+    *,
+    core_path: str = "PRUMO-CORE.md",
 ) -> str:
     return f"""# Índice de contexto — {user_name}
 
@@ -212,7 +214,7 @@ def render_agente_index(
 - Pendência viva: `PAUTA.md`
 - Item não processado: `INBOX.md`
 - Histórico e trilha do que já foi resolvido: `REGISTRO.md`
-- Regras do sistema: `PRUMO-CORE.md`
+- Regras do sistema: `{core_path}`
 """
 
 

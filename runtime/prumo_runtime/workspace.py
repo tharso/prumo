@@ -179,6 +179,7 @@ def render_files(config: WorkspaceConfig) -> dict[str, str]:
             timezone_name=config.timezone_name,
             briefing_time=config.briefing_time,
             setup_date=setup_date,
+            core_path=core_relative,
         ),
         paths.relative(paths.agente_root / "PESSOAS.md"): templates.render_people_md(),
         paths.relative(paths.agente_root / "SAUDE.md"): templates.render_health_md(),
@@ -410,63 +411,121 @@ def build_config_from_existing(workspace: Path) -> WorkspaceConfig:
     )
 
 
+def copy_to_backup(source: Path, backup_target: Path) -> None:
+    backup_target.parent.mkdir(parents=True, exist_ok=True)
+    if source.is_dir():
+        shutil.copytree(source, backup_target)
+        return
+    shutil.copy2(source, backup_target)
+
+
+def move_with_backup(
+    source: Path,
+    destination: Path,
+    *,
+    workspace: Path,
+    stamp: str,
+    backed_up: list[str],
+    moved: list[str],
+) -> None:
+    if not source.exists():
+        return
+    relative = str(source.relative_to(workspace))
+    backup_target = backup_path_for(workspace, relative, stamp)
+    copy_to_backup(source, backup_target)
+    backed_up.append(relative)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(source), str(destination))
+    moved.append(f"{relative} -> {destination.relative_to(workspace)}")
+
+
+def remove_if_empty(path: Path) -> None:
+    if path.exists() and path.is_dir() and not any(path.iterdir()):
+        path.rmdir()
+
+
 def migrate_legacy_workspace(config: WorkspaceConfig) -> dict[str, list[str] | str]:
-    ensure_directories(config.workspace)
-    rendered = render_files(config)
+    if infer_layout_mode(config.workspace) == "nested":
+        raise WorkspaceError(
+            "workspace já está no layout novo. `migrate` aqui seria retrofit com marreta."
+        )
+
+    nested_config = WorkspaceConfig(
+        workspace=config.workspace,
+        user_name=config.user_name,
+        agent_name=config.agent_name,
+        timezone_name=config.timezone_name,
+        briefing_time=config.briefing_time,
+        layout_mode="nested",
+        wrapper_policy="replace",
+    )
     stamp = now_stamp(config.timezone_name)
     backup_root = config.workspace / ".prumo" / "backups" / "runtime-migrate" / stamp
     backup_root.mkdir(parents=True, exist_ok=True)
-    paths = workspace_paths(config.workspace)
+    flat_paths = workspace_paths(config.workspace, layout_mode="flat")
+    nested_paths = workspace_paths(config.workspace, layout_mode="nested")
 
     backed_up: list[str] = []
     created: list[str] = []
     overwritten: list[str] = []
     preserved: list[str] = []
+    moved: list[str] = []
+    legacy_claude_text: str | None = None
 
-    claude_path = paths.wrappers["CLAUDE.md"]
-    legacy_import_path = paths.agente_root / "LEGADO-CLAUDE.md"
+    claude_path = flat_paths.wrappers["CLAUDE.md"]
+    legacy_import_path = nested_paths.agente_root / "LEGADO-CLAUDE.md"
     if claude_path.exists():
         current = claude_path.read_text(encoding="utf-8")
         if current.strip() and not looks_like_wrapper(current) and not legacy_import_path.exists():
-            legacy_import_path.parent.mkdir(parents=True, exist_ok=True)
-            legacy_import_path.write_text(current, encoding="utf-8")
-            created.append("Agente/LEGADO-CLAUDE.md")
+            legacy_claude_text = current
+
+    move_pairs = [
+        (flat_paths.pauta, nested_paths.pauta),
+        (flat_paths.inbox, nested_paths.inbox),
+        (flat_paths.registro, nested_paths.registro),
+        (flat_paths.ideias, nested_paths.ideias),
+        (flat_paths.agente_root, nested_paths.agente_root),
+        (flat_paths.referencias_root, nested_paths.referencias_root),
+        (flat_paths.inbox4mobile_root, nested_paths.inbox4mobile_root),
+        (flat_paths.state_root, nested_paths.state_root),
+        (flat_paths.logs_root, nested_paths.logs_root),
+    ]
+    for source, destination in move_pairs:
+        if source.exists() and destination.exists():
+            preserved.append(str(destination.relative_to(config.workspace)))
+            continue
+        move_with_backup(
+            source,
+            destination,
+            workspace=config.workspace,
+            stamp=stamp,
+            backed_up=backed_up,
+            moved=moved,
+        )
 
     for relative in ("AGENT.md", "CLAUDE.md", "AGENTS.md", "PRUMO-CORE.md"):
         target = config.workspace / relative
+        if not target.exists():
+            continue
         backup_target = backup_path_for(config.workspace, relative, stamp)
-        backup_target.parent.mkdir(parents=True, exist_ok=True)
-        if target.exists():
-            shutil.copy2(target, backup_target)
-            backed_up.append(relative)
-            target.write_text(rendered[relative], encoding="utf-8")
-            overwritten.append(relative)
-        else:
-            target.write_text(rendered[relative], encoding="utf-8")
-            created.append(relative)
+        copy_to_backup(target, backup_target)
+        backed_up.append(relative)
+        target.unlink()
 
-    for relative, content in rendered.items():
-        if relative in ("AGENT.md", "CLAUDE.md", "AGENTS.md", "PRUMO-CORE.md"):
-            continue
-        target = config.workspace / relative
-        target.parent.mkdir(parents=True, exist_ok=True)
-        if target.exists():
-            preserved.append(relative)
-            continue
-        target.write_text(content, encoding="utf-8")
-        created.append(relative)
+    migrated = create_missing_files(nested_config)
+    created.extend(migrated["created"])
+    preserved.extend(migrated["preserved"])
+    overwritten.extend(migrated["overwritten"])
+    if "backup_root" in migrated:
+        preserved.append("setup backup também criado")
 
-    schema_path = paths.workspace_schema
-    existing_schema = read_schema(config.workspace)
-    created_at = existing_schema.get("created_at")
-    if schema_path.exists():
-        backed_up.append(paths.relative(schema_path))
-        backup_target = backup_path_for(config.workspace, paths.relative(schema_path), stamp)
-        backup_target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(schema_path, backup_target)
-    write_schema(config, preserve_created_at=created_at)
-    if not schema_path.exists():
-        created.append(paths.relative(schema_path))
+    if legacy_claude_text and not legacy_import_path.exists():
+        legacy_import_path.parent.mkdir(parents=True, exist_ok=True)
+        legacy_import_path.write_text(legacy_claude_text, encoding="utf-8")
+        created.append("Prumo/Agente/LEGADO-CLAUDE.md")
+
+    remove_if_empty(config.workspace / "_state")
+    remove_if_empty(config.workspace / "_logs")
 
     return {
         "backup_root": str(backup_root),
@@ -474,6 +533,7 @@ def migrate_legacy_workspace(config: WorkspaceConfig) -> dict[str, list[str] | s
         "created": created,
         "overwritten": overwritten,
         "preserved": preserved,
+        "moved": moved,
     }
 
 

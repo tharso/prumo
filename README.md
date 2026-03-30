@@ -217,9 +217,10 @@ prumo migrate --workspace /caminho/do/workspace
 
 Esse comando:
 
-1. cria `AGENT.md` e o schema do workspace;
-2. faz backup antes de sobrescrever wrappers e `PRUMO-CORE.md`;
-3. preserva o `CLAUDE.md` legado em `Agente/LEGADO-CLAUDE.md`.
+1. migra o workspace flat para a topologia nova (`/Prumo/` + `/.prumo/` + raiz mínima);
+2. move memória viva e estado técnico sem deixar a casa parecendo almoxarifado;
+3. faz backup antes de substituir wrappers e `PRUMO-CORE.md`;
+4. preserva `CLAUDE.md` legado em `Prumo/Agente/LEGADO-CLAUDE.md` quando ele não era só wrapper.
 
 Se quiser abastecer agenda/email sem obrigar o briefing a esperar coleta ao vivo:
 

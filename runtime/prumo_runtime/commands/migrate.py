@@ -40,13 +40,18 @@ def run_migrate(args) -> int:
     )
     result = migrate_legacy_workspace(config)
 
-    print(f"{user_name}, o workspace legado foi adotado pelo runtime em: {workspace}")
+    print(f"{user_name}, o workspace legado foi migrado para o layout novo em: {workspace}")
     print("O que isso significa:")
-    print("1. Arquivos canônicos do runtime foram materializados.")
-    print("2. O que já era do usuário foi preservado.")
-    print("3. O que foi sobrescrito ganhou backup antes.")
+    print("1. A raiz agora fica leve para descoberta por host.")
+    print("2. A memória viva foi levada para `Prumo/`.")
+    print("3. A infraestrutura técnica foi movida para `/.prumo/`.")
+    print("4. O que foi substituído ganhou backup antes.")
     print("")
     print(f"Backup: {result['backup_root']}")
+    if result["moved"]:
+        print(f"Arquivos e diretórios movidos: {len(result['moved'])}")
+        for relative in result["moved"]:
+            print(f"- movido: {relative}")
     print(f"Arquivos sobrescritos: {len(result['overwritten'])}")
     for relative in result["overwritten"]:
         print(f"- sobrescrito com backup: {relative}")

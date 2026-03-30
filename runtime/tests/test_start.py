@@ -79,7 +79,7 @@ class StartCommandTests(unittest.TestCase):
             self.assertIn(str(workspace), rendered)
             self.assertTrue(
                 "o Prumo está de pé no workspace" in rendered
-                or "Em vez de fingir briefing vazio, vamos montar o primeiro mapa útil." in rendered
+                or "Como ainda não há nada na pasta, vou te pedir matéria-prima antes de organizar qualquer coisa." in rendered
             )
             self.assertIn(str(workspace), rendered)
 
@@ -273,7 +273,7 @@ class StartCommandTests(unittest.TestCase):
                 rc = run_start(args)
             self.assertEqual(rc, 0)
             rendered = buffer.getvalue()
-            self.assertIn("Em vez de fingir briefing vazio, vamos montar o primeiro mapa útil.", rendered)
+            self.assertIn("Como ainda não há nada na pasta, vou te pedir matéria-prima antes de organizar qualquer coisa.", rendered)
             self.assertIn("Me conta as coisas que estao ocupando sua cabeca agora", rendered)
             self.assertNotIn("Estado rápido", rendered)
             self.assertNotIn("estado tecnico", rendered.lower())
@@ -315,7 +315,7 @@ class StartCommandTests(unittest.TestCase):
             self.assertNotIn("workspace legado", rendered)
             self.assertTrue(
                 "o Prumo está de pé no workspace" in rendered
-                or "Em vez de fingir briefing vazio, vamos montar o primeiro mapa útil." in rendered
+                or "Como ainda não há nada na pasta, vou te pedir matéria-prima antes de organizar qualquer coisa." in rendered
             )
 
     def test_actions_keep_context_and_drop_google_placeholder_path(self) -> None:

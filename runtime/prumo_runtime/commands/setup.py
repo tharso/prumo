@@ -143,6 +143,6 @@ def run_setup(args) -> int:
     print("")
     print("Próximos passos:")
     print("1. Entre no workspace e rode `prumo`.")
-    print("2. Em workspace novo, a primeira sessão deve abrir a trilha de arranque, não um briefing vazio travestido de valor.")
+    print("2. Em workspace novo, a primeira sessão deve começar pedindo matéria-prima, não empurrando um mapa vazio.")
     print("3. Se apagar wrapper ou índice por acidente, rode `prumo repair --workspace ...`.")
     return 0

@@ -77,7 +77,7 @@ Se o workspace esta vazio:
 Explicar em uma linha:
 
 1. que o workspace ainda esta cru;
-2. que a sessao vai montar o primeiro mapa util;
+2. que ainda nao ha material suficiente na pasta e, por isso, o Prumo vai pedir materia-prima antes de organizar;
 3. que a conversa sera curta.
 
 ### 2. Primeiro despejo

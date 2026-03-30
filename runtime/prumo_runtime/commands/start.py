@@ -123,7 +123,7 @@ def _render_text_for_missing_workspace(workspace: Path) -> str:
     return "\n".join(
         [
             f"1. Não achei o workspace `{workspace_str}`.",
-            "2. Então não faz sentido fingir briefing. Primeiro precisamos de chão.",
+            "2. Primeiro precisamos criar ou apontar a pasta certa.",
             "3. Minha sugestão: criar o workspace com `prumo setup`.",
             "a) Rodar `prumo setup --workspace "
             f"{workspace_str}`",
@@ -182,7 +182,7 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
     ):
         lines = [
             f"1. {overview['user_name']}, o workspace `{workspace}` acabou de nascer.",
-            "2. Em vez de fingir briefing vazio, vamos montar o primeiro mapa útil.",
+            "2. Como ainda não há nada na pasta, vou te pedir matéria-prima antes de organizar qualquer coisa.",
             f"3. {next_move.get('initial_question')}",
         ]
         return "\n".join(lines)

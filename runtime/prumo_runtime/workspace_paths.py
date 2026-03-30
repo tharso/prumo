@@ -126,7 +126,11 @@ class WorkspacePaths:
         return self.inbox4mobile_root / "_preview-index.json"
 
     def generated_relative_paths(self) -> tuple[str, ...]:
-        return tuple(self.relative(path) for path in self.wrappers.values()) + (self.relative(self.core),)
+        items = [self.relative(path) for path in self.wrappers.values()]
+        if self.nested_layout:
+            items.append(self.relative(self.canonical_agent))
+        items.append(self.relative(self.core))
+        return tuple(items)
 
     def authorial_relative_paths(self) -> tuple[str, ...]:
         return (
@@ -170,6 +174,7 @@ def detect_nested_layout(workspace: Path) -> bool:
     return (workspace / "Prumo").exists() or (workspace / ".prumo").exists()
 
 
-def workspace_paths(workspace: Path) -> WorkspacePaths:
+def workspace_paths(workspace: Path, *, layout_mode: str | None = None) -> WorkspacePaths:
     root = workspace.expanduser().resolve()
-    return WorkspacePaths(root=root, nested_layout=detect_nested_layout(root))
+    nested_layout = detect_nested_layout(root) if layout_mode is None else layout_mode == "nested"
+    return WorkspacePaths(root=root, nested_layout=nested_layout)

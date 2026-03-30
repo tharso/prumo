@@ -157,6 +157,17 @@ def count_markdown_items(markdown: str) -> int:
     return count
 
 
+def registro_entry_count(markdown: str) -> int:
+    count = 0
+    for raw_line in markdown.splitlines():
+        stripped = raw_line.strip()
+        if not stripped or stripped.startswith("| Data |") or stripped.startswith("|------"):
+            continue
+        if stripped.startswith("|") and stripped.endswith("|"):
+            count += 1
+    return count
+
+
 def inbox_item_count(workspace: Path) -> int:
     paths = workspace_paths(workspace)
     preview_payload = load_json(paths.inbox_preview_index)
@@ -164,6 +175,20 @@ def inbox_item_count(workspace: Path) -> int:
     if isinstance(preview_items, list) and preview_items:
         return len(preview_items)
     return count_markdown_items(read_text(paths.inbox))
+
+
+def is_fresh_workspace(workspace: Path) -> bool:
+    paths = workspace_paths(workspace)
+    hot, ongoing = pauta_candidates(workspace)
+    if hot or ongoing:
+        return False
+    if inbox_item_count(workspace) > 0:
+        return False
+    if registro_entry_count(read_text(paths.registro)) > 0:
+        return False
+    if count_markdown_items(read_text(paths.ideias)) > 0:
+        return False
+    return True
 
 
 def suggest_google_auth_action(workspace: Path) -> dict[str, str]:
@@ -277,6 +302,7 @@ def build_daily_actions(
     google_connected = overview["google_integration"]["active_profile_status"] == "connected"
     docs = documentation_targets(workspace)
     inbox_count = inbox_item_count(workspace)
+    fresh_workspace = is_fresh_workspace(workspace)
 
     actions_by_id: dict[str, dict[str, object]] = {}
 
@@ -301,21 +327,39 @@ def build_daily_actions(
     if overview.get("core_outdated"):
         register(suggest_core_alignment_action(workspace, overview))
 
-    register(
-        shell_action(
-            "briefing",
-            "Rodar o briefing agora" if not has_briefed_today else "Rodar o briefing de novo",
-            f"prumo briefing --workspace {workspace_str} --refresh-snapshot",
-            category="briefing",
-            documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
-            outcome="Panorama atualizado com proposta do dia e contexto suficiente para seguir trabalhando.",
-            why_now=(
-                "Ainda não houve briefing hoje; antes de acelerar, convém olhar o painel do carro."
-                if not has_briefed_today
-                else "Vale reabrir o radar quando o contexto já esquentou ou mudou desde o último briefing."
-            ),
+    if not has_briefed_today and fresh_workspace:
+        register(
+            host_prompt_action(
+                "kickoff",
+                "Abrir sessão de arranque em vez de briefing vazio",
+                (
+                    "O workspace acabou de nascer e ainda nao tem tracao real. "
+                    f"Conduza uma sessao curta de arranque usando `{docs['pauta']}`, `{docs['inbox']}` e "
+                    f"`{docs['registro']}` como destino. Pergunte uma coisa por vez, capture frentes, "
+                    "prioridades, rotina e o que mereceria aparecer primeiro num briefing útil."
+                ),
+                category="onboarding",
+                documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
+                outcome="Primeiras frentes e prioridades capturadas sem fingir que o vazio ja e contexto.",
+                why_now="Briefing de apartamento vazio so prova que ainda nao ha moveis. Sessao de arranque pelo menos compra utilidade.",
+            )
         )
-    )
+    else:
+        register(
+            shell_action(
+                "briefing",
+                "Rodar o briefing agora" if not has_briefed_today else "Rodar o briefing de novo",
+                f"prumo briefing --workspace {workspace_str} --refresh-snapshot",
+                category="briefing",
+                documentation_targets=[docs["pauta"], docs["inbox"], docs["registro"]],
+                outcome="Panorama atualizado com proposta do dia e contexto suficiente para seguir trabalhando.",
+                why_now=(
+                    "Ainda não houve briefing hoje; antes de acelerar, convém olhar o painel do carro."
+                    if not has_briefed_today
+                    else "Vale reabrir o radar quando o contexto já esquentou ou mudou desde o último briefing."
+                ),
+            )
+        )
 
     if continue_item:
         register(
@@ -403,7 +447,7 @@ def build_daily_actions(
     if "repair" in actions_by_id:
         order.append("repair")
     if not has_briefed_today:
-        order.extend(["briefing", "continue", "process-inbox", "organize-day"])
+        order.extend(["kickoff", "briefing", "continue", "process-inbox", "organize-day"])
     elif continue_item:
         order.extend(["continue", "process-inbox", "organize-day", "briefing"])
     elif inbox_count:

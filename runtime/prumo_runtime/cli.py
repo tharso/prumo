@@ -25,11 +25,16 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command")
 
     setup = subparsers.add_parser("setup", help="Preparar ou inicializar um workspace")
-    setup.add_argument("--workspace", required=True, help="Caminho do workspace")
+    setup.add_argument("--workspace", help="Caminho do workspace")
     setup.add_argument("--user-name", help="Nome preferido do usuario")
     setup.add_argument("--agent-name", default="Prumo", help="Nome do agente")
     setup.add_argument("--timezone", default="America/Sao_Paulo", help="Fuso IANA")
     setup.add_argument("--briefing-time", default="09:00", help="Horario preferido do briefing")
+    setup.add_argument(
+        "--mode",
+        choices=["new", "adopt"],
+        help="Forcar criacao em pasta nova ou adocao de pasta existente",
+    )
     setup.set_defaults(handler=run_setup)
 
     start = subparsers.add_parser("start", help="Abrir a porta de entrada do Prumo no workspace")

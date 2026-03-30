@@ -177,6 +177,8 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
 
     if missing["generated"] or missing["derived"]:
         suggestion = "consertar a estrutura antes de brincar de produtividade."
+    elif next_move and next_move.get("id") == "kickoff":
+        suggestion = "abrir a sessao de arranque antes de tentar briefing no vazio."
     elif not has_briefed_today:
         suggestion = "rodar o briefing agora."
     elif continue_item:
@@ -212,6 +214,8 @@ def _render_start_text(workspace: Path, overview: dict) -> str:
     else:
         if has_briefed_today and last_briefing_clock:
             lines.append(f"4. Você já passou pelo briefing hoje, às {last_briefing_clock}.")
+        elif next_move and next_move.get("id") == "kickoff":
+            lines.append("4. Este workspace acabou de nascer. Ainda não faz sentido posar de briefing diário.")
         else:
             lines.append("4. Ainda não há briefing registrado hoje neste workspace.")
         suggestion_index = 5

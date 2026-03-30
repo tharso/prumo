@@ -59,6 +59,9 @@ def render_agent_md(
     agent_name: str,
     timezone_name: str,
     briefing_time: str,
+    *,
+    core_path: str = "PRUMO-CORE.md",
+    state_path: str = "_state/",
 ) -> str:
     return f"""# AGENT.md
 
@@ -77,7 +80,7 @@ def render_agent_md(
 1. `Agente/INDEX.md`
 2. `PAUTA.md`
 3. `INBOX.md`
-4. `PRUMO-CORE.md`
+4. `{core_path}`
 5. `REGISTRO.md` (quando precisar histórico)
 
 ## Mapa do workspace
@@ -86,8 +89,8 @@ def render_agent_md(
 - `PAUTA.md`: estado vivo e pendências
 - `INBOX.md`: itens ainda não processados
 - `REGISTRO.md`: rastro do que aconteceu
-- `PRUMO-CORE.md`: regras do motor e guardrails do sistema
-- `_state/`: estado técnico e metadados do runtime
+- `{core_path}`: regras do motor e guardrails do sistema
+- `{state_path}`: estado técnico e metadados do runtime
 
 ## Regras rápidas
 
@@ -95,11 +98,17 @@ def render_agent_md(
 """
 
 
-def render_claude_wrapper(user_name: str, agent_name: str) -> str:
+def render_agent_root_wrapper(
+    user_name: str,
+    agent_name: str,
+    *,
+    canonical_target: str = "AGENT.md",
+    system_root: str = "_state/",
+) -> str:
     return f"""# Prumo Adapter — {user_name}
 
-> Compatibilidade para Claude/Cowork.
-> Este arquivo não é a fonte canônica. Leia `AGENT.md` primeiro.
+> Entrada curta para hosts que procuram `AGENT.md` na raiz.
+> A fonte canônica do workspace está em `{canonical_target}`.
 
 ## Porta curta
 
@@ -107,19 +116,25 @@ def render_claude_wrapper(user_name: str, agent_name: str) -> str:
 
 ## Instrução primária
 
-1. Leia `AGENT.md`.
-2. Use `PRUMO-CORE.md` para regras do sistema.
-3. Contexto pessoal e estável mora em `Agente/`.
+1. Leia `{canonical_target}`.
+2. Não trate a raiz do workspace como almoxarifado do sistema.
+3. O estado técnico do sistema mora em `{system_root}`, não na sala.
 
 Agente: **{agent_name}**
 """
 
 
-def render_agents_wrapper(user_name: str, agent_name: str) -> str:
+def render_claude_wrapper(
+    user_name: str,
+    agent_name: str,
+    *,
+    canonical_target: str = "AGENT.md",
+    context_root: str = "Agente/",
+) -> str:
     return f"""# Prumo Adapter — {user_name}
 
-> Compatibilidade para ambientes que procuram `AGENTS.md`.
-> Se você está aqui, ótimo. Mas o volante mesmo está em `AGENT.md`.
+> Compatibilidade para Claude/Cowork.
+> Este arquivo não é a fonte canônica. Leia `{canonical_target}` primeiro.
 
 ## Porta curta
 
@@ -127,9 +142,35 @@ def render_agents_wrapper(user_name: str, agent_name: str) -> str:
 
 ## Instrução primária
 
-1. Leia `AGENT.md`.
+1. Leia `{canonical_target}`.
+2. Use `PRUMO-CORE.md` para regras do sistema.
+3. Contexto pessoal e estável mora em `{context_root}`.
+
+Agente: **{agent_name}**
+"""
+
+
+def render_agents_wrapper(
+    user_name: str,
+    agent_name: str,
+    *,
+    canonical_target: str = "AGENT.md",
+    context_root: str = "Agente/",
+) -> str:
+    return f"""# Prumo Adapter — {user_name}
+
+> Compatibilidade para ambientes que procuram `AGENTS.md`.
+> Se você está aqui, ótimo. Mas o volante mesmo está em `{canonical_target}`.
+
+## Porta curta
+
+{_render_wrapper_runtime_rules()}
+
+## Instrução primária
+
+1. Leia `{canonical_target}`.
 2. Leia `PRUMO-CORE.md`.
-3. Contexto vivo do usuário mora em `Agente/`.
+3. Contexto vivo do usuário mora em `{context_root}`.
 
 Agente: **{agent_name}**
 """

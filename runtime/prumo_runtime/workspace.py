@@ -47,6 +47,7 @@ class WorkspaceConfig:
     agent_name: str = DEFAULT_AGENT_NAME
     timezone_name: str = DEFAULT_TIMEZONE
     briefing_time: str = DEFAULT_BRIEFING_TIME
+    layout_mode: str = "flat"
 
 
 class WorkspaceError(RuntimeError):
@@ -84,42 +85,74 @@ def write_json(path: Path, payload: dict) -> None:
 def render_files(config: WorkspaceConfig) -> dict[str, str]:
     repo_root = repo_root_from(Path(__file__))
     setup_date = templates.now_display(config.timezone_name)
-    return {
-        "AGENT.md": templates.render_agent_md(
+    paths = workspace_paths(config.workspace, layout_mode=config.layout_mode)
+    canonical_target = paths.relative(paths.canonical_agent) if paths.nested_layout else "AGENT.md"
+    core_relative = paths.relative(paths.core)
+    state_relative = paths.relative(paths.state_root) + "/"
+    rendered: dict[str, str] = {}
+    if paths.nested_layout:
+        rendered["AGENT.md"] = templates.render_agent_root_wrapper(
+            config.user_name,
+            config.agent_name,
+            canonical_target=canonical_target,
+            system_root=paths.relative(paths.state_root) + "/",
+        )
+    else:
+        rendered["AGENT.md"] = templates.render_agent_md(
             user_name=config.user_name,
             agent_name=config.agent_name,
             timezone_name=config.timezone_name,
             briefing_time=config.briefing_time,
+        )
+    return {
+        **rendered,
+        paths.relative(paths.wrappers["CLAUDE.md"]): templates.render_claude_wrapper(
+            config.user_name,
+            config.agent_name,
+            canonical_target=canonical_target,
+            context_root=paths.relative(paths.agente_root) + "/",
         ),
-        "CLAUDE.md": templates.render_claude_wrapper(config.user_name, config.agent_name),
-        "AGENTS.md": templates.render_agents_wrapper(config.user_name, config.agent_name),
-        "PRUMO-CORE.md": templates.load_prumo_core_text(repo_root),
-        "Agente/INDEX.md": templates.render_agente_index(
+        paths.relative(paths.wrappers["AGENTS.md"]): templates.render_agents_wrapper(
+            config.user_name,
+            config.agent_name,
+            canonical_target=canonical_target,
+            context_root=paths.relative(paths.agente_root) + "/",
+        ),
+        paths.relative(paths.core): templates.load_prumo_core_text(repo_root),
+        paths.relative(paths.canonical_agent): templates.render_agent_md(
+            user_name=config.user_name,
+            agent_name=config.agent_name,
+            timezone_name=config.timezone_name,
+            briefing_time=config.briefing_time,
+            core_path=core_relative,
+            state_path=state_relative,
+        ),
+        paths.relative(paths.agent_index): templates.render_agente_index(
             user_name=config.user_name,
             timezone_name=config.timezone_name,
             briefing_time=config.briefing_time,
             setup_date=setup_date,
         ),
-        "Agente/PESSOAS.md": templates.render_people_md(),
-        "Agente/SAUDE.md": templates.render_health_md(),
-        "Agente/ROTINA.md": templates.render_routine_md(),
-        "Agente/INFRA.md": templates.render_infra_md(),
-        "Agente/PROJETOS.md": templates.render_projects_md(),
-        "Agente/RELACOES.md": templates.render_relationships_md(),
-        "PAUTA.md": templates.render_pauta_md(setup_date),
-        "INBOX.md": templates.render_inbox_md(),
-        "REGISTRO.md": templates.render_registro_md(),
-        "IDEIAS.md": templates.render_ideias_md(),
-        "Referencias/INDICE.md": templates.render_referencias_md(setup_date),
-        "Referencias/WORKFLOWS.md": templates.render_workflows_md(setup_date),
-        "_state/briefing-state.json": templates.render_briefing_state_json(),
-        "_state/google-integration.json": render_google_integration_json(config.workspace),
-        "Inbox4Mobile/_processed.json": templates.render_inbox_processed_json(),
+        paths.relative(paths.agente_root / "PESSOAS.md"): templates.render_people_md(),
+        paths.relative(paths.agente_root / "SAUDE.md"): templates.render_health_md(),
+        paths.relative(paths.agente_root / "ROTINA.md"): templates.render_routine_md(),
+        paths.relative(paths.agente_root / "INFRA.md"): templates.render_infra_md(),
+        paths.relative(paths.agente_root / "PROJETOS.md"): templates.render_projects_md(),
+        paths.relative(paths.agente_root / "RELACOES.md"): templates.render_relationships_md(),
+        paths.relative(paths.pauta): templates.render_pauta_md(setup_date),
+        paths.relative(paths.inbox): templates.render_inbox_md(),
+        paths.relative(paths.registro): templates.render_registro_md(),
+        paths.relative(paths.ideias): templates.render_ideias_md(),
+        paths.relative(paths.referencias_index): templates.render_referencias_md(setup_date),
+        paths.relative(paths.workflows_index): templates.render_workflows_md(setup_date),
+        paths.relative(paths.briefing_state): templates.render_briefing_state_json(),
+        paths.relative(paths.google_integration): render_google_integration_json(config.workspace),
+        paths.relative(paths.inbox_processed): templates.render_inbox_processed_json(),
     }
 
 
 def schema_payload(config: WorkspaceConfig) -> dict:
-    paths = workspace_paths(config.workspace)
+    paths = workspace_paths(config.workspace, layout_mode=config.layout_mode)
     return {
         "schema_version": SCHEMA_VERSION,
         "runtime_version": RUNTIME_VERSION,
@@ -128,6 +161,7 @@ def schema_payload(config: WorkspaceConfig) -> dict:
         "agent_name": config.agent_name,
         "timezone": config.timezone_name,
         "briefing_time": config.briefing_time,
+        "layout_mode": config.layout_mode,
         "files": {
             "generated": list(paths.generated_relative_paths()),
             "authorial": list(paths.authorial_relative_paths()),
@@ -138,6 +172,12 @@ def schema_payload(config: WorkspaceConfig) -> dict:
 
 def ensure_directories(workspace: Path) -> None:
     paths = workspace_paths(workspace)
+    for directory in paths.directories():
+        directory.mkdir(parents=True, exist_ok=True)
+
+
+def ensure_directories_for_layout(workspace: Path, layout_mode: str) -> None:
+    paths = workspace_paths(workspace, layout_mode=layout_mode)
     for directory in paths.directories():
         directory.mkdir(parents=True, exist_ok=True)
 
@@ -154,9 +194,9 @@ def write_schema(config: WorkspaceConfig, preserve_created_at: str | None = None
 
 
 def create_missing_files(config: WorkspaceConfig) -> dict[str, list[str]]:
-    ensure_directories(config.workspace)
+    ensure_directories_for_layout(config.workspace, config.layout_mode)
     rendered = render_files(config)
-    paths = workspace_paths(config.workspace)
+    paths = workspace_paths(config.workspace, layout_mode=config.layout_mode)
     created: list[str] = []
     preserved: list[str] = []
     for relative, content in rendered.items():
@@ -245,6 +285,14 @@ def infer_briefing_time(workspace: Path) -> str:
     return str(value) if value else DEFAULT_BRIEFING_TIME
 
 
+def infer_layout_mode(workspace: Path) -> str:
+    schema = read_schema(workspace)
+    value = str(schema.get("layout_mode") or "").strip().lower()
+    if value in {"flat", "nested"}:
+        return value
+    return "nested" if workspace_paths(workspace).nested_layout else "flat"
+
+
 def ensure_workspace_exists(workspace: Path) -> None:
     if not workspace.exists():
         raise WorkspaceError(f"workspace não encontrado: {workspace}")
@@ -274,6 +322,7 @@ def build_config_from_existing(workspace: Path) -> WorkspaceConfig:
         agent_name=infer_agent_name(workspace),
         timezone_name=infer_timezone(workspace),
         briefing_time=infer_briefing_time(workspace),
+        layout_mode=infer_layout_mode(workspace),
     )
 
 

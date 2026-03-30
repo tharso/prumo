@@ -141,6 +141,19 @@ prumo briefing --workspace /caminho/do/workspace
 prumo repair --workspace /caminho/do/workspace
 ```
 
+O `setup` agora aceita duas posturas sem bancar porteiro confuso:
+
+1. se voce passar `--workspace`, ele confirma o terreno e segue em etapas curtas;
+2. se nao passar, ele pergunta onde o workspace deve morar em vez de fingir que telepatia e UX.
+
+Para workspace novo, a estrutura agora nasce assim:
+
+1. wrappers leves na raiz (`AGENT.md`, `AGENTS.md`, `CLAUDE.md`)
+2. memoria viva do usuario em `Prumo/`
+3. infraestrutura local atualizavel em `/.prumo/`
+
+Traduzindo: a raiz deixou de parecer bancada de oficina.
+
 Importante, para não vender andaime como se já fosse varanda:
 
 1. `prumo ...` é a porta técnica do runtime hoje;
@@ -163,6 +176,8 @@ prumo start
 ```
 
 `prumo` sem subcomando já cai em `start`. Não é a ignição universal final, mas pelo menos o binário deixou de responder com parser ferido quando o usuário só quer chamar o produto pelo nome. O comportamento continua o mesmo: tenta inferir o workspace pelo diretório atual (ou por um pai reconhecível), olha o estado do sistema e oferece briefing, retomada, repair ou auth/config sem pedir que o usuário adivinhe qual subcomando merece ser invocado naquela manhã.
+
+Em workspace recém-criado, isso também mudou de postura: antes de vender briefing no vácuo, o `start` agora prefere abrir uma sessão de arranque curta para captar frentes, rotina e prioridades. Panorama sobre o nada e so jeito bonito de chamar carpintaria de produto.
 
 Esse trilho cria:
 

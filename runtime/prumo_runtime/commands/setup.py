@@ -15,12 +15,73 @@ def ask_if_missing(value: str | None, prompt: str) -> str:
     return answer
 
 
-def run_setup(args) -> int:
-    workspace = Path(args.workspace).expanduser().resolve()
-    workspace.mkdir(parents=True, exist_ok=True)
-    ensure_workspace_exists(workspace)
+def prompt_choice(prompt: str, options: dict[str, str], *, default: str | None = None) -> str:
+    while True:
+        print(prompt)
+        for key, label in options.items():
+            suffix = " (padrao)" if default == key else ""
+            print(f"{key}) {label}{suffix}")
+        answer = input("> ").strip().lower()
+        if not answer and default:
+            return default
+        if answer in options:
+            return answer
+        print("Escolha uma das opcoes visiveis. Produto nao e quiz de adivinhacao.")
 
+
+def ask_workspace_path(value: str | None) -> Path:
+    path_value = ask_if_missing(value, "Em qual pasta o workspace deve morar? ")
+    return Path(path_value).expanduser().resolve()
+
+
+def detect_setup_mode(workspace: Path, explicit_mode: str | None) -> str:
+    if workspace.exists() and not workspace.is_dir():
+        raise SystemExit(f"setup cancelado: `{workspace}` existe, mas não é diretório")
+    if explicit_mode in {"new", "adopt"}:
+        return explicit_mode
+    if not workspace.exists():
+        return "new"
+    if not any(workspace.iterdir()):
+        return "new"
+    return "adopt"
+
+
+def run_setup(args) -> int:
+    print("Etapa 1 de 3: identidade")
     user_name = ask_if_missing(args.user_name, "Como você prefere ser chamado? ")
+
+    print("")
+    print("Etapa 2 de 3: escolher o terreno")
+    workspace = ask_workspace_path(args.workspace)
+    mode = detect_setup_mode(workspace, getattr(args, "mode", None))
+
+    if mode == "new":
+        target_choice = prompt_choice(
+            f"Vou preparar um workspace novo em `{workspace}`.",
+            {
+                "a": "Criar o workspace novo aqui",
+                "b": "Cancelar por enquanto",
+            },
+            default="a",
+        )
+        if target_choice != "a":
+            raise SystemExit("setup cancelado pelo usuario")
+        workspace.mkdir(parents=True, exist_ok=True)
+    else:
+        target_choice = prompt_choice(
+            f"`{workspace}` ja tem conteudo. Como quer seguir?",
+            {
+                "a": "Adotar esta pasta como workspace do Prumo",
+                "b": "Cancelar para escolher outro caminho depois",
+            },
+            default="a",
+        )
+        if target_choice != "a":
+            raise SystemExit("setup cancelado pelo usuario")
+        ensure_workspace_exists(workspace)
+
+    print("")
+    print("Etapa 3 de 3: materializar a estrutura")
     agent_name = args.agent_name or DEFAULT_AGENT_NAME
     timezone_name = args.timezone or DEFAULT_TIMEZONE
     briefing_time = args.briefing_time or DEFAULT_BRIEFING_TIME
@@ -31,14 +92,15 @@ def run_setup(args) -> int:
         agent_name=agent_name,
         timezone_name=timezone_name,
         briefing_time=briefing_time,
+        layout_mode="nested",
     )
     result = create_missing_files(config)
 
     print(f"{user_name}, o workspace do Prumo agora mora em: {workspace}")
     print("O que isso significa:")
-    print("1. Esta pasta vira a base legível do sistema.")
-    print("2. O Prumo só cria e organiza os arquivos dele aqui.")
-    print("3. Se um dia você parar de usar o Prumo, basta desinstalar. Nada do que é seu desaparece.")
+    print("1. A raiz fica leve para descoberta por host.")
+    print("2. A memória viva do usuário mora em `Prumo/`.")
+    print("3. A infraestrutura atualizável do sistema mora em `/.prumo/`.")
     print("")
     print(f"Arquivos criados: {len(result['created'])}")
     for relative in result["created"]:
@@ -49,7 +111,7 @@ def run_setup(args) -> int:
             print(f"- preservado: {relative}")
     print("")
     print("Próximos passos:")
-    print("1. Rode `prumo context-dump --workspace ...` para inspecionar a estrutura.")
-    print("2. Rode `prumo briefing --workspace ...` para testar o trilho novo.")
+    print("1. Entre no workspace e rode `prumo`.")
+    print("2. Em workspace novo, a primeira sessão deve abrir a trilha de arranque, não um briefing vazio travestido de valor.")
     print("3. Se apagar wrapper ou índice por acidente, rode `prumo repair --workspace ...`.")
     return 0

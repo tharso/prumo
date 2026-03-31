@@ -187,6 +187,12 @@ class WorkspacePaths:
 
 
 def detect_nested_layout(workspace: Path) -> bool:
+    # Flat-layout marker takes precedence: if _state/workspace-schema.json
+    # exists at the root, this is definitely a flat workspace. Without this
+    # check, a dev repo named "Prumo/" inside the workspace would incorrectly
+    # trigger nested-layout detection.
+    if (workspace / "_state" / "workspace-schema.json").exists():
+        return False
     return (workspace / "Prumo").exists() or (workspace / ".prumo").exists()
 
 

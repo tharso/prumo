@@ -1,49 +1,143 @@
 ---
 name: higiene
 description: >
-  Higiene assistida do CLAUDE.md. Diagnostica duplicações, redundâncias e
-  conflitos, classifica drift de conteúdo por arquivo, gera relatório e patch
-  proposto, e só aplica com confirmação explícita do usuário. Use com /higiene.
+  Higiene assistida do workspace. Detecta problemas que precisam de decisão
+  do usuário: itens velhos na pauta, contradições entre arquivos, CLAUDE.md
+  pesado, contexto obsoleto em Agente/, inbox esquecido. Propõe e espera
+  confirmação — nunca resolve sozinha. Use com /higiene, "tem algo pra
+  limpar?", "revisa meus arquivos", ou quando o briefing detectar sinais.
 ---
 
-# Higiene Assistida do Prumo
+# Higiene
 
-Você está executando o comando `/higiene`.
+A higiene é parceria. Prumo detecta o problema e propõe saída.
+A decisão é sempre do usuário.
 
-Isto não é sanitização operacional. É revisão assistida do `CLAUDE.md`.
-Também é checagem de governança do que pertence a cada arquivo vivo do Prumo.
+Se o problema pode ser resolvido sem perguntar, não é higiene. É faxina.
+A faxina age. A higiene conversa.
 
-## Carregamento obrigatório
+## Quando rodar
 
-1. Leia `CLAUDE.md`.
-2. Leia `PRUMO-CORE.md`.
-3. Leia:
-   - `skills/prumo/references/modules/claude-hygiene.md`
-   - `skills/prumo/references/modules/runtime-file-governance.md`
-4. Quando houver shell, carregue também:
-   - `skills/prumo/references/modules/runtime-paths.md`
+- **Sob demanda:** `/higiene` ou "tem algo pra limpar?"
+- **No briefing:** quando detectar sinais, adiciona como item de pauta
+  ("Achei umas coisas que podem estar atrapalhando. Quer resolver comigo?")
+- **Nunca:** sem avisar — higiene sempre mostra o que encontrou antes de propor
 
-## Fluxo
+## O que a higiene detecta
 
-1. Rodar diagnóstico do `CLAUDE.md`.
-2. Mostrar o resultado em 3 blocos fixos, nesta ordem:
-   - `Mudanças seguras`
-   - `Itens que pedem confirmação factual`
-   - `Decisões de governança/arquitetura`
-   `Mudanças seguras` só pode conter o que o patch atual consegue aplicar sem interpretação.
-3. Apontar onde está o patch proposto.
-4. Perguntar se o usuário quer aplicar.
-5. Só com confirmação explícita:
-   - aplicar a proposta;
-   - criar backup;
-   - registrar em `REGISTRO.md`.
+### 1. CLAUDE.md pesado ou bagunçado
 
-## Guardrails
+Isso já existia e continua funcionando.
 
-- `CLAUDE.md` nunca entra em autosanitização.
-- Nunca aplicar sem confirmação explícita.
-- Nunca reescrever preferências subjetivas por conta própria.
-- Nunca mover item entre arquivos sem confirmação factual do usuário.
-- Nunca misturar no mesmo bloco limpeza segura, confirmação factual e decisão de governança.
-- Se o `PRUMO-CORE.md` do workspace estiver defasado em relação ao runtime, sinalizar isso explicitamente.
-- Se o conflito for interpretativo demais, reportar e deixar a decisão para o usuário.
+**Verificar:**
+- Duplicações, redundâncias, conflitos dentro do CLAUDE.md
+- Conteúdo que deveria estar em outro arquivo (pendências no CLAUDE.md
+  que pertencem à PAUTA.md, histórico que pertence ao REGISTRO.md)
+- PRUMO-CORE.md defasado em relação ao runtime
+
+**Como funciona:**
+- Ler `skills/prumo/references/modules/claude-hygiene.md` para o procedimento detalhado
+- Apresentar em 3 blocos fixos: mudanças seguras, confirmações factuais, decisões de governança
+- Só aplicar com confirmação explícita
+
+### 2. PAUTA.md com itens parados
+
+**Verificar:**
+- Itens com `(desde DD/MM)` onde a data tem mais de 14 dias
+- Itens na seção "Quente" que nunca foram trabalhados
+- Itens na seção "Em andamento" sem atividade recente
+
+**Propor (uma decisão por vez):**
+- "Tem X itens parados há mais de 2 semanas."
+- Para cada item: "Quer limpar, reativar, ou mover pra Hibernando?"
+- Se muitos itens (> 5): agrupar e perguntar em lote
+
+**Tom:** "Faz 18 dias que isso tá aqui. Se ainda importa, vamos reativar. Se não, tiro da frente."
+
+### 3. Agente/ com informação possivelmente obsoleta
+
+**Verificar:**
+- Data de última modificação dos arquivos em `Agente/`
+- Arquivos com mais de 6 meses sem alteração
+
+**Propor (um arquivo por vez):**
+- "PROJETOS.md tem 8 meses sem mexer. Ainda vale ou posso arquivar?"
+- Se o usuário confirmar que vale: atualizar data de modificação (touch)
+- Se confirmar que não vale: mover pra `Prumo/Arquivo/`
+
+**Tom:** "Não tô dizendo que tá errado. Só tô perguntando se ainda serve."
+
+### 4. INBOX.md com itens esquecidos
+
+**Verificar:**
+- INBOX.md com itens há mais de 7 dias
+- Inbox4Mobile com arquivos não processados
+
+**Propor:**
+- "Tem coisa no inbox há X dias. Quer processar agora ou deixar pra depois?"
+- Se "agora": entrar no fluxo de inbox processing
+- Se "depois": deixar, sem insistir
+
+**Tom:** "Fila encostada tende a apodrecer. Mas a decisão é sua."
+
+### 5. Contradições entre arquivos
+
+**Verificar:**
+- Item em PAUTA.md marcado como pendente que aparece como concluído em REGISTRO.md
+- Dados conflitantes entre Agente/PESSOAS.md e PAUTA.md
+- Informação que aparece em dois arquivos com versões diferentes
+
+**Propor:**
+- "Achei uma contradição: {arquivo A} diz X, {arquivo B} diz Y. Qual vale?"
+- Apresentar os dois trechos
+- Aplicar a correção no arquivo errado
+
+**Tom:** "Não sei qual tá certo. Você sabe."
+
+### 6. Arquivos grandes demais
+
+**Verificar:**
+- AGENT.md ou PRUMO-CORE.md > 500 linhas
+- PAUTA.md > 200 linhas
+- Qualquer arquivo em Agente/ > 300 linhas
+
+**Propor:**
+- "A pauta tá com {N} linhas. Quer mover o que tá hibernando pra arquivo?"
+- "AGENT.md tá pesado ({N} linhas). Quer revisar comigo?"
+- Para Agente/: "PESSOAS.md tá grande. Quer separar por grupo?"
+
+**Tom:** "Arquivo pesado demais faz o contexto ficar caro. Vamos aliviar?"
+
+### 7. Custom/ possivelmente incompatível
+
+**Verificar:**
+- Se `.prumo/system/skills/` foi atualizado recentemente
+- Se `Prumo/Custom/skills/` tem overrides
+- Comparar versões (data de modificação como proxy)
+
+**Propor:**
+- "O sistema atualizou e você tem um override do briefing. Pode ter ficado incompatível. Quer revisar?"
+
+## Fluxo de execução
+
+1. Rodar todos os checks (1-7)
+2. Se nada encontrado: "Casa em ordem. Nada pra revisar."
+3. Se encontrou algo: apresentar lista curta dos achados
+4. Perguntar: "Quer resolver agora ou coloco na pauta pra depois?"
+5. Se agora: uma decisão por vez, na ordem de urgência
+6. Se depois: adicionar como item na PAUTA.md seção "Quente"
+
+## Regras invioláveis
+
+1. **Higiene nunca resolve sozinha.** Sempre propõe, sempre espera.
+2. **Uma decisão por vez.** Não empilhar 7 perguntas numa mensagem.
+3. **Backup antes de mudar.** Se vai editar CLAUDE.md ou mover arquivo, backup primeiro.
+4. **Registrar em REGISTRO.md.** Toda mudança aplicada vira linha no registro.
+5. **Nunca reescrever preferências subjetivas.** Se o usuário escreveu de um jeito, é de um jeito.
+6. **Custom/ é sagrado.** Não propor mudanças em Custom/ — só avisar incompatibilidade.
+
+## Relação com outras skills
+
+- **faxina** — o que não precisa de decisão vai pra faxina
+- **briefing** — a higiene pode ser acionada pelo briefing quando detectar sinais
+- **sanitize** — o sanitize cuida de estado técnico; a higiene cuida de conteúdo do usuário

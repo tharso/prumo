@@ -12,6 +12,7 @@
     "./skills/prumo",
     "./skills/briefing",
     "./skills/doctor",
+    "./skills/faxina",
     "./skills/sanitize",
     "./skills/higiene",
     "./skills/start"

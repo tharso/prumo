@@ -33,7 +33,7 @@ trab/
 .claude-plugin/*
 !.claude-plugin/marketplace.json
 !.claude-plugin/plugin.json
-docs/
+docs/stories/
 scripts/*
 !scripts/
 !scripts/prumo_plugin_install.sh
@@ -42,4 +42,3 @@ scripts/*
 !scripts/prumo_cowork_doctor.sh
 !scripts/prumo_cowork_update.sh
 !scripts/prumo_cowork_bridge.py
-/skills/

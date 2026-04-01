@@ -1,6 +1,6 @@
 # Cowork Runtime Bridge
 
-> **module_version: 4.16.6**
+> **module_version: 4.17.0**
 >
 > Fonte canônica do bridge experimental entre Cowork e o runtime local do Prumo.
 

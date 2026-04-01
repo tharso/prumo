@@ -23,7 +23,7 @@ class MigrateCommandTests(unittest.TestCase):
             (workspace / "AGENT.md").write_text("# AGENT legado\n", encoding="utf-8")
             (workspace / "CLAUDE.md").write_text("# Meu CLAUDE\n\nNotas do usuario.\n", encoding="utf-8")
             (workspace / "AGENTS.md").write_text("# AGENTS legado\n", encoding="utf-8")
-            (workspace / "PRUMO-CORE.md").write_text("> **prumo_version: 4.16.6**\n", encoding="utf-8")
+            (workspace / "PRUMO-CORE.md").write_text("> **prumo_version: 4.17.0**\n", encoding="utf-8")
             (workspace / "PAUTA.md").write_text("# Pauta\n\n- Tarefa antiga\n", encoding="utf-8")
             (workspace / "INBOX.md").write_text("# Inbox\n\n- Entrada antiga\n", encoding="utf-8")
             (workspace / "REGISTRO.md").write_text("# Registro\n\n- Ontem\n", encoding="utf-8")

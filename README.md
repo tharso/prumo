@@ -98,7 +98,7 @@ Se preferir ir direto: abra uma conversa e diga o que está na sua cabeça. Prum
 
 ## Versão
 
-`4.16.6`
+`4.17.0`
 
 ## Licença
 

@@ -1,0 +1,193 @@
+from __future__ import annotations
+
+import argparse
+
+from prumo_runtime import __version__
+from prumo_runtime.commands import (
+    run_acervo,
+    run_acervo_apply,
+    run_briefing,
+    run_context_dump,
+    run_fim,
+    run_inbox_preview,
+    run_menu,
+    run_migrate,
+    run_migrate_skills,
+    run_repair,
+    run_setup,
+    run_start,
+    run_update,
+)
+from prumo_runtime.workspace import WorkspaceError
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Prumo local runtime")
+    parser.add_argument("--version", action="version", version=f"prumo {__version__}")
+    subparsers = parser.add_subparsers(dest="command")
+
+    setup = subparsers.add_parser("setup", help="Preparar ou inicializar um workspace")
+    setup.add_argument("--workspace", help="Caminho do workspace")
+    setup.add_argument("--user-name", help="Nome preferido do usuario")
+    setup.add_argument(
+        "--workspace-name",
+        help="Nome do workspace (ex: 'Vida Tharso', 'Pessoal'). Aparece no briefing e logs.",
+    )
+    setup.add_argument("--agent-name", default="Prumo", help="Nome do agente")
+    setup.add_argument("--timezone", default="America/Sao_Paulo", help="Fuso IANA")
+    setup.add_argument("--briefing-time", default="09:00", help="Horario preferido do briefing")
+    setup.add_argument(
+        "--mode",
+        choices=["new", "adopt"],
+        help="Forcar criacao em pasta nova ou adocao de pasta existente",
+    )
+    setup.set_defaults(handler=run_setup)
+
+    start = subparsers.add_parser("start", help="Abrir a porta de entrada do Prumo no workspace")
+    start.add_argument(
+        "--workspace",
+        help="Caminho do workspace (padrao: diretorio atual ou pai reconhecivel)",
+    )
+    start.add_argument("--format", choices=["text", "json"], default="text")
+    start.set_defaults(handler=run_start)
+
+    migrate = subparsers.add_parser("migrate", help="Adotar um workspace legado no trilho novo")
+    migrate.add_argument("--workspace", required=True, help="Caminho do workspace")
+    migrate.add_argument("--user-name", help="Nome preferido do usuario")
+    migrate.add_argument("--agent-name", default="Prumo", help="Nome do agente")
+    migrate.add_argument("--timezone", default="America/Sao_Paulo", help="Fuso IANA")
+    migrate.add_argument("--briefing-time", default="09:00", help="Horario preferido do briefing")
+    migrate.set_defaults(handler=run_migrate)
+
+    migrate_skills = subparsers.add_parser(
+        "migrate-skills",
+        help="Mover skills de Prumo/skills[_OLD]/ pra .prumo/skills/ (#77)",
+    )
+    migrate_skills.add_argument("--workspace", required=True, help="Caminho do workspace")
+    migrate_skills.add_argument(
+        "--yes",
+        action="store_true",
+        help="Pula confirmacao do pre-flight. Necessario em automacao destrutiva.",
+    )
+    migrate_skills.set_defaults(handler=run_migrate_skills)
+
+    context_dump = subparsers.add_parser("context-dump", help="Resumir o workspace para hosts")
+    context_dump.add_argument("--workspace", required=True, help="Caminho do workspace")
+    context_dump.add_argument("--format", choices=["json", "markdown"], default="json")
+    context_dump.set_defaults(handler=run_context_dump)
+
+    inbox = subparsers.add_parser("inbox", help="Operar a fila e o preview do inbox local")
+    inbox_subparsers = inbox.add_subparsers(dest="inbox_command", required=True)
+
+    inbox_preview = inbox_subparsers.add_parser(
+        "preview",
+        help="Gerar e resumir a vitrine local do Inbox4Mobile",
+    )
+    inbox_preview.add_argument("--workspace", required=True, help="Caminho do workspace")
+    inbox_preview.add_argument("--format", choices=["text", "json"], default="text")
+    inbox_preview.set_defaults(handler=run_inbox_preview)
+
+    acervo = subparsers.add_parser(
+        "acervo",
+        help="Enumerar o limbo durável (ideias/hibernando/referências) read-only; alimenta a skill `acervo`",
+    )
+    acervo.add_argument("--workspace", required=True, help="Caminho do workspace")
+    acervo.add_argument(
+        "--format",
+        choices=["text", "json", "html-items"],
+        default="text",
+        help="html-items: JSON seguro (escapado) pra injetar no template.",
+    )
+    acervo.set_defaults(handler=run_acervo)
+    acervo_sub = acervo.add_subparsers(dest="acervo_command")
+    acervo_apply = acervo_sub.add_parser(
+        "apply",
+        help="Aplicar um relatório do acervo (incluir/arquivar com remoção segura)",
+    )
+    acervo_apply.add_argument("--report", required=True, help="Caminho do JSON do relatório")
+    acervo_apply.add_argument(
+        "--permanent",
+        action="store_true",
+        help="Apaga de vez em vez de arquivar. Só sob pedido explícito do usuário.",
+    )
+    acervo_apply.set_defaults(handler=run_acervo_apply)
+
+    fim = subparsers.add_parser(
+        "fim",
+        help="Detector de acúmulo do encerramento de sessão (read-only); alimenta a skill `fim`",
+    )
+    fim.add_argument("--workspace", required=True, help="Caminho do workspace")
+    fim.add_argument("--format", choices=["text", "json"], default="text")
+    fim.set_defaults(handler=run_fim)
+
+    menu = subparsers.add_parser(
+        "menu",
+        help="Manual de comandos (derivado do core) read-only; alimenta a skill `menu`",
+    )
+    menu.add_argument("--workspace", required=True, help="Caminho do workspace")
+    menu.add_argument("--format", choices=["text", "json"], default="text")
+    menu.set_defaults(handler=run_menu)
+
+    repair = subparsers.add_parser("repair", help="Validar e reparar arquivos recriaveis do workspace")
+    repair.add_argument("--workspace", required=True, help="Caminho do workspace")
+    repair.add_argument("--format", choices=["json", "text"], default="text")
+    repair.set_defaults(handler=run_repair)
+
+    briefing = subparsers.add_parser("briefing", help="Painel local do dia (seed/backcompat); o briefing rico é conduzido pelo agente")
+    briefing.add_argument("--workspace", required=True, help="Caminho do workspace")
+    briefing.add_argument("--format", choices=["text", "json"], default="text")
+    briefing.add_argument(
+        "--mark-done",
+        action="store_true",
+        help="Só registra o briefing do dia como feito (não monta o painel). Usado ao final da curadoria rica.",
+    )
+    briefing.set_defaults(handler=run_briefing)
+
+    update = subparsers.add_parser(
+        "update",
+        aliases=["upgrade"],
+        help="Atualizar o runtime instalado pra versao remota mais recente",
+    )
+    update.add_argument(
+        "--check",
+        action="store_true",
+        help="Reporta versao remota e plano sem executar update.",
+    )
+    update.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Mostra o plano de update sem executar.",
+    )
+    update.add_argument(
+        "--format",
+        choices=["text", "json"],
+        default="text",
+        help="Formato de saida (json pra hosts/automacao).",
+    )
+    update.add_argument(
+        "--yes", "-y",
+        action="store_true",
+        help="Pula confirmacao interativa (pra CI/automacao).",
+    )
+    update.set_defaults(handler=run_update)
+
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    from prumo_runtime.version_check import check_and_notify
+
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    if getattr(args, "command", None) is None:
+        args = argparse.Namespace(command="start", workspace=None, format="text", handler=run_start)
+
+    check_and_notify(
+        command=getattr(args, "command", None),
+        format_arg=getattr(args, "format", None),
+    )
+
+    try:
+        return args.handler(args)
+    except WorkspaceError as exc:
+        parser.exit(2, f"erro: {exc}\n")

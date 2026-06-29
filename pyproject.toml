@@ -1,0 +1,72 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "prumo-runtime"
+version = "5.18.0"
+description = "Runtime local do Prumo"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+  { name = "Prumo Maintainers" }
+]
+dependencies = [
+  # zoneinfo da stdlib em Windows nao tem dados de timezone embutidos;
+  # macOS/Linux leem do sistema. Pin condicional pra evitar ZoneInfoNotFoundError.
+  'tzdata; sys_platform == "win32"',
+]
+
+[project.scripts]
+prumo = "prumo_runtime.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["runtime/prumo_runtime"]
+
+# Bundle de skills + manifesto + VERSION dentro do package, para que o
+# runtime instalado via pip/wheel ache os assets sem depender de o repo
+# estar montado ao lado (ver #82). force-include copia os caminhos a
+# partir do repo root para o destino dentro do package no wheel.
+[tool.hatch.build.targets.wheel.force-include]
+"skills" = "prumo_runtime/_bundled/skills"
+"plugin.json" = "prumo_runtime/_bundled/plugin.json"
+"VERSION" = "prumo_runtime/_bundled/VERSION"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/runtime/prumo_runtime",
+  "/skills",
+  "/plugin.json",
+  "/README.md",
+  "/CHANGELOG.md",
+  "/VERSION",
+  "/scripts/prumo_runtime_install.sh",
+  "/scripts/prumo_runtime_update.sh",
+  "/scripts/prumo_runtime_install.ps1",
+  "/scripts/prumo_runtime_update.ps1"
+]
+# skills/ e plugin.json estão aqui (além do force-include do wheel) porque
+# o force-include do wheel é resolvido em build time a partir do CWD. Build
+# wheel a partir do sdist extraído precisa que esses caminhos existam dentro
+# do tarball, senão hatchling falha com "Forced include not found". Garante
+# que sdist → wheel reconstrói exatamente o mesmo wheel publicado direto do
+# repo. Validado em CI por wheel-install-smoke (build via sdist).
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+# E: pycodestyle erros, F: pyflakes
+# I (isort) e UP (pyupgrade) entram quando o baseline for limpo
+select = ["E", "F"]
+ignore = [
+  "E501",  # line too long — ruff format cuida disso
+]
+
+[tool.coverage.run]
+source = ["prumo_runtime"]
+
+[tool.coverage.report]
+skip_empty = true
